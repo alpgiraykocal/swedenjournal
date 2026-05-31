@@ -260,8 +260,8 @@ function renderStory(data){
   const slug = requestedSlug || fallbackSlug;
   const s = (data.stories||[]).find(x=>x.slug===slug);
   if(!s){
-    updateMeta(data, {title:"Story not found", description:"The requested story could not be found.", path:"stories/", robots:"noindex,follow"});
-    $("#app").innerHTML = `<main class="container section"><p class="eyebrow">Story not found</p><h1 class="headline">This story is not available.</h1><p class="intro">The link may be outdated, or the story may have been removed.</p><p><a class="text-link" href="${root()}stories/index.html">Return to stories</a></p></main>`;
+    updateMeta(data, {title:"Hikâye bulunamadı", description:"Talep edilen hikâye mevcut değil.", path:"stories/", robots:"noindex,follow"});
+    $("#app").innerHTML = `<main class="container section"><p class="eyebrow">Hikâye bulunamadı</p><h1 class="headline">Bu hikâye mevcut değil.</h1><p class="intro">Bağlantı geçerliliğini yitirmiş veya hikâye kaldırılmış olabilir.</p><p><a class="text-link" href="${root()}stories/index.html">Return to stories</a></p></main>`;
     return;
   }
   const p = photo(data,s.heroPhotoId);
