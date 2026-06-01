@@ -1,0 +1,1705 @@
+{
+  "site": {
+    "ownerName": "Sweden Journal",
+    "siteTitle": "Photography & Travel Notes",
+    "tagline": "Photography, travel experiences, and quiet visual stories.",
+    "description": "A personal photo blog by Alpgiray Koçal: photography, travel notes, visual essays, and quiet observations.",
+    "instagramUrl": "https://www.instagram.com/alpgiraykocal/",
+    "instagramLabel": "@alpgiraykocal",
+    "footerText": "Photography, travel notes, and visual stories.",
+    "baseUrl": "https://alpgiraykocal.com"
+  },
+  "home": {
+    "eyebrow": "Personal photo blog",
+    "headline": "Quiet photographs from places, walks, and changing light.",
+    "intro": "A visual notebook for travel, observation, and the small atmospheres that remain after a journey.",
+    "heroPhotoId": "looking-toward-riddarholmen",
+    "featuredStorySlugs": [
+      "ales-stenar",
+      "church-of-old-uppsala"
+    ],
+    "galleryPhotoIds": [
+      "quiet-street-in-gamla-stan",
+      "crowded-street-in-gamla-stan",
+      "stone-ship-at-anundshog",
+      "ales-stenar-under-a-grey-sky"
+    ],
+    "closingTitle": "Collected slowly, edited carefully.",
+    "closingText": "This site is designed as a calm archive rather than a feed: fewer images, stronger rhythm, and enough space for each photograph to breathe."
+  },
+  "about": {
+    "eyebrow": "About",
+    "headline": "A personal archive of photographs, travel notes, and quiet observation.",
+    "portraitPhotoId": "anundshog-runestone-vs-13",
+    "paragraphs": [
+      "I photograph while walking: old streets, weathered façades, waterlines, ruins, signs, and the small details that make a place feel remembered rather than simply visited.",
+      "This site is my quiet archive for travel notes and selected photographs. I keep it slow on purpose: fewer images, more attention, and enough space for each frame to hold its own atmosphere.",
+      "I am drawn to Nordic heritage, historic cities, soft light, and places where ordinary movement meets older layers of memory. The result is part visual notebook, part travel journal, part personal map."
+    ]
+  },
+  "gallery": {
+    "eyebrow": "Gallery",
+    "headline": "Selected frames, organized by place, season, and mood.",
+    "intro": "A curated image-first archive. Use it as a quiet visual index rather than a chronological feed.",
+    "filters": [
+      "All",
+      "Street",
+      "Old Town",
+      "Architecture",
+      "Waterfront",
+      "Nordic Heritage",
+      "Runestone",
+      "Castle Architecture",
+      "Castle",
+      "Historic Architecture",
+      "Courtyard",
+      "Architectural Detail",
+      "Passage",
+      "Historic Detail",
+      "Urban Detail",
+      "Urban Life",
+      "Landscape",
+      "Travel",
+      "Ancient Landscape",
+      "Coastal Landscape",
+      "Cityscape",
+      "Street Moment",
+      "Old Town Detail"
+    ]
+  },
+  "storiesPage": {
+    "eyebrow": "Stories",
+    "headline": "Visual essays and travel notes.",
+    "intro": "Each story is built around place, light, movement, and a small sequence of photographs.",
+    "featuredLabel": "Featured story",
+    "categoryLabel": "Browse by category"
+  },
+  "photos": [
+    {
+      "id": "quiet-street-in-gamla-stan",
+      "title": "Quiet Street in Gamla Stan",
+      "location": "Gamla Stan, Stockholm, Sweden",
+      "season": "Spring",
+      "theme": "Street, Old Town, Urban Detail",
+      "date": "Summer 2026",
+      "tags": [
+        "Gamla Stan",
+        "Stockholm",
+        "Sweden",
+        "Street Photography",
+        "Old Town",
+        "Cobblestone Street",
+        "Travel",
+        "Nordic City",
+        "Swedish Flag"
+      ],
+      "src": "assets/images/photos/quiet-street-in-gamla-stan.jpeg",
+      "width": 6240,
+      "height": 4160,
+      "alt": "A quiet cobblestone street in Gamla Stan, Stockholm, lined with historic buildings, hanging signs, street lamps, flowers, and Swedish flags.",
+      "caption": "A quiet street scene in Gamla Stan, where cobblestones, historic façades, and Swedish flags create a calm and timeless atmosphere.",
+      "sortOrder": 10,
+      "featured": true,
+      "variants": {
+        "thumb": {
+          "jpeg": "assets/images/generated/thumb/quiet-street-in-gamla-stan.jpeg",
+          "webp": "assets/images/generated/thumb/quiet-street-in-gamla-stan.webp",
+          "width": 480,
+          "avif": "assets/images/generated/thumb/quiet-street-in-gamla-stan.avif"
+        },
+        "medium": {
+          "jpeg": "assets/images/generated/medium/quiet-street-in-gamla-stan.jpeg",
+          "webp": "assets/images/generated/medium/quiet-street-in-gamla-stan.webp",
+          "width": 1200,
+          "avif": "assets/images/generated/medium/quiet-street-in-gamla-stan.avif"
+        },
+        "full": {
+          "jpeg": "assets/images/generated/full/quiet-street-in-gamla-stan.jpeg",
+          "webp": "assets/images/generated/full/quiet-street-in-gamla-stan.webp",
+          "width": 2200,
+          "avif": "assets/images/generated/full/quiet-street-in-gamla-stan.avif"
+        }
+      }
+    },
+    {
+      "id": "crowded-street-in-gamla-stan",
+      "title": "Crowded Street in Gamla Stan",
+      "location": "Gamla Stan, Stockholm, Sweden",
+      "season": "Summer",
+      "theme": "Street, Old Town, Urban Life",
+      "date": "Summer 2026",
+      "tags": [
+        "Gamla Stan",
+        "Stockholm",
+        "Sweden",
+        "Street Photography",
+        "Old Town",
+        "Urban Life",
+        "Crowded Street",
+        "Travel",
+        "City Walk",
+        "Historic District"
+      ],
+      "src": "assets/images/photos/crowded-street-in-gamla-stan.jpeg",
+      "width": 6240,
+      "height": 4160,
+      "alt": "A crowded street in Gamla Stan, Stockholm, with people walking between historic buildings, shop signs, restaurants, and narrow old-town façades.",
+      "caption": "A busy summer street in Gamla Stan, where historic façades, restaurant signs, and passing crowds shape the rhythm of Stockholm’s old town.",
+      "sortOrder": 11,
+      "featured": true,
+      "variants": {
+        "thumb": {
+          "jpeg": "assets/images/generated/thumb/crowded-street-in-gamla-stan.jpeg",
+          "webp": "assets/images/generated/thumb/crowded-street-in-gamla-stan.webp",
+          "width": 480,
+          "avif": "assets/images/generated/thumb/crowded-street-in-gamla-stan.avif"
+        },
+        "medium": {
+          "jpeg": "assets/images/generated/medium/crowded-street-in-gamla-stan.jpeg",
+          "webp": "assets/images/generated/medium/crowded-street-in-gamla-stan.webp",
+          "width": 1200,
+          "avif": "assets/images/generated/medium/crowded-street-in-gamla-stan.avif"
+        },
+        "full": {
+          "jpeg": "assets/images/generated/full/crowded-street-in-gamla-stan.jpeg",
+          "webp": "assets/images/generated/full/crowded-street-in-gamla-stan.webp",
+          "width": 2200,
+          "avif": "assets/images/generated/full/crowded-street-in-gamla-stan.avif"
+        }
+      }
+    },
+    {
+      "id": "stockholm-city-hall",
+      "title": "Stockholm City Hall",
+      "location": "Stockholm, Sweden",
+      "season": "Summer",
+      "theme": "Architecture",
+      "date": "Summer 2026",
+      "tags": [
+        "Stockholm",
+        "Sweden",
+        "City Hall",
+        "Architecture",
+        "Waterfront",
+        "Nordic City",
+        "Travel Photography",
+        "Historic Landmark"
+      ],
+      "src": "assets/images/photos/stockholm-city-hall.jpeg",
+      "width": 5307,
+      "height": 3538,
+      "alt": "Stockholm City Hall seen from across the water, with its tall brick tower rising under a cloudy sky.",
+      "caption": "Stockholm City Hall stands quietly by the water, its brick tower framed by clouds and the soft rhythm of the city.",
+      "sortOrder": 12,
+      "featured": true,
+      "variants": {
+        "thumb": {
+          "jpeg": "assets/images/generated/thumb/stockholm-city-hall.jpeg",
+          "webp": "assets/images/generated/thumb/stockholm-city-hall.webp",
+          "width": 480,
+          "avif": "assets/images/generated/thumb/stockholm-city-hall.avif"
+        },
+        "medium": {
+          "jpeg": "assets/images/generated/medium/stockholm-city-hall.jpeg",
+          "webp": "assets/images/generated/medium/stockholm-city-hall.webp",
+          "width": 1200,
+          "avif": "assets/images/generated/medium/stockholm-city-hall.avif"
+        },
+        "full": {
+          "jpeg": "assets/images/generated/full/stockholm-city-hall.jpeg",
+          "webp": "assets/images/generated/full/stockholm-city-hall.webp",
+          "width": 2200,
+          "avif": "assets/images/generated/full/stockholm-city-hall.avif"
+        }
+      }
+    },
+    {
+      "id": "looking-toward-riddarholmen",
+      "title": "Looking Toward Riddarholmen",
+      "location": "Klara Mälarstrand, Stockholm, Sweden",
+      "season": "Summer",
+      "theme": "Waterfront, Cityscape, Street Moment",
+      "date": "Summer 2026",
+      "tags": [
+        "Stockholm",
+        "Sweden",
+        "Klara Mälarstrand",
+        "Riddarholmen",
+        "Waterfront",
+        "Cityscape",
+        "Street Photography",
+        "Old Man",
+        "Urban Stillness",
+        "Travel Photography"
+      ],
+      "src": "assets/images/photos/looking-toward-riddarholmen.jpeg",
+      "width": 4774,
+      "height": 3183,
+      "alt": "A view from Klara Mälarstrand in Stockholm looking across the water toward Riddarholmen, with an elderly man sitting alone by the waterfront in the foreground.",
+      "caption": "From Klara Mälarstrand, an elderly man sits quietly by the water, facing Riddarholmen and the layered skyline of Stockholm.",
+      "sortOrder": 13,
+      "featured": false,
+      "variants": {
+        "thumb": {
+          "jpeg": "assets/images/generated/thumb/looking-toward-riddarholmen.jpeg",
+          "webp": "assets/images/generated/thumb/looking-toward-riddarholmen.webp",
+          "width": 480,
+          "avif": "assets/images/generated/thumb/looking-toward-riddarholmen.avif"
+        },
+        "medium": {
+          "jpeg": "assets/images/generated/medium/looking-toward-riddarholmen.jpeg",
+          "webp": "assets/images/generated/medium/looking-toward-riddarholmen.webp",
+          "width": 1200,
+          "avif": "assets/images/generated/medium/looking-toward-riddarholmen.avif"
+        },
+        "full": {
+          "jpeg": "assets/images/generated/full/looking-toward-riddarholmen.jpeg",
+          "webp": "assets/images/generated/full/looking-toward-riddarholmen.webp",
+          "width": 2200,
+          "avif": "assets/images/generated/full/looking-toward-riddarholmen.avif"
+        }
+      }
+    },
+    {
+      "id": "view-toward-soder-malarstrand",
+      "title": "View Toward Söder Mälarstrand",
+      "location": "Södra Riddarholmshamnen, Stockholm, Sweden",
+      "season": "Summer",
+      "theme": "Waterfront, Cityscape",
+      "date": "Summer 2026",
+      "tags": [
+        "Stockholm",
+        "Sweden",
+        "Södra Riddarholmshamnen",
+        "Söder Mälarstrand",
+        "Mariahissen",
+        "Waterfront",
+        "Cityscape",
+        "Architecture",
+        "Travel Photography",
+        "Nordic City"
+      ],
+      "src": "assets/images/photos/view-toward-soder-malarstrand.jpeg",
+      "width": 6240,
+      "height": 4160,
+      "alt": "A waterfront view from Södra Riddarholmshamnen in Stockholm, looking across the water toward Söder Mälarstrand and Mariahissen, with historic buildings rising above the shoreline.",
+      "caption": "From Södra Riddarholmshamnen, the view opens across the water toward Söder Mälarstrand, where Mariahissen and the hillside buildings shape Stockholm’s layered skyline.",
+      "sortOrder": 14,
+      "featured": false,
+      "variants": {
+        "thumb": {
+          "jpeg": "assets/images/generated/thumb/view-toward-soder-malarstrand.jpeg",
+          "webp": "assets/images/generated/thumb/view-toward-soder-malarstrand.webp",
+          "width": 480,
+          "avif": "assets/images/generated/thumb/view-toward-soder-malarstrand.avif"
+        },
+        "medium": {
+          "jpeg": "assets/images/generated/medium/view-toward-soder-malarstrand.jpeg",
+          "webp": "assets/images/generated/medium/view-toward-soder-malarstrand.webp",
+          "width": 1200,
+          "avif": "assets/images/generated/medium/view-toward-soder-malarstrand.avif"
+        },
+        "full": {
+          "jpeg": "assets/images/generated/full/view-toward-soder-malarstrand.jpeg",
+          "webp": "assets/images/generated/full/view-toward-soder-malarstrand.webp",
+          "width": 2200,
+          "avif": "assets/images/generated/full/view-toward-soder-malarstrand.avif"
+        }
+      }
+    },
+    {
+      "id": "old-facade-gamla-stan",
+      "title": "Old Façade in Gamla Stan",
+      "location": "Gamla Stan, Stockholm, Sweden",
+      "season": "Summer",
+      "theme": "Architecture, Old Town Detail",
+      "date": "Summer 2026",
+      "tags": [
+        "Gamla Stan",
+        "Stockholm",
+        "Sweden",
+        "Old Town",
+        "Historic Building",
+        "Architecture",
+        "Façade",
+        "Urban Detail",
+        "Nordic City",
+        "Travel Photography"
+      ],
+      "src": "assets/images/photos/old-facade-gamla-stan.jpeg",
+      "width": 5553,
+      "height": 3702,
+      "alt": "An upward view of an old building façade in Gamla Stan, Stockholm, with a pale gabled wall, small windows, and warm-toned historic architecture below.",
+      "caption": "An old façade in Gamla Stan rises into the soft sky, revealing the quiet geometry and aged surfaces of Stockholm’s historic core.",
+      "sortOrder": 15,
+      "featured": false,
+      "variants": {
+        "thumb": {
+          "jpeg": "assets/images/generated/thumb/old-facade-gamla-stan.jpeg",
+          "webp": "assets/images/generated/thumb/old-facade-gamla-stan.webp",
+          "width": 480,
+          "avif": "assets/images/generated/thumb/old-facade-gamla-stan.avif"
+        },
+        "medium": {
+          "jpeg": "assets/images/generated/medium/old-facade-gamla-stan.jpeg",
+          "webp": "assets/images/generated/medium/old-facade-gamla-stan.webp",
+          "width": 1200,
+          "avif": "assets/images/generated/medium/old-facade-gamla-stan.avif"
+        },
+        "full": {
+          "jpeg": "assets/images/generated/full/old-facade-gamla-stan.jpeg",
+          "webp": "assets/images/generated/full/old-facade-gamla-stan.webp",
+          "width": 2200,
+          "avif": "assets/images/generated/full/old-facade-gamla-stan.avif"
+        }
+      }
+    },
+    {
+      "id": "yttre-borggarden-stockholm-cathedral",
+      "title": "Yttre Borggården and Stockholm Cathedral",
+      "location": "Gamla Stan, Stockholm, Sweden",
+      "season": "Summer",
+      "theme": "Architecture, Old Town",
+      "date": "Summer 2026",
+      "tags": [
+        "Gamla Stan",
+        "Stockholm",
+        "Sweden",
+        "Yttre Borggården",
+        "Stockholm Cathedral",
+        "Storkyrkan",
+        "Royal Palace",
+        "Old Town",
+        "Architecture",
+        "Courtyard",
+        "Travel Photography"
+      ],
+      "src": "assets/images/photos/yttre-borggarden-stockholm-cathedral.jpeg",
+      "width": 6240,
+      "height": 4160,
+      "alt": "A view from Yttre Borggården in Gamla Stan, Stockholm, with people standing in the courtyard and the tower of Stockholm Cathedral visible beyond the palace buildings.",
+      "caption": "From Yttre Borggården, the tower of Stockholm Cathedral rises beyond the palace courtyard, connecting the open square with the old city skyline.",
+      "sortOrder": 16,
+      "featured": false,
+      "variants": {
+        "thumb": {
+          "jpeg": "assets/images/generated/thumb/yttre-borggarden-stockholm-cathedral.jpeg",
+          "webp": "assets/images/generated/thumb/yttre-borggarden-stockholm-cathedral.webp",
+          "width": 480,
+          "avif": "assets/images/generated/thumb/yttre-borggarden-stockholm-cathedral.avif"
+        },
+        "medium": {
+          "jpeg": "assets/images/generated/medium/yttre-borggarden-stockholm-cathedral.jpeg",
+          "webp": "assets/images/generated/medium/yttre-borggarden-stockholm-cathedral.webp",
+          "width": 1200,
+          "avif": "assets/images/generated/medium/yttre-borggarden-stockholm-cathedral.avif"
+        },
+        "full": {
+          "jpeg": "assets/images/generated/full/yttre-borggarden-stockholm-cathedral.jpeg",
+          "webp": "assets/images/generated/full/yttre-borggarden-stockholm-cathedral.webp",
+          "width": 2200,
+          "avif": "assets/images/generated/full/yttre-borggarden-stockholm-cathedral.avif"
+        }
+      }
+    },
+    {
+      "id": "view-toward-the-german-church",
+      "title": "View Toward the German Church",
+      "location": "Gamla Stan, Stockholm, Sweden",
+      "season": "Summer",
+      "theme": "Old Town, Architecture",
+      "date": "Summer 2026",
+      "tags": [
+        "Gamla Stan",
+        "Stockholm",
+        "Sweden",
+        "German Church",
+        "Tyska kyrkan",
+        "Old Town",
+        "Architecture",
+        "Cobblestone Street",
+        "Nordic City",
+        "Travel Photography"
+      ],
+      "src": "assets/images/photos/view-toward-the-german-church.jpeg",
+      "width": 6240,
+      "height": 4160,
+      "alt": "A cobblestone street in Gamla Stan, Stockholm, leading toward the tower of the German Church between historic buildings.",
+      "caption": "A quiet view through Gamla Stan, where the tower of the German Church rises between old façades and cobblestone streets.",
+      "sortOrder": 17,
+      "featured": false,
+      "variants": {
+        "thumb": {
+          "jpeg": "assets/images/generated/thumb/view-toward-the-german-church.jpeg",
+          "webp": "assets/images/generated/thumb/view-toward-the-german-church.webp",
+          "width": 480,
+          "avif": "assets/images/generated/thumb/view-toward-the-german-church.avif"
+        },
+        "medium": {
+          "jpeg": "assets/images/generated/medium/view-toward-the-german-church.jpeg",
+          "webp": "assets/images/generated/medium/view-toward-the-german-church.webp",
+          "width": 1200,
+          "avif": "assets/images/generated/medium/view-toward-the-german-church.avif"
+        },
+        "full": {
+          "jpeg": "assets/images/generated/full/view-toward-the-german-church.jpeg",
+          "webp": "assets/images/generated/full/view-toward-the-german-church.webp",
+          "width": 2200,
+          "avif": "assets/images/generated/full/view-toward-the-german-church.avif"
+        }
+      }
+    },
+    {
+      "id": "stone-ship-at-anundshog",
+      "title": "Stone Ship at Anundshög",
+      "location": "Anundshög, Västerås, Sweden",
+      "date": "Spring 2026",
+      "season": "Spring",
+      "theme": "Nordic Heritage",
+      "tags": [
+        "Anundshög",
+        "Västerås",
+        "Sweden",
+        "Stone Ship",
+        "Ancient Site",
+        "Nordic Heritage",
+        "Burial Mound",
+        "Viking Age",
+        "Landscape",
+        "Travel Photography"
+      ],
+      "src": "assets/images/photos/stone-ship-at-anundshog.jpeg",
+      "width": 6240,
+      "height": 4160,
+      "alt": "A stone ship formation at Anundshög in Västerås, Sweden, surrounded by grassy burial mounds, leafless trees, and open Nordic landscape.",
+      "caption": "A stone ship at Anundshög, standing quietly among burial mounds and open fields near Västerås.",
+      "sortOrder": 18,
+      "featured": true,
+      "variants": {
+        "thumb": {
+          "jpeg": "assets/images/generated/thumb/stone-ship-at-anundshog.jpeg",
+          "webp": "assets/images/generated/thumb/stone-ship-at-anundshog.webp",
+          "width": 480,
+          "avif": "assets/images/generated/thumb/stone-ship-at-anundshog.avif"
+        },
+        "medium": {
+          "jpeg": "assets/images/generated/medium/stone-ship-at-anundshog.jpeg",
+          "webp": "assets/images/generated/medium/stone-ship-at-anundshog.webp",
+          "width": 1200,
+          "avif": "assets/images/generated/medium/stone-ship-at-anundshog.avif"
+        },
+        "full": {
+          "jpeg": "assets/images/generated/full/stone-ship-at-anundshog.jpeg",
+          "webp": "assets/images/generated/full/stone-ship-at-anundshog.webp",
+          "width": 2200,
+          "avif": "assets/images/generated/full/stone-ship-at-anundshog.avif"
+        }
+      }
+    },
+    {
+      "id": "anundshog-runestone-vs-13",
+      "title": "Anundshög Runestone, Vs 13",
+      "location": "Anundshög, Västerås, Sweden",
+      "date": "Spring 2026",
+      "season": "Spring",
+      "theme": "Runestone, Nordic Heritage",
+      "tags": [
+        "Anundshög",
+        "Västerås",
+        "Sweden",
+        "Runestone",
+        "Vs 13",
+        "Anundshögsstenen",
+        "Nordic Heritage",
+        "Viking Age",
+        "Rune Inscription",
+        "Ancient Site",
+        "Cultural Heritage"
+      ],
+      "src": "assets/images/photos/anundshog-runestone-vs-13.jpeg",
+      "width": 2773,
+      "height": 4160,
+      "alt": "The Anundshög Runestone, known as Vs 13, standing at Anundshög in Västerås, Sweden, with a runic inscription commemorating Heden, son of Folkvid and brother of Anund.",
+      "caption": "The Anundshög Runestone, Vs 13, bears the inscription: “Folkvid raised all these stones in memory of his son Heden, Anund’s brother. Vred carved the runes.”",
+      "sortOrder": 19,
+      "featured": false,
+      "variants": {
+        "thumb": {
+          "jpeg": "assets/images/generated/thumb/anundshog-runestone-vs-13.jpeg",
+          "webp": "assets/images/generated/thumb/anundshog-runestone-vs-13.webp",
+          "width": 480,
+          "avif": "assets/images/generated/thumb/anundshog-runestone-vs-13.avif"
+        },
+        "medium": {
+          "jpeg": "assets/images/generated/medium/anundshog-runestone-vs-13.jpeg",
+          "webp": "assets/images/generated/medium/anundshog-runestone-vs-13.webp",
+          "width": 1200,
+          "avif": "assets/images/generated/medium/anundshog-runestone-vs-13.avif"
+        },
+        "full": {
+          "jpeg": "assets/images/generated/full/anundshog-runestone-vs-13.jpeg",
+          "webp": "assets/images/generated/full/anundshog-runestone-vs-13.webp",
+          "width": 2200,
+          "avif": "assets/images/generated/full/anundshog-runestone-vs-13.avif"
+        }
+      }
+    },
+    {
+      "id": "round-bastion-at-landskrona-slott",
+      "title": "Round Bastion at Landskrona Slott",
+      "location": "Landskrona Slott, Landskrona, Sweden",
+      "date": "Spring 2026",
+      "season": "Spring",
+      "theme": "Castle Architecture",
+      "tags": [
+        "Landskrona",
+        "Sweden",
+        "Landskrona Slott",
+        "Landskrona Citadel",
+        "Castle",
+        "Bastion",
+        "Brick Architecture",
+        "Historic Landmark",
+        "Waterfront",
+        "Travel Photography"
+      ],
+      "src": "assets/images/photos/round-bastion-at-landskrona-slott.jpeg",
+      "width": 6240,
+      "height": 4160,
+      "alt": "A round red brick bastion at Landskrona Slott in Sweden, seen beside the water with historic castle buildings and a cloudy sky in the background.",
+      "caption": "A round bastion at Landskrona Slott, where red brick walls, water, and spring light meet in a quiet historic setting.",
+      "sortOrder": 21,
+      "featured": false,
+      "variants": {
+        "thumb": {
+          "jpeg": "assets/images/generated/thumb/round-bastion-at-landskrona-slott.jpeg",
+          "webp": "assets/images/generated/thumb/round-bastion-at-landskrona-slott.webp",
+          "width": 480,
+          "avif": "assets/images/generated/thumb/round-bastion-at-landskrona-slott.avif"
+        },
+        "medium": {
+          "jpeg": "assets/images/generated/medium/round-bastion-at-landskrona-slott.jpeg",
+          "webp": "assets/images/generated/medium/round-bastion-at-landskrona-slott.webp",
+          "width": 1200,
+          "avif": "assets/images/generated/medium/round-bastion-at-landskrona-slott.avif"
+        },
+        "full": {
+          "jpeg": "assets/images/generated/full/round-bastion-at-landskrona-slott.jpeg",
+          "webp": "assets/images/generated/full/round-bastion-at-landskrona-slott.webp",
+          "width": 2200,
+          "avif": "assets/images/generated/full/round-bastion-at-landskrona-slott.avif"
+        }
+      }
+    },
+    {
+      "id": "landskrona-slott-across-the-moat",
+      "title": "Landskrona Slott Across the Moat",
+      "location": "Landskrona Slott, Landskrona, Sweden",
+      "date": "Spring 2026",
+      "season": "Spring",
+      "theme": "Castle, Waterfront, Historic Architecture",
+      "tags": [
+        "Landskrona",
+        "Sweden",
+        "Landskrona Slott",
+        "Landskrona Citadel",
+        "Castle",
+        "Moat",
+        "Bridge",
+        "Brick Architecture",
+        "Historic Landmark",
+        "Swedish Heritage",
+        "Travel Photography"
+      ],
+      "src": "assets/images/photos/landskrona-slott-across-the-moat.jpeg",
+      "width": 6240,
+      "height": 4160,
+      "alt": "A wide view of Landskrona Slott in Sweden, with red brick castle buildings, a wooden bridge, the surrounding moat, and a bright cloudy sky.",
+      "caption": "Landskrona Slott stands across the moat, its red brick walls and wooden bridge reflected in the calm water.",
+      "sortOrder": 22,
+      "featured": true,
+      "variants": {
+        "thumb": {
+          "jpeg": "assets/images/generated/thumb/landskrona-slott-across-the-moat.jpeg",
+          "webp": "assets/images/generated/thumb/landskrona-slott-across-the-moat.webp",
+          "width": 480,
+          "avif": "assets/images/generated/thumb/landskrona-slott-across-the-moat.avif"
+        },
+        "medium": {
+          "jpeg": "assets/images/generated/medium/landskrona-slott-across-the-moat.jpeg",
+          "webp": "assets/images/generated/medium/landskrona-slott-across-the-moat.webp",
+          "width": 1200,
+          "avif": "assets/images/generated/medium/landskrona-slott-across-the-moat.avif"
+        },
+        "full": {
+          "jpeg": "assets/images/generated/full/landskrona-slott-across-the-moat.jpeg",
+          "webp": "assets/images/generated/full/landskrona-slott-across-the-moat.webp",
+          "width": 2200,
+          "avif": "assets/images/generated/full/landskrona-slott-across-the-moat.avif"
+        }
+      }
+    },
+    {
+      "id": "courtyard-of-landskrona-slott",
+      "title": "Courtyard of Landskrona Slott",
+      "location": "Landskrona Slott, Landskrona, Sweden",
+      "date": "Spring 2026",
+      "season": "Spring",
+      "theme": "Courtyard, Historic Architecture",
+      "tags": [
+        "Landskrona",
+        "Sweden",
+        "Landskrona Slott",
+        "Landskrona Citadel",
+        "Courtyard",
+        "Historic Buildings",
+        "Brick Architecture",
+        "Castle Interior",
+        "Swedish Heritage",
+        "Travel Photography"
+      ],
+      "src": "assets/images/photos/courtyard-of-landskrona-slott.jpeg",
+      "width": 6240,
+      "height": 4160,
+      "alt": "The inner courtyard of Landskrona Slott in Sweden, with pink and red brick historic buildings, green-framed windows, and a single person standing near the center.",
+      "caption": "Inside the courtyard of Landskrona Slott, weathered brick walls, muted pink façades, and open space create a quiet architectural rhythm.",
+      "sortOrder": 23,
+      "featured": false,
+      "variants": {
+        "thumb": {
+          "jpeg": "assets/images/generated/thumb/courtyard-of-landskrona-slott.jpeg",
+          "webp": "assets/images/generated/thumb/courtyard-of-landskrona-slott.webp",
+          "width": 480,
+          "avif": "assets/images/generated/thumb/courtyard-of-landskrona-slott.avif"
+        },
+        "medium": {
+          "jpeg": "assets/images/generated/medium/courtyard-of-landskrona-slott.jpeg",
+          "webp": "assets/images/generated/medium/courtyard-of-landskrona-slott.webp",
+          "width": 1200,
+          "avif": "assets/images/generated/medium/courtyard-of-landskrona-slott.avif"
+        },
+        "full": {
+          "jpeg": "assets/images/generated/full/courtyard-of-landskrona-slott.jpeg",
+          "webp": "assets/images/generated/full/courtyard-of-landskrona-slott.webp",
+          "width": 2200,
+          "avif": "assets/images/generated/full/courtyard-of-landskrona-slott.avif"
+        }
+      }
+    },
+    {
+      "id": "passage-through-landskrona-slott",
+      "title": "Passage Through Landskrona Slott",
+      "location": "Landskrona Slott, Landskrona, Sweden",
+      "date": "Spring 2026",
+      "season": "Spring",
+      "theme": "Architecture, Passage, Historic Detail",
+      "tags": [
+        "Landskrona",
+        "Sweden",
+        "Landskrona Slott",
+        "Landskrona Citadel",
+        "Castle Passage",
+        "Archway",
+        "Brick Walls",
+        "Historic Architecture",
+        "Bridge",
+        "Travel Photography"
+      ],
+      "src": "assets/images/photos/passage-through-landskrona-slott.jpeg",
+      "width": 6240,
+      "height": 4160,
+      "alt": "An arched passage inside Landskrona Slott, with red brick walls, white archways, and two people walking across the bridge in the distance.",
+      "caption": "A passage through Landskrona Slott frames the bridge beyond, turning brick, shadow, and daylight into a quiet architectural sequence.",
+      "sortOrder": 24,
+      "featured": false,
+      "variants": {
+        "thumb": {
+          "jpeg": "assets/images/generated/thumb/passage-through-landskrona-slott.jpeg",
+          "webp": "assets/images/generated/thumb/passage-through-landskrona-slott.webp",
+          "width": 480,
+          "avif": "assets/images/generated/thumb/passage-through-landskrona-slott.avif"
+        },
+        "medium": {
+          "jpeg": "assets/images/generated/medium/passage-through-landskrona-slott.jpeg",
+          "webp": "assets/images/generated/medium/passage-through-landskrona-slott.webp",
+          "width": 1200,
+          "avif": "assets/images/generated/medium/passage-through-landskrona-slott.avif"
+        },
+        "full": {
+          "jpeg": "assets/images/generated/full/passage-through-landskrona-slott.jpeg",
+          "webp": "assets/images/generated/full/passage-through-landskrona-slott.webp",
+          "width": 2200,
+          "avif": "assets/images/generated/full/passage-through-landskrona-slott.avif"
+        }
+      }
+    },
+    {
+      "id": "rooflines-of-landskrona-slott",
+      "title": "Rooflines of Landskrona Slott",
+      "location": "Landskrona Slott, Landskrona, Sweden",
+      "date": "Spring 2026",
+      "season": "Spring",
+      "theme": "Architectural Detail, Castle",
+      "tags": [
+        "Landskrona",
+        "Sweden",
+        "Landskrona Slott",
+        "Landskrona Citadel",
+        "Roofline",
+        "Brick Architecture",
+        "Castle Detail",
+        "Historic Building",
+        "Swedish Heritage",
+        "Travel Photography"
+      ],
+      "src": "assets/images/photos/rooflines-of-landskrona-slott.jpeg",
+      "width": 6240,
+      "height": 4160,
+      "alt": "A close architectural view of Landskrona Slott, showing red brick walls, tiled rooflines, a round tower roof, and blue sky with clouds above.",
+      "caption": "Red brick, tiled roofs, and soft clouds define the quiet architectural character of Landskrona Slott.",
+      "sortOrder": 25,
+      "featured": false,
+      "variants": {
+        "thumb": {
+          "jpeg": "assets/images/generated/thumb/rooflines-of-landskrona-slott.jpeg",
+          "webp": "assets/images/generated/thumb/rooflines-of-landskrona-slott.webp",
+          "width": 480,
+          "avif": "assets/images/generated/thumb/rooflines-of-landskrona-slott.avif"
+        },
+        "medium": {
+          "jpeg": "assets/images/generated/medium/rooflines-of-landskrona-slott.jpeg",
+          "webp": "assets/images/generated/medium/rooflines-of-landskrona-slott.webp",
+          "width": 1200,
+          "avif": "assets/images/generated/medium/rooflines-of-landskrona-slott.avif"
+        },
+        "full": {
+          "jpeg": "assets/images/generated/full/rooflines-of-landskrona-slott.jpeg",
+          "webp": "assets/images/generated/full/rooflines-of-landskrona-slott.webp",
+          "width": 2200,
+          "avif": "assets/images/generated/full/rooflines-of-landskrona-slott.avif"
+        }
+      }
+    },
+    {
+      "id": "ales-stenar-under-a-grey-sky",
+      "title": "Ales Stenar Under a Grey Sky",
+      "location": "Ales Stenar, Kåseberga, Skåne, Sweden",
+      "date": "Spring 2026",
+      "season": "Spring",
+      "theme": "Nordic Heritage, Ancient Landscape",
+      "tags": [
+        "Ales Stenar",
+        "Kåseberga",
+        "Skåne",
+        "Sweden",
+        "Stone Ship",
+        "Ancient Site",
+        "Nordic Heritage",
+        "Megalithic Monument",
+        "Coastal Landscape",
+        "Swedish Heritage",
+        "Travel Photography"
+      ],
+      "src": "assets/images/photos/ales-stenar-under-a-grey-sky.jpeg",
+      "width": 5252,
+      "height": 3501,
+      "alt": "Ales Stenar stone ship in Kåseberga, Sweden, with large standing stones arranged in a ship formation under a grey cloudy sky.",
+      "caption": "At Ales Stenar, standing stones form a quiet ship-shaped monument above the coast, held between open ground and a heavy Nordic sky.",
+      "sortOrder": 26,
+      "featured": true,
+      "variants": {
+        "thumb": {
+          "jpeg": "assets/images/generated/thumb/ales-stenar-under-a-grey-sky.jpeg",
+          "webp": "assets/images/generated/thumb/ales-stenar-under-a-grey-sky.webp",
+          "width": 480,
+          "avif": "assets/images/generated/thumb/ales-stenar-under-a-grey-sky.avif"
+        },
+        "medium": {
+          "jpeg": "assets/images/generated/medium/ales-stenar-under-a-grey-sky.jpeg",
+          "webp": "assets/images/generated/medium/ales-stenar-under-a-grey-sky.webp",
+          "width": 1200,
+          "avif": "assets/images/generated/medium/ales-stenar-under-a-grey-sky.avif"
+        },
+        "full": {
+          "jpeg": "assets/images/generated/full/ales-stenar-under-a-grey-sky.jpeg",
+          "webp": "assets/images/generated/full/ales-stenar-under-a-grey-sky.webp",
+          "width": 2200,
+          "avif": "assets/images/generated/full/ales-stenar-under-a-grey-sky.avif"
+        }
+      }
+    },
+    {
+      "id": "standing-stone-at-ales-stenar",
+      "title": "Standing Stone at Ales Stenar",
+      "location": "Ales Stenar, Kåseberga, Skåne, Sweden",
+      "date": "Spring 2026",
+      "season": "Spring",
+      "theme": "Nordic Heritage, Ancient Landscape",
+      "tags": [
+        "Ales Stenar",
+        "Kåseberga",
+        "Skåne",
+        "Sweden",
+        "Standing Stone",
+        "Stone Ship",
+        "Ancient Site",
+        "Nordic Heritage",
+        "Megalithic Monument",
+        "Coastal Landscape",
+        "Swedish Heritage",
+        "Travel Photography"
+      ],
+      "src": "assets/images/photos/standing-stone-at-ales-stenar.jpeg",
+      "width": 6240,
+      "height": 4160,
+      "alt": "A close view of a large standing stone at Ales Stenar in Kåseberga, Sweden, with other stones forming a ship-shaped monument under a grey cloudy sky.",
+      "caption": "A single standing stone anchors the view at Ales Stenar, surrounded by the wider stone ship and the muted openness of the Skåne coast.",
+      "sortOrder": 27,
+      "featured": false,
+      "variants": {
+        "thumb": {
+          "jpeg": "assets/images/generated/thumb/standing-stone-at-ales-stenar.jpeg",
+          "webp": "assets/images/generated/thumb/standing-stone-at-ales-stenar.webp",
+          "width": 480,
+          "avif": "assets/images/generated/thumb/standing-stone-at-ales-stenar.avif"
+        },
+        "medium": {
+          "jpeg": "assets/images/generated/medium/standing-stone-at-ales-stenar.jpeg",
+          "webp": "assets/images/generated/medium/standing-stone-at-ales-stenar.webp",
+          "width": 1200,
+          "avif": "assets/images/generated/medium/standing-stone-at-ales-stenar.avif"
+        },
+        "full": {
+          "jpeg": "assets/images/generated/full/standing-stone-at-ales-stenar.jpeg",
+          "webp": "assets/images/generated/full/standing-stone-at-ales-stenar.webp",
+          "width": 2200,
+          "avif": "assets/images/generated/full/standing-stone-at-ales-stenar.avif"
+        }
+      }
+    },
+    {
+      "id": "ales-stenar-on-the-horizon",
+      "title": "Ales Stenar on the Horizon",
+      "location": "Ales Stenar, Kåseberga, Skåne, Sweden",
+      "date": "Spring 2026",
+      "season": "Spring",
+      "theme": "Nordic Heritage, Coastal Landscape",
+      "tags": [
+        "Ales Stenar",
+        "Kåseberga",
+        "Skåne",
+        "Sweden",
+        "Stone Ship",
+        "Ancient Site",
+        "Nordic Heritage",
+        "Coastal Landscape",
+        "Megalithic Monument",
+        "Swedish Heritage",
+        "Travel Photography"
+      ],
+      "src": "assets/images/photos/ales-stenar-on-the-horizon.jpeg",
+      "width": 4793,
+      "height": 3195,
+      "alt": "A distant view of Ales Stenar in Kåseberga, Sweden, with standing stones silhouetted along the horizon under a wide grey sky and visitors walking nearby.",
+      "caption": "Ales Stenar stretches along the horizon, its standing stones silhouetted beneath a vast grey sky above the Skåne coast.",
+      "sortOrder": 28,
+      "featured": false,
+      "variants": {
+        "thumb": {
+          "jpeg": "assets/images/generated/thumb/ales-stenar-on-the-horizon.jpeg",
+          "webp": "assets/images/generated/thumb/ales-stenar-on-the-horizon.webp",
+          "width": 480,
+          "avif": "assets/images/generated/thumb/ales-stenar-on-the-horizon.avif"
+        },
+        "medium": {
+          "jpeg": "assets/images/generated/medium/ales-stenar-on-the-horizon.jpeg",
+          "webp": "assets/images/generated/medium/ales-stenar-on-the-horizon.webp",
+          "width": 1200,
+          "avif": "assets/images/generated/medium/ales-stenar-on-the-horizon.avif"
+        },
+        "full": {
+          "jpeg": "assets/images/generated/full/ales-stenar-on-the-horizon.jpeg",
+          "webp": "assets/images/generated/full/ales-stenar-on-the-horizon.webp",
+          "width": 2200,
+          "avif": "assets/images/generated/full/ales-stenar-on-the-horizon.avif"
+        }
+      }
+    },
+    {
+      "id": "church-of-old-uppsala",
+      "title": "Church of Old Uppsala",
+      "location": "Gamla Uppsala, Uppsala, Sweden",
+      "date": "Spring 2026",
+      "season": "Spring",
+      "theme": "Nordic Heritage, Historic Architecture",
+      "tags": [
+        "Gamla Uppsala",
+        "Uppsala",
+        "Sweden",
+        "Church of Old Uppsala",
+        "Gamla Uppsala Church",
+        "Nordic Heritage",
+        "Historic Church",
+        "Medieval Architecture",
+        "Cultural Heritage",
+        "Swedish Heritage",
+        "Travel Photography"
+      ],
+      "src": "assets/images/photos/church-of-old-uppsala.jpeg",
+      "width": 6240,
+      "height": 4160,
+      "alt": "The Church of Old Uppsala in Sweden, seen on a grassy hill surrounded by trees, with stone walls, a red brick gable, and a blue sky above.",
+      "caption": "The Church of Old Uppsala rises quietly above the grass, framed by trees, spring light, and the deep historical landscape of Gamla Uppsala.",
+      "sortOrder": 29,
+      "featured": false,
+      "variants": {
+        "thumb": {
+          "jpeg": "assets/images/generated/thumb/church-of-old-uppsala.jpeg",
+          "webp": "assets/images/generated/thumb/church-of-old-uppsala.webp",
+          "width": 480
+        },
+        "medium": {
+          "jpeg": "assets/images/generated/medium/church-of-old-uppsala.jpeg",
+          "webp": "assets/images/generated/medium/church-of-old-uppsala.webp",
+          "width": 1200
+        },
+        "full": {
+          "jpeg": "assets/images/generated/full/church-of-old-uppsala.jpeg",
+          "webp": "assets/images/generated/full/church-of-old-uppsala.webp",
+          "width": 2200
+        }
+      }
+    },
+    {
+      "id": "front-of-the-church-of-old-uppsala",
+      "title": "Front of the Church of Old Uppsala",
+      "location": "Gamla Uppsala, Uppsala, Sweden",
+      "date": "Spring 2026",
+      "season": "Spring",
+      "theme": "Nordic Heritage, Historic Architecture",
+      "tags": [
+        "Gamla Uppsala",
+        "Uppsala",
+        "Sweden",
+        "Church of Old Uppsala",
+        "Gamla Uppsala Church",
+        "Nordic Heritage",
+        "Historic Church",
+        "Medieval Architecture",
+        "Stone Church",
+        "Cultural Heritage",
+        "Travel Photography"
+      ],
+      "src": "assets/images/photos/front-of-the-church-of-old-uppsala.jpeg",
+      "width": 3958,
+      "height": 5937,
+      "alt": "The front façade of the Church of Old Uppsala in Sweden, showing a tall medieval stone church with a red brick entrance, benches, green grass, and a blue sky with clouds.",
+      "caption": "The front of the Church of Old Uppsala stands in clear spring light, its stone façade framed by grass, benches, and a wide blue sky.",
+      "sortOrder": 30,
+      "featured": false,
+      "variants": {
+        "thumb": {
+          "jpeg": "assets/images/generated/thumb/front-of-the-church-of-old-uppsala.jpeg",
+          "webp": "assets/images/generated/thumb/front-of-the-church-of-old-uppsala.webp",
+          "width": 480
+        },
+        "medium": {
+          "jpeg": "assets/images/generated/medium/front-of-the-church-of-old-uppsala.jpeg",
+          "webp": "assets/images/generated/medium/front-of-the-church-of-old-uppsala.webp",
+          "width": 1200
+        },
+        "full": {
+          "jpeg": "assets/images/generated/full/front-of-the-church-of-old-uppsala.jpeg",
+          "webp": "assets/images/generated/full/front-of-the-church-of-old-uppsala.webp",
+          "width": 2200
+        }
+      }
+    },
+    {
+      "id": "uppsala-church-bell-tower",
+      "title": "Uppsala Church Bell Tower",
+      "location": "Gamla Uppsala, Uppsala, Sweden",
+      "date": "Spring 2026",
+      "season": "Spring",
+      "theme": "Nordic Heritage, Historic Architecture",
+      "tags": [
+        "Gamla Uppsala",
+        "Uppsala",
+        "Sweden",
+        "Uppsala Church Bell Tower",
+        "Bell Tower",
+        "Churchyard",
+        "Nordic Heritage",
+        "Historic Architecture",
+        "Wooden Architecture",
+        "Cultural Heritage",
+        "Travel Photography"
+      ],
+      "src": "assets/images/photos/uppsala-church-bell-tower.jpeg",
+      "width": 6240,
+      "height": 4160,
+      "alt": "The wooden bell tower beside the Church of Old Uppsala in Sweden, standing among trees, gravestones, grass, and a bright spring sky.",
+      "caption": "Beside the Church of Old Uppsala, the wooden bell tower stands quietly among trees and gravestones, adding a warm historic presence to the churchyard.",
+      "sortOrder": 31,
+      "featured": false,
+      "variants": {
+        "thumb": {
+          "jpeg": "assets/images/generated/thumb/uppsala-church-bell-tower.jpeg",
+          "webp": "assets/images/generated/thumb/uppsala-church-bell-tower.webp",
+          "width": 480
+        },
+        "medium": {
+          "jpeg": "assets/images/generated/medium/uppsala-church-bell-tower.jpeg",
+          "webp": "assets/images/generated/medium/uppsala-church-bell-tower.webp",
+          "width": 1200
+        },
+        "full": {
+          "jpeg": "assets/images/generated/full/uppsala-church-bell-tower.jpeg",
+          "webp": "assets/images/generated/full/uppsala-church-bell-tower.webp",
+          "width": 2200
+        }
+      }
+    },
+    {
+      "id": "runestone-u978-old-uppsala-church",
+      "title": "Runestone U 978 at Old Uppsala Church",
+      "location": "Gamla Uppsala, Uppsala, Sweden",
+      "date": "Spring 2026",
+      "season": "Spring",
+      "theme": "Runestone, Nordic Heritage",
+      "tags": [
+        "Gamla Uppsala",
+        "Uppsala",
+        "Sweden",
+        "Runestone U 978",
+        "Old Uppsala Church",
+        "Viking Age",
+        "Rune Inscription",
+        "Nordic Heritage",
+        "Medieval Church",
+        "Cultural Heritage",
+        "Travel Photography"
+      ],
+      "src": "assets/images/photos/runestone-u-978-at-old-uppsala-church.jpeg",
+      "width": 4160,
+      "height": 6240,
+      "alt": "Runestone U 978 built into the wall of the Church of Old Uppsala in Sweden, showing a carved cross, runic inscription, and weathered stone surface.",
+      "caption": "Runestone U 978, set into the wall of the Church of Old Uppsala, carries the inscription: “Sigvid, the England traveller, raised this stone in memory of Vidjärv, his father …”",
+      "sortOrder": 32,
+      "featured": false,
+      "variants": {
+        "thumb": {
+          "jpeg": "assets/images/generated/thumb/runestone-u-978-at-old-uppsala-church.jpeg",
+          "webp": "assets/images/generated/thumb/runestone-u-978-at-old-uppsala-church.webp",
+          "width": 480
+        },
+        "medium": {
+          "jpeg": "assets/images/generated/medium/runestone-u-978-at-old-uppsala-church.jpeg",
+          "webp": "assets/images/generated/medium/runestone-u-978-at-old-uppsala-church.webp",
+          "width": 1200
+        },
+        "full": {
+          "jpeg": "assets/images/generated/full/runestone-u-978-at-old-uppsala-church.jpeg",
+          "webp": "assets/images/generated/full/runestone-u-978-at-old-uppsala-church.webp",
+          "width": 2200
+        }
+      }
+    },
+    {
+      "id": "lovanger-church",
+      "title": "Lövånger Church",
+      "location": "Lövånger, Västerbotten, Sweden",
+      "date": "Spring 2024",
+      "season": "Spring",
+      "theme": "Nordic Heritage, Historic Architecture",
+      "tags": [
+        "Lövånger",
+        "Västerbotten",
+        "Sweden",
+        "Lövånger Church",
+        "Lövånger Kyrka",
+        "Historic Church",
+        "Nordic Heritage",
+        "Wooden Bell Tower",
+        "Church Architecture",
+        "Swedish Heritage",
+        "Travel Photography"
+      ],
+      "src": "assets/images/photos/lovanger-church.jpeg",
+      "width": 5514,
+      "height": 3676,
+      "alt": "Lövånger Church in Västerbotten, Sweden, with a white church building, wooden bell tower, road signs, patches of snow, and a clear blue sky.",
+      "caption": "Lövånger Church stands in clear spring light, its white walls and wooden bell tower set against snow, road signs, and the quiet landscape of Västerbotten.",
+      "sortOrder": 33,
+      "featured": false,
+      "variants": {
+        "thumb": {
+          "jpeg": "assets/images/generated/thumb/lovanger-church.jpeg",
+          "webp": "assets/images/generated/thumb/lovanger-church.webp",
+          "width": 480
+        },
+        "medium": {
+          "jpeg": "assets/images/generated/medium/lovanger-church.jpeg",
+          "webp": "assets/images/generated/medium/lovanger-church.webp",
+          "width": 1200
+        },
+        "full": {
+          "jpeg": "assets/images/generated/full/lovanger-church.jpeg",
+          "webp": "assets/images/generated/full/lovanger-church.webp",
+          "width": 2200
+        }
+      }
+    },
+    {
+      "id": "lovanger-church-spring-light",
+      "title": "Lövånger Church in Spring Light",
+      "location": "Lövånger, Västerbotten, Sweden",
+      "date": "Spring 2024",
+      "season": "Spring",
+      "theme": "Nordic Heritage, Historic Architecture",
+      "tags": [
+        "Lövånger",
+        "Västerbotten",
+        "Sweden",
+        "Lövånger Church",
+        "Lövånger Kyrka",
+        "Historic Church",
+        "Nordic Heritage",
+        "Church Architecture",
+        "White Church",
+        "Spring Landscape",
+        "Swedish Heritage",
+        "Travel Photography"
+      ],
+      "src": "assets/images/photos/lovanger-church-in-spring-light.jpeg",
+      "width": 5637,
+      "height": 3758,
+      "alt": "Lövånger Church in Västerbotten, Sweden, seen from the side with white walls, a dark roof, patches of snow, bare trees, and a clear blue spring sky.",
+      "caption": "Lövånger Church stands in sharp spring light, its white walls and dark roof contrasting with melting snow and the clear northern sky.",
+      "sortOrder": 34,
+      "featured": false,
+      "variants": {
+        "thumb": {
+          "jpeg": "assets/images/generated/thumb/lovanger-church-in-spring-light.jpeg",
+          "webp": "assets/images/generated/thumb/lovanger-church-in-spring-light.webp",
+          "width": 480
+        },
+        "medium": {
+          "jpeg": "assets/images/generated/medium/lovanger-church-in-spring-light.jpeg",
+          "webp": "assets/images/generated/medium/lovanger-church-in-spring-light.webp",
+          "width": 1200
+        },
+        "full": {
+          "jpeg": "assets/images/generated/full/lovanger-church-in-spring-light.jpeg",
+          "webp": "assets/images/generated/full/lovanger-church-in-spring-light.webp",
+          "width": 2200
+        }
+      }
+    },
+    {
+      "id": "lovanger-kyrkstad",
+      "title": "Lövånger Kyrkstad",
+      "location": "Lövånger, Västerbotten, Sweden",
+      "date": "Spring 2024",
+      "season": "Spring",
+      "theme": "Nordic Heritage, Historic Architecture",
+      "tags": [
+        "Lövånger",
+        "Västerbotten",
+        "Sweden",
+        "Lövånger Kyrkstad",
+        "Church Town",
+        "Historic Wooden Houses",
+        "Nordic Heritage",
+        "Swedish Heritage",
+        "Red Wooden Buildings",
+        "Spring Snow",
+        "Travel Photography"
+      ],
+      "src": "assets/images/photos/lovanger-kyrkstad.jpeg",
+      "width": 6240,
+      "height": 4160,
+      "alt": "Red wooden church town cottages at Lövånger Kyrkstad in Västerbotten, Sweden, standing in spring snow under a clear blue sky.",
+      "caption": "Red wooden cottages line the snowy path at Lövånger Kyrkstad, preserving the quiet rhythm of a historic Swedish church town.",
+      "sortOrder": 35,
+      "featured": false,
+      "variants": {
+        "thumb": {
+          "jpeg": "assets/images/generated/thumb/lovanger-kyrkstad.jpeg",
+          "webp": "assets/images/generated/thumb/lovanger-kyrkstad.webp",
+          "width": 480
+        },
+        "medium": {
+          "jpeg": "assets/images/generated/medium/lovanger-kyrkstad.jpeg",
+          "webp": "assets/images/generated/medium/lovanger-kyrkstad.webp",
+          "width": 1200
+        },
+        "full": {
+          "jpeg": "assets/images/generated/full/lovanger-kyrkstad.jpeg",
+          "webp": "assets/images/generated/full/lovanger-kyrkstad.webp",
+          "width": 2200
+        }
+      }
+    },
+    {
+      "id": "cottage-lovanger-kyrkstad",
+      "title": "Cottage at Lövånger Kyrkstad",
+      "location": "Lövånger, Västerbotten, Sweden",
+      "date": "Spring 2024",
+      "season": "Spring",
+      "theme": "Nordic Heritage, Historic Architecture",
+      "tags": [
+        "Lövånger",
+        "Västerbotten",
+        "Sweden",
+        "Lövånger Kyrkstad",
+        "Church Town",
+        "Historic Wooden Cottage",
+        "Red Wooden Building",
+        "Nordic Heritage",
+        "Swedish Heritage",
+        "Spring Landscape",
+        "Travel Photography"
+      ],
+      "src": "assets/images/photos/cottage-at-lovanger-kyrkstad.jpeg",
+      "width": 5430,
+      "height": 3620,
+      "alt": "A red wooden cottage at Lövånger Kyrkstad in Västerbotten, Sweden, standing on rocky ground with a yellow door, wooden steps, bare trees, and a clear blue sky.",
+      "caption": "A small red cottage at Lövånger Kyrkstad stands on the rock, its yellow door and weathered steps preserving the quiet character of the historic church town.",
+      "sortOrder": 36,
+      "featured": false,
+      "variants": {
+        "thumb": {
+          "jpeg": "assets/images/generated/thumb/cottage-at-lovanger-kyrkstad.jpeg",
+          "webp": "assets/images/generated/thumb/cottage-at-lovanger-kyrkstad.webp",
+          "width": 480
+        },
+        "medium": {
+          "jpeg": "assets/images/generated/medium/cottage-at-lovanger-kyrkstad.jpeg",
+          "webp": "assets/images/generated/medium/cottage-at-lovanger-kyrkstad.webp",
+          "width": 1200
+        },
+        "full": {
+          "jpeg": "assets/images/generated/full/cottage-at-lovanger-kyrkstad.jpeg",
+          "webp": "assets/images/generated/full/cottage-at-lovanger-kyrkstad.webp",
+          "width": 2200
+        }
+      }
+    },
+    {
+      "id": "weathered-window-lovanger-kyrkstad",
+      "title": "Weathered Window at Lövånger Kyrkstad",
+      "location": "Lövånger, Västerbotten, Sweden",
+      "date": "Spring 2024",
+      "season": "Spring",
+      "theme": "Architectural Detail, Nordic Heritage",
+      "tags": [
+        "Lövånger",
+        "Västerbotten",
+        "Sweden",
+        "Lövånger Kyrkstad",
+        "Church Town",
+        "Wooden Detail",
+        "Weathered Window",
+        "Red Wooden Building",
+        "Nordic Heritage",
+        "Swedish Heritage",
+        "Travel Photography"
+      ],
+      "src": "assets/images/photos/weathered-window-at-lovanger-kyrkstad.jpeg",
+      "width": 6240,
+      "height": 4160,
+      "alt": "A close view of a weathered yellow wooden window shutter set into a red wooden building at Lövånger Kyrkstad in Västerbotten, Sweden.",
+      "caption": "A weathered yellow shutter set into red timber, preserving the texture, age, and quiet character of Lövånger Kyrkstad.",
+      "sortOrder": 37,
+      "featured": false,
+      "variants": {
+        "thumb": {
+          "jpeg": "assets/images/generated/thumb/weathered-window-at-lovanger-kyrkstad.jpeg",
+          "webp": "assets/images/generated/thumb/weathered-window-at-lovanger-kyrkstad.webp",
+          "width": 480
+        },
+        "medium": {
+          "jpeg": "assets/images/generated/medium/weathered-window-at-lovanger-kyrkstad.jpeg",
+          "webp": "assets/images/generated/medium/weathered-window-at-lovanger-kyrkstad.webp",
+          "width": 1200
+        },
+        "full": {
+          "jpeg": "assets/images/generated/full/weathered-window-at-lovanger-kyrkstad.jpeg",
+          "webp": "assets/images/generated/full/weathered-window-at-lovanger-kyrkstad.webp",
+          "width": 2200
+        }
+      }
+    }
+  ],
+  "stories": [
+    {
+      "slug": "anundshog",
+      "title": "Anundshög",
+      "location": "Västerås, Västmanland, Sweden",
+      "date": "Spring 2026",
+      "theme": "Ancient Landscape / Nordic Heritage / Travel",
+      "summary": "A walk through Anundshög near Västerås, one of Sweden’s most evocative ancient landscapes. This story explores the site’s great burial mound, stone ships, runestone, and open fields, reflecting on how memory, mythology, family, and Nordic heritage are preserved in the land.",
+      "heroPhotoId": "stone-ship-at-anundshog",
+      "tags": [
+        "Anundshög",
+        "Västerås",
+        "Västmanland",
+        "Sweden",
+        "Ancient History",
+        "Viking Age",
+        "Nordic Heritage",
+        "Burial Mound",
+        "Stone Ship",
+        "Rune Stone",
+        "Travel Photography",
+        "Landscape"
+      ],
+      "body": [
+        {
+          "type": "paragraph",
+          "text": "Anundshög is one of Sweden’s most atmospheric ancient sites, where burial mounds, stone ships, rune stones, and open fields come together in a quiet dialogue between landscape and memory. Located near Västerås, this historic place invites visitors to step into a world shaped by ritual, remembrance, and the deep traces of Sweden’s pre-Christian past."
+        },
+        {
+          "type": "paragraph",
+          "text": "At the heart of the site stands Sweden’s largest burial mound, traditionally associated with the legendary King Anund. Around it, ship-shaped stone settings, rune stones, and ancient roadways create a powerful historical landscape. These stones were not placed randomly; they formed part of a symbolic environment connected to travel, death, status, family, and collective memory."
+        },
+        {
+          "type": "paragraph",
+          "text": "Walking through Anundshög today feels like moving between history and mythology. The scale of the mound, the stillness of the stones, and the openness of the surrounding fields make the place more than an archaeological site. It is a reminder of how people once marked identity, power, belief, and remembrance directly into the land."
+        },
+        {
+          "type": "image",
+          "photoId": "anundshog-runestone-vs-13"
+        },
+        {
+          "type": "paragraph",
+          "text": "One of the most meaningful features of the site is the Anundshög Runestone, Vs 13. Its inscription reads: “Folkvid raised all these stones in memory of his son Heden, Anund’s brother. Vred carved the runes.” More than a carved text, it is a deeply personal voice from the Viking Age — a father’s act of remembrance, preserved in stone for nearly a thousand years."
+        },
+        {
+          "type": "paragraph",
+          "text": "For me, Anundshög is not only a place to visit, but a place to pause, observe, and imagine. Between the mound, the stone ships, and the runestone, the landscape holds a rare sense of continuity: a connection between the people who shaped it, the memories they wanted to preserve, and those who still walk among the stones today."
+        }
+      ],
+      "readingTime": "2 min read",
+      "featured": true,
+      "category": "Nordic Heritage",
+      "isoDate": "2026-04-12"
+    },
+    {
+      "slug": "landskrona-slott",
+      "title": "Landskrona Slott",
+      "location": "Landskrona, Skåne, Sweden",
+      "date": "Spring 2026",
+      "theme": "Castle Architecture, Nordic Heritage, Waterfront",
+      "summary": "Landskrona Slott is one of Sweden’s best-preserved Renaissance fortresses, surrounded by moats, green ramparts, and the quiet atmosphere of the Öresund coast. This story follows a walk through the castle’s courtyards, passages, brick walls, and waterside setting, reflecting on its military past, architectural character, and enduring presence in southern Sweden.",
+      "heroPhotoId": "landskrona-slott-across-the-moat",
+      "tags": [
+        "Landskrona Slott",
+        "Landskrona",
+        "Skåne",
+        "Sweden",
+        "Castle",
+        "Castle Architecture",
+        "Renaissance Fortress",
+        "Historic Architecture",
+        "Nordic Heritage",
+        "Waterfront",
+        "Moat",
+        "Courtyard",
+        "Brick Architecture",
+        "Historic Detail",
+        "Passage",
+        "Travel Photography"
+      ],
+      "body": [
+        {
+          "type": "paragraph",
+          "text": "Landskrona Slott stands close to the waterfront in Landskrona, where brick walls, deep moats, and open green spaces create one of southern Sweden’s most atmospheric historic settings. The castle was built in the 16th century, during a period when control of the Öresund region was strategically important. Today, it feels calm and almost restrained, but its architecture still carries the logic of defence, power, and territorial control."
+        },
+        {
+          "type": "image",
+          "photoId": "rooflines-of-landskrona-slott"
+        },
+        {
+          "type": "paragraph",
+          "text": "Approaching the castle, the first impression is its strong geometric order. The red brick façades, arched entrances, narrow passages, and heavy walls create a clear sense of permanence. Unlike romantic castle ruins, Landskrona Slott feels practical and disciplined. Its beauty comes not from decoration, but from proportion, material, and the relationship between architecture and landscape."
+        },
+        {
+          "type": "heading",
+          "text": "A Fortress Shaped by the Öresund Landscape"
+        },
+        {
+          "type": "paragraph",
+          "text": "The castle’s surrounding moat is central to its character. Water softens the military form of the fortress, reflecting the walls and opening the space around them. From different angles, the site shifts between castle, island, park, and defensive structure. This balance between strength and stillness gives Landskrona Slott a distinctive Nordic atmosphere."
+        },
+        {
+          "type": "quote",
+          "text": "“Landskrona Slott is not only a castle to look at, but a place to walk through slowly — where brick, water, and silence reveal the layers of history.”"
+        },
+        {
+          "type": "paragraph",
+          "text": "Inside the castle area, details become more intimate. Doorways, stone paths, vaulted passages, and weathered surfaces show how the site has been used, adapted, and preserved over time. Every architectural element feels connected to function: movement, protection, visibility, and control. Yet the present-day experience is peaceful, shaped by walking, observation, and quiet reflection."
+        },
+        {
+          "type": "image",
+          "photoId": "courtyard-of-landskrona-slott"
+        },
+        {
+          "type": "heading",
+          "text": "Between Defence, Memory, and Modern Calm"
+        },
+        {
+          "type": "paragraph",
+          "text": "What makes Landskrona Slott memorable is the contrast between its original purpose and its current atmosphere. Built for security and military strength, it now invites visitors into a slower encounter with history. The surrounding parkland, water, and open sky make the fortress feel integrated into daily life rather than separated from it."
+        },
+        {
+          "type": "paragraph",
+          "text": "Walking around Landskrona Slott is a reminder that Nordic heritage is often quiet rather than dramatic. The site does not need to overwhelm the visitor. Its impact comes through repetition and detail: brick against water, shadows under arches, grass-covered ramparts, and the measured rhythm of the castle walls. In this stillness, the past remains present without becoming distant."
+        }
+      ],
+      "readingTime": "2 min read",
+      "featured": true,
+      "category": "Castle Architecture",
+      "isoDate": "2026-04-20"
+    },
+    {
+      "slug": "ales-stenar",
+      "title": "Ales Stenar",
+      "location": "Ales Stenar, Kåseberga, Skåne, Sweden",
+      "date": "Spring 2026",
+      "readingTime": "2 min read",
+      "category": "Travel Notes",
+      "theme": "Nordic Heritage, Coastal Landscape",
+      "summary": "Ales Stenar stands on the southern coast of Sweden, where ancient stones, open fields, sea air, and a vast grey sky create one of Skåne’s most atmospheric landscapes. This story follows a quiet walk around the stone ship, observing its scale, silence, and connection to Nordic memory.",
+      "heroPhotoId": "ales-stenar-under-a-grey-sky",
+      "featured": true,
+      "tags": [
+        "Ales Stenar",
+        "Kåseberga",
+        "Skåne",
+        "Sweden",
+        "Nordic Heritage",
+        "Stone Ship",
+        "Ancient Site",
+        "Coastal Landscape",
+        "Megalithic Monument",
+        "Swedish Heritage",
+        "Travel Photography"
+      ],
+      "body": [
+        {
+          "type": "paragraph",
+          "text": "On the southern edge of Sweden, Ales Stenar rises quietly above the coast. The stones stand in the shape of a ship, arranged across open ground where the wind moves freely and the sky feels unusually large. From a distance, the monument appears almost simple: a line of upright stones on the horizon. But as you walk closer, its scale becomes more physical, more silent, and more difficult to reduce to a single explanation."
+        },
+        {
+          "type": "image",
+          "photoId": "ales-stenar-on-the-horizon",
+          "caption": "Ales Stenar stretches along the horizon, its standing stones silhouetted beneath a vast grey sky above the Skåne coast."
+        },
+        {
+          "type": "paragraph",
+          "text": "The landscape is part of the experience. There is no heavy architecture around the site, no dramatic framing, and no attempt to separate the monument from the land. The stones belong to the field, the sea, the path, and the changing weather. Under a grey Nordic sky, the place feels restrained and monumental at the same time."
+        },
+        {
+          "type": "image",
+          "photoId": "ales-stenar-under-a-grey-sky",
+          "caption": "At Ales Stenar, standing stones form a quiet ship-shaped monument above the coast, held between open ground and a heavy Nordic sky."
+        },
+        {
+          "type": "heading",
+          "text": "A ship made of stone"
+        },
+        {
+          "type": "paragraph",
+          "text": "Seen from within the formation, the individual stones become more expressive. Some are tall and narrow, others rough, pale, dark, or weathered by time. Their arrangement gives the site its shape, but their surfaces give it texture. Each stone feels separate, yet together they create a rhythm that pulls the eye through the monument like a slow procession."
+        },
+        {
+          "type": "image",
+          "photoId": "standing-stone-at-ales-stenar",
+          "caption": "A single standing stone anchors the view at Ales Stenar, surrounded by the wider stone ship and the muted openness of the Skåne coast."
+        },
+        {
+          "type": "paragraph",
+          "text": "What makes Ales Stenar powerful is not only its age or mystery, but the way it holds space. It does not explain itself immediately. It invites observation: the distance between stones, the low coastline, the movement of visitors, the wind across the grass, and the heavy light of the afternoon. The site feels less like an object to look at and more like a place to move through slowly."
+        },
+        {
+          "type": "quote",
+          "text": "Ales Stenar is not loud. Its presence comes from stone, distance, wind, and the long memory of the coast."
+        },
+        {
+          "type": "paragraph",
+          "text": "Leaving the stones, the view remains simple: open land, sea beyond the edge, and a line of ancient forms against the sky. The memory of the place is not decorative or romantic. It is quiet, exposed, and grounded — a meeting between landscape and time on the southern coast of Sweden."
+        }
+      ],
+      "isoDate": "2026-05-03"
+    },
+    {
+      "slug": "church-of-old-uppsala",
+      "title": "Church of Old Uppsala",
+      "location": "Gamla Uppsala, Uppsala, Sweden",
+      "date": "Spring 2026",
+      "readingTime": "2 min read",
+      "category": "Travel Notes",
+      "theme": "Nordic Heritage, Historic Architecture",
+      "summary": "In Gamla Uppsala, history gathers around a quiet medieval church, a wooden bell tower, old stone walls, and a runestone set into the church façade. This story follows a walk through one of Sweden’s most historically layered places, where Christian architecture, Viking Age memory, and the open landscape of Old Uppsala meet.",
+      "heroPhotoId": "church-of-old-uppsala",
+      "featured": false,
+      "tags": [
+        "Gamla Uppsala",
+        "Uppsala",
+        "Sweden",
+        "Church of Old Uppsala",
+        "Gamla Uppsala Church",
+        "Nordic Heritage",
+        "Historic Church",
+        "Medieval Architecture",
+        "Runestone",
+        "Bell Tower",
+        "Swedish Heritage",
+        "Travel Photography"
+      ],
+      "body": [
+        {
+          "type": "paragraph",
+          "text": "In Gamla Uppsala, the church stands on a landscape already full of memory. Before reaching the entrance, the place feels older than its walls: grass, trees, burial mounds, stone, and sky all seem to belong to the same historical field. The Church of Old Uppsala does not dominate the landscape aggressively. It rises quietly from it, carrying the weight of centuries with restraint."
+        },
+        {
+          "type": "image",
+          "photoId": "church-of-old-uppsala",
+          "caption": "The Church of Old Uppsala rises quietly above the grass, framed by trees, spring light, and the deep historical landscape of Gamla Uppsala."
+        },
+        {
+          "type": "paragraph",
+          "text": "The building’s stone walls, red brick details, and steep roof create a simple but powerful presence. From a distance, the church feels almost hidden among trees and grass. From the front, it becomes more direct: a medieval façade shaped by stone, shadow, and the clear blue light of spring."
+        },
+        {
+          "type": "image",
+          "photoId": "front-of-the-church-of-old-uppsala",
+          "caption": "The front of the Church of Old Uppsala stands in clear spring light, its stone façade framed by grass, benches, and a wide blue sky."
+        },
+        {
+          "type": "heading",
+          "text": "Stone, wood, and memory"
+        },
+        {
+          "type": "paragraph",
+          "text": "Beside the church, the wooden bell tower adds another material voice to the site. Its red timber and steep shingled roof contrast with the heavier stone of the church, but the two structures feel connected by purpose and place. Together, they create a small architectural ensemble: modest, historic, and deeply rooted in the churchyard around them."
+        },
+        {
+          "type": "image",
+          "photoId": "uppsala-church-bell-tower",
+          "caption": "Beside the Church of Old Uppsala, the wooden bell tower stands quietly among trees and gravestones, adding a warm historic presence to the churchyard."
+        },
+        {
+          "type": "paragraph",
+          "text": "One of the most striking details is Runestone U 978, built into the church wall. Its carved cross and runic inscription connect different layers of belief, language, and remembrance. The stone carries the words: “Sigvid, the England traveller, raised this stone in memory of Vidjärv, his father …” Set into the church itself, it becomes both an object of memory and part of the architecture."
+        },
+        {
+          "type": "image",
+          "photoId": "runestone-u978-old-uppsala-church",
+          "caption": "Runestone U 978, set into the wall of the Church of Old Uppsala, carries the inscription: “Sigvid, the England traveller, raised this stone in memory of Vidjärv, his father …”"
+        },
+        {
+          "type": "quote",
+          "text": "At Old Uppsala, history is not held in a single monument. It is spread across stone, timber, grass, inscriptions, and the quiet spaces between them."
+        },
+        {
+          "type": "paragraph",
+          "text": "What makes the Church of Old Uppsala memorable is not only its architecture, but its position within a larger cultural landscape. The site feels like a meeting point between eras: Viking Age memory, medieval Christianity, rural Sweden, and the present-day visitor moving slowly through the churchyard. It is a place where history remains visible, but never loud."
+        }
+      ],
+      "isoDate": "2026-05-10"
+    },
+    {
+      "slug": "lovanger-church",
+      "title": "Lövånger Church",
+      "location": "Lövånger, Västerbotten, Sweden",
+      "date": "Spring 2024",
+      "readingTime": "2 min read",
+      "category": "Travel Notes",
+      "theme": "Nordic Heritage, Historic Architecture",
+      "summary": "In Lövånger, a white historic church, a wooden bell tower, and a preserved church town stand together in the quiet landscape of Västerbotten. This story follows a spring visit shaped by clear northern light, melting snow, red timber cottages, and the calm rhythm of Swedish cultural heritage.",
+      "heroPhotoId": "lovanger-church-spring-light",
+      "featured": false,
+      "tags": [
+        "Lövånger",
+        "Västerbotten",
+        "Sweden",
+        "Lövånger Church",
+        "Lövånger Kyrka",
+        "Lövånger Kyrkstad",
+        "Church Town",
+        "Nordic Heritage",
+        "Historic Church",
+        "Wooden Architecture",
+        "Swedish Heritage",
+        "Travel Photography"
+      ],
+      "body": [
+        {
+          "type": "paragraph",
+          "text": "Lövånger Church stands in a quiet part of Västerbotten, surrounded by open light, snow traces, road signs, and the stillness of early spring. The first impression is simple and clear: white walls, a dark roof, a wooden bell tower, and a landscape that feels calm rather than monumental. Nothing here feels staged. The place carries its history with restraint."
+        },
+        {
+          "type": "image",
+          "photoId": "lovanger-church-spring-light",
+          "caption": "Lövånger Church stands in sharp spring light, its white walls and dark roof contrasting with melting snow and the clear northern sky."
+        },
+        {
+          "type": "paragraph",
+          "text": "From another angle, the church appears more connected to its surroundings. The bell tower, the patches of snow, and the road leading past the site all place the building within everyday life. It is not only a historic object, but part of a lived landscape — a church beside roads, trees, signs, and the seasonal change of northern Sweden."
+        },
+        {
+          "type": "image",
+          "photoId": "lovanger-church",
+          "caption": "Lövånger Church stands in clear spring light, its white walls and wooden bell tower set against snow, road signs, and the quiet landscape of Västerbotten."
+        },
+        {
+          "type": "heading",
+          "text": "The church town beside the church"
+        },
+        {
+          "type": "paragraph",
+          "text": "Close to the church, Lövånger Kyrkstad preserves another layer of the place. The red wooden cottages form a small historic church town, built around the practical and social life connected to church visits. Their scale is modest, but their presence is strong: timber walls, small windows, yellow doors, snow-covered paths, and the deep red color so closely associated with rural Sweden."
+        },
+        {
+          "type": "image",
+          "photoId": "lovanger-kyrkstad",
+          "caption": "Red wooden cottages line the snowy path at Lövånger Kyrkstad, preserving the quiet rhythm of a historic Swedish church town."
+        },
+        {
+          "type": "paragraph",
+          "text": "Individual cottages reveal the character of the church town more closely. A small red building stands on rock, reached by a simple wooden stair. Its yellow door and compact form give the place a human scale. The architecture is not decorative in a grand sense; its beauty comes from use, weather, material, and time."
+        },
+        {
+          "type": "image",
+          "photoId": "cottage-lovanger-kyrkstad",
+          "caption": "A small red cottage at Lövånger Kyrkstad stands on the rock, its yellow door and weathered steps preserving the quiet character of the historic church town."
+        },
+        {
+          "type": "heading",
+          "text": "Wood, color, and weather"
+        },
+        {
+          "type": "paragraph",
+          "text": "The details are as important as the wider views. A weathered shutter, peeling yellow paint, white trim, and red timber show how the buildings have aged in place. These surfaces make the history feel physical. They are not polished smooth; they hold marks of climate, repair, use, and exposure."
+        },
+        {
+          "type": "image",
+          "photoId": "weathered-window-lovanger-kyrkstad",
+          "caption": "A weathered yellow shutter set into red timber, preserving the texture, age, and quiet character of Lövånger Kyrkstad."
+        },
+        {
+          "type": "quote",
+          "text": "In Lövånger, history feels less like a monument and more like a settlement of wood, snow, light, and memory."
+        },
+        {
+          "type": "paragraph",
+          "text": "What remains after leaving Lövånger is the clarity of the place: the white church, the red cottages, the dark roofs, and the cold brightness of spring. It is a quiet historical landscape, built from practical forms and enduring materials. Its atmosphere comes from simplicity — and from the way each building still seems to belong exactly where it stands."
+        }
+      ],
+      "isoDate": "2024-04-08"
+    }
+  ]
+}
