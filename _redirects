@@ -1,5 +1,0 @@
-# Block raw local source photos if the workspace folder is uploaded by mistake
-/assets/images/photos/* /404.html 404
-
-# Catch-all 404
-/* /404.html 404
