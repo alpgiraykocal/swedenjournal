@@ -1136,20 +1136,20 @@
         "thumb": {
           "jpeg": "assets/images/generated/thumb/lovanger-church.jpeg",
           "webp": "assets/images/generated/thumb/lovanger-church.webp",
-          "avif": "assets/images/generated/thumb/lovanger-church.avif",
-          "width": 480
+          "width": 480,
+          "avif": "assets/images/generated/thumb/lovanger-church.avif"
         },
         "medium": {
           "jpeg": "assets/images/generated/medium/lovanger-church.jpeg",
           "webp": "assets/images/generated/medium/lovanger-church.webp",
-          "avif": "assets/images/generated/medium/lovanger-church.avif",
-          "width": 1200
+          "width": 1200,
+          "avif": "assets/images/generated/medium/lovanger-church.avif"
         },
         "full": {
           "jpeg": "assets/images/generated/full/lovanger-church.jpeg",
           "webp": "assets/images/generated/full/lovanger-church.webp",
-          "avif": "assets/images/generated/full/lovanger-church.avif",
-          "width": 2200
+          "width": 2200,
+          "avif": "assets/images/generated/full/lovanger-church.avif"
         }
       }
     },
@@ -1185,20 +1185,20 @@
         "thumb": {
           "jpeg": "assets/images/generated/thumb/lovanger-church-in-spring-light.jpeg",
           "webp": "assets/images/generated/thumb/lovanger-church-in-spring-light.webp",
-          "avif": "assets/images/generated/thumb/lovanger-church-in-spring-light.avif",
-          "width": 480
+          "width": 480,
+          "avif": "assets/images/generated/thumb/lovanger-church-in-spring-light.avif"
         },
         "medium": {
           "jpeg": "assets/images/generated/medium/lovanger-church-in-spring-light.jpeg",
           "webp": "assets/images/generated/medium/lovanger-church-in-spring-light.webp",
-          "avif": "assets/images/generated/medium/lovanger-church-in-spring-light.avif",
-          "width": 1200
+          "width": 1200,
+          "avif": "assets/images/generated/medium/lovanger-church-in-spring-light.avif"
         },
         "full": {
           "jpeg": "assets/images/generated/full/lovanger-church-in-spring-light.jpeg",
           "webp": "assets/images/generated/full/lovanger-church-in-spring-light.webp",
-          "avif": "assets/images/generated/full/lovanger-church-in-spring-light.avif",
-          "width": 2200
+          "width": 2200,
+          "avif": "assets/images/generated/full/lovanger-church-in-spring-light.avif"
         }
       }
     },
@@ -1233,20 +1233,20 @@
         "thumb": {
           "jpeg": "assets/images/generated/thumb/lovanger-kyrkstad.jpeg",
           "webp": "assets/images/generated/thumb/lovanger-kyrkstad.webp",
-          "avif": "assets/images/generated/thumb/lovanger-kyrkstad.avif",
-          "width": 480
+          "width": 480,
+          "avif": "assets/images/generated/thumb/lovanger-kyrkstad.avif"
         },
         "medium": {
           "jpeg": "assets/images/generated/medium/lovanger-kyrkstad.jpeg",
           "webp": "assets/images/generated/medium/lovanger-kyrkstad.webp",
-          "avif": "assets/images/generated/medium/lovanger-kyrkstad.avif",
-          "width": 1200
+          "width": 1200,
+          "avif": "assets/images/generated/medium/lovanger-kyrkstad.avif"
         },
         "full": {
           "jpeg": "assets/images/generated/full/lovanger-kyrkstad.jpeg",
           "webp": "assets/images/generated/full/lovanger-kyrkstad.webp",
-          "avif": "assets/images/generated/full/lovanger-kyrkstad.avif",
-          "width": 2200
+          "width": 2200,
+          "avif": "assets/images/generated/full/lovanger-kyrkstad.avif"
         }
       }
     },
@@ -1281,20 +1281,20 @@
         "thumb": {
           "jpeg": "assets/images/generated/thumb/cottage-at-lovanger-kyrkstad.jpeg",
           "webp": "assets/images/generated/thumb/cottage-at-lovanger-kyrkstad.webp",
-          "avif": "assets/images/generated/thumb/cottage-at-lovanger-kyrkstad.avif",
-          "width": 480
+          "width": 480,
+          "avif": "assets/images/generated/thumb/cottage-at-lovanger-kyrkstad.avif"
         },
         "medium": {
           "jpeg": "assets/images/generated/medium/cottage-at-lovanger-kyrkstad.jpeg",
           "webp": "assets/images/generated/medium/cottage-at-lovanger-kyrkstad.webp",
-          "avif": "assets/images/generated/medium/cottage-at-lovanger-kyrkstad.avif",
-          "width": 1200
+          "width": 1200,
+          "avif": "assets/images/generated/medium/cottage-at-lovanger-kyrkstad.avif"
         },
         "full": {
           "jpeg": "assets/images/generated/full/cottage-at-lovanger-kyrkstad.jpeg",
           "webp": "assets/images/generated/full/cottage-at-lovanger-kyrkstad.webp",
-          "avif": "assets/images/generated/full/cottage-at-lovanger-kyrkstad.avif",
-          "width": 2200
+          "width": 2200,
+          "avif": "assets/images/generated/full/cottage-at-lovanger-kyrkstad.avif"
         }
       }
     },
@@ -1329,20 +1329,20 @@
         "thumb": {
           "jpeg": "assets/images/generated/thumb/weathered-window-at-lovanger-kyrkstad.jpeg",
           "webp": "assets/images/generated/thumb/weathered-window-at-lovanger-kyrkstad.webp",
-          "avif": "assets/images/generated/thumb/weathered-window-at-lovanger-kyrkstad.avif",
-          "width": 480
+          "width": 480,
+          "avif": "assets/images/generated/thumb/weathered-window-at-lovanger-kyrkstad.avif"
         },
         "medium": {
           "jpeg": "assets/images/generated/medium/weathered-window-at-lovanger-kyrkstad.jpeg",
           "webp": "assets/images/generated/medium/weathered-window-at-lovanger-kyrkstad.webp",
-          "avif": "assets/images/generated/medium/weathered-window-at-lovanger-kyrkstad.avif",
-          "width": 1200
+          "width": 1200,
+          "avif": "assets/images/generated/medium/weathered-window-at-lovanger-kyrkstad.avif"
         },
         "full": {
           "jpeg": "assets/images/generated/full/weathered-window-at-lovanger-kyrkstad.jpeg",
           "webp": "assets/images/generated/full/weathered-window-at-lovanger-kyrkstad.webp",
-          "avif": "assets/images/generated/full/weathered-window-at-lovanger-kyrkstad.avif",
-          "width": 2200
+          "width": 2200,
+          "avif": "assets/images/generated/full/weathered-window-at-lovanger-kyrkstad.avif"
         }
       }
     }

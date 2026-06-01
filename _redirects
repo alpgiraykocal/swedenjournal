@@ -1,6 +1,2 @@
-# Story clean URLs — redirect old query-param format to clean paths
-/story/ /stories/:slug/ 301
-/story/index.html /stories/:slug/ 301
-
 # Catch-all 404
 /* /404.html 404

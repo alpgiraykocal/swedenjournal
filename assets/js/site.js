@@ -198,7 +198,44 @@ function sharePanel(data, story){
     <p class="share-status" aria-live="polite"></p>
   </aside>`;
 }
-function injectJsonLd(obj){const s=document.createElement("script");s.type="application/ld+json";s.textContent=JSON.stringify(obj);document.head.appendChild(s);}function jsonLdArticle(data,story,heroPhoto){const base=String(data.site?.baseUrl||"").replace(/\/+$/,"");injectJsonLd({"@context":"https://schema.org","@type":"Article","headline":esc(story.title||""),"description":esc(story.summary||data.site?.description||""),"image":heroPhoto?absoluteUrl(data,(variant(heroPhoto,"full","jpeg")||imgPath(heroPhoto)).replace(/^\.\.\//),""):undefined,"datePublished":story.isoDate||story.date||"","author":{"@type":"Person","name":esc(data.site?.ownerName||""),"url":base||undefined},"publisher":{"@type":"Person","name":esc(data.site?.ownerName||"")},"url":absoluteUrl(data,"stories/"+encodeURIComponent(story.slug)+"/")});}function jsonLdWebSite(data){const base=String(data.site?.baseUrl||"").replace(/\/+$/,"");if(!base)return;injectJsonLd({"@context":"https://schema.org","@type":"WebSite","name":esc(data.site?.siteTitle||data.site?.ownerName||""),"url":base+"/","author":{"@type":"Person","name":esc(data.site?.ownerName||"")}});}async function boot(){
+function injectJsonLd(obj){
+  const s=document.createElement("script");
+  s.type="application/ld+json";
+  s.textContent=JSON.stringify(obj);
+  document.head.appendChild(s);
+}
+function jsonLdImageUrl(data, p){
+  return p ? absoluteUrl(data, (variant(p, "full", "jpeg") || imgPath(p)).replace(/^\.\.\//, "")) : undefined;
+}
+function jsonLdArticle(data,story,heroPhoto){
+  const base=String(data.site?.baseUrl||"").replace(/\/+$/,"");
+  injectJsonLd({"@context":"https://schema.org","@type":"Article","headline":story.title||"","description":story.summary||data.site?.description||"","image":jsonLdImageUrl(data,heroPhoto),"datePublished":story.isoDate||story.date||"","author":{"@type":"Person","name":data.site?.ownerName||"","url":base||undefined},"publisher":{"@type":"Person","name":data.site?.ownerName||""},"url":absoluteUrl(data,"stories/"+encodeURIComponent(story.slug)+"/")});
+}
+function jsonLdWebSite(data){
+  const base=String(data.site?.baseUrl||"").replace(/\/+$/,"");
+  if(!base)return;
+  injectJsonLd({"@context":"https://schema.org","@type":"WebSite","name":data.site?.siteTitle||data.site?.ownerName||"","url":base+"/","author":{"@type":"Person","name":data.site?.ownerName||""}});
+}
+function jsonLdImageGallery(data, list){
+  injectJsonLd({"@context":"https://schema.org","@type":"ImageGallery","name":data.gallery?.headline||"Gallery","description":data.gallery?.intro||data.site?.description||"","url":absoluteUrl(data,"gallery/"),"image":(list||[]).slice(0,24).map(p=>({"@type":"ImageObject","name":p.title||"","caption":p.caption||"","contentUrl":jsonLdImageUrl(data,p),"thumbnailUrl":variant(p,"thumb","jpeg")?absoluteUrl(data,variant(p,"thumb","jpeg").replace(/^\.\.\//,"")):undefined}))});
+}
+function jsonLdPerson(data){
+  const base=String(data.site?.baseUrl||"").replace(/\/+$/,"");
+  const portrait=photo(data,data.about?.portraitPhotoId);
+  injectJsonLd({"@context":"https://schema.org","@type":"Person","name":data.site?.ownerName||"","url":base||absoluteUrl(data,"about/"),"sameAs":data.site?.instagramUrl?[data.site.instagramUrl]:undefined,"image":jsonLdImageUrl(data,portrait),"description":(data.about?.paragraphs||[])[0]||data.site?.description||""});
+}
+function currentStorySlug(){
+  const querySlug = query().get("slug");
+  if(querySlug) return querySlug;
+  const parts = location.pathname.replace(/\/$/, "").split("/").filter(Boolean);
+  const last = parts.at(-1);
+  if(last === "index.html"){
+    const parent = parts.at(-2);
+    return parent && !["story","stories"].includes(parent) ? decodeURIComponent(parent) : null;
+  }
+  return last && !["story","stories"].includes(last) ? decodeURIComponent(last) : null;
+}
+async function boot(){
   try{
     const data = await loadContent();
     document.title = data.site.siteTitle || data.site.ownerName || "Photo Blog";
@@ -211,7 +248,7 @@ function injectJsonLd(obj){const s=document.createElement("script");s.type="appl
       gallery: sortPhotos(photos(data))[0],
       stories: storyPhotos(data, [...(data.stories || [])].sort((a,b)=>Number(Boolean(b.featured))-Number(Boolean(a.featured)))[0] || {})[0],
       about: photo(data, data.about?.portraitPhotoId),
-      story: photo(data, ((data.stories || []).find(x => { const ps=location.pathname.replace(/\/$/, "").split("/").pop(); return x.slug===(ps&&ps!=="story"&&ps!=="stories"?ps:query().get("slug")); }) || data.stories?.[0])?.heroPhotoId)
+      story: photo(data, ((data.stories || []).find(x => x.slug===currentStorySlug()) || data.stories?.[0])?.heroPhotoId)
     };
     injectPreload(preloadMap[page], "(max-width: 850px) calc(100vw - 28px), 1180px", "medium");
     if(page === "home") renderHome(data);
@@ -228,7 +265,6 @@ function injectJsonLd(obj){const s=document.createElement("script");s.type="appl
 function renderHome(data){
   const h = data.home || {}, hp = photo(data,h.heroPhotoId);
   updateMeta(data, {title:data.site?.siteTitle, description:data.site?.description, path:"", imagePhoto:hp});
-  jsonLdWebSite(data);
   jsonLdWebSite(data);
   const storyList = (h.featuredStorySlugs||[]).map(slug=>(data.stories||[]).find(s=>s.slug===slug)).filter(Boolean);
   const photoList = (h.galleryPhotoIds||[]).map(id => photo(data,id)).filter(Boolean);
@@ -262,9 +298,7 @@ function renderAbout(data){
   $("#app").innerHTML = `<main><section class="hero container about-grid">${responsiveImage(p,{className:"about-img",priority:true,sizes:"(max-width: 850px) calc(100vw - 28px), 520px"})}<div><p class="eyebrow">${esc(a.eyebrow)}</p><h1 class="headline">${esc(a.headline)}</h1><div class="prose">${(a.paragraphs||[]).map(x=>`<p>${esc(x)}</p>`).join("")}</div></div></section></main>`;
 }
 function renderStory(data){
-  const pathSlug = location.pathname.replace(/\/$/, "").split("/").pop();
-  const querySlug = new URLSearchParams(location.search).get("slug");
-  const requestedSlug = (pathSlug && pathSlug !== "story" && pathSlug !== "stories") ? pathSlug : querySlug;
+  const requestedSlug = currentStorySlug();
   const fallbackSlug = data.stories?.[0]?.slug;
   const slug = requestedSlug || fallbackSlug;
   const s = (data.stories||[]).find(x=>x.slug===slug);
@@ -562,4 +596,3 @@ document.addEventListener("click",e=>{
   e.preventDefault();
   document.startViewTransition(()=>{location.href=a.href;});
 });
-
