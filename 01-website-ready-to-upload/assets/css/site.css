@@ -452,6 +452,9 @@ body[data-page="gallery"] .photo-card[hidden]{display:none!important}
 .site-footer{border-top:1px solid var(--line);padding:34px 0;color:var(--muted);font-size:14px}
 .footer-row{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
 .footer-row a{min-height:44px;display:inline-flex;align-items:center;color:var(--accent);font-weight:650}
+.ig-icon{width:18px;height:18px;flex-shrink:0;display:block}
+.ig-nav-link{padding:0 10px!important}
+.ig-footer-link{gap:7px}
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
