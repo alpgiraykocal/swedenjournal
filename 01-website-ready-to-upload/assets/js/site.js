@@ -3,7 +3,7 @@ import {
   sortPhotos, storyPhotos, absoluteUrl, root, header, footer,
   homeMain, galleryMain, storiesMain, aboutMain, storyMain, legacyStoryMain,
   websiteLdObject, imageGalleryLdObject, personLdObject, articleLdObject,
-} from "./templates.mjs?v=dda8993015";
+} from "./templates.mjs?v=2f63f44aa5";
 
 const DATA_PATH = window.__DATA_PATH__ || "assets/data/site-content.json";
 
@@ -348,7 +348,7 @@ function bindGalleryControls(data, list){
       card.hidden = !show;
       if(show) visible += 1;
     });
-    if(count) count.textContent = `${visible} of ${list.length} photographs`;
+    if(count) count.textContent = filter === "all" ? `${visible} photographs` : `${visible} of ${list.length} photographs`;
     if(empty) empty.hidden = visible !== 0;
     if(reset) reset.disabled = filter === "all";
     document.querySelectorAll(".filter").forEach(btn => {
@@ -467,6 +467,10 @@ function bindLightbox(data, getVisiblePhotos){
   document.querySelectorAll("[data-open-photo]").forEach(btn => btn.addEventListener("click", () => {
     const p = photos(data).find(item => item.id === btn.dataset.openPhoto);
     if(p) open(p);
+  }));
+  document.querySelectorAll(".photo-media").forEach(m => m.addEventListener("click", e => {
+    if(e.target.closest("[data-open-photo]")) return;
+    m.querySelector("[data-open-photo]")?.click();
   }));
   close.addEventListener("click", hide);
   prev.addEventListener("click", () => step(-1));

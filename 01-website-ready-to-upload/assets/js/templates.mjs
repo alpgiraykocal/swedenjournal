@@ -97,7 +97,7 @@ export function featuredStoryBlock(data, story) {
 }
 export function photoFigure(p, options = {}) {
   const opts = typeof options === "object" ? options : {};
-  const button = opts.interactive ? `<button class="photo-open" type="button" data-open-photo="${esc(p.id)}" aria-label="Open ${esc(p.title)}">View</button>` : "";
+  const button = opts.interactive ? `<button class="photo-open" type="button" data-open-photo="${esc(p.id)}" aria-label="Open ${esc(p.title)}"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M10 2h4v4M14 2l-5 5M6 14H2v-4M2 14l5-5"/></svg></button>` : "";
   return `<figure class="photo-card ${p.featured ? "featured" : ""}" data-photo-id="${esc(p.id)}" data-category="${esc(p.category || "")}" data-tags="${esc((p.tags || []).join("|"))}" data-theme="${esc(p.theme || "")}"><div class="photo-media"${mediaRatioStyle(p)}>${responsiveImage(p, { priority: opts.priority, eager: opts.eager, sizes: opts.sizes || "(max-width: 560px) calc(100vw - 24px), (max-width: 900px) 50vw, 380px" })}${button}</div><figcaption><strong>${esc(p.title)}</strong>${p.location ? ` — ${esc(p.location)}` : ""}${p.caption ? `<br>${esc(p.caption)}` : ""}</figcaption></figure>`;
 }
 export function blockHtmlInteractive(data, block) {
