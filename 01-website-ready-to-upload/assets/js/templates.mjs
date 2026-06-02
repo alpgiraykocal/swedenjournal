@@ -173,7 +173,7 @@ export function storiesMain(data) {
 }
 export function aboutMain(data) {
   const a = data.about || {}, p = photo(data, a.portraitPhotoId);
-  return `<main><section class="hero container about-grid">${responsiveImage(p, { className: "about-img", priority: true, sizes: "(max-width: 850px) calc(100vw - 28px), 520px" })}<div><p class="eyebrow">${esc(a.eyebrow)}</p><h1 class="headline">${esc(a.headline)}</h1><div class="prose">${(a.paragraphs || []).map((x) => `<p>${esc(x)}</p>`).join("")}</div></div></section></main>`;
+  return `<main><section class="hero container about-grid">${responsiveImage(p, { className: "about-img", priority: true, sizes: "(max-width: 850px) calc(100vw - 28px), 520px" })}<div><p class="eyebrow">${esc(a.eyebrow)}</p><h1 class="headline">${esc(a.headline)}</h1><div class="prose">${(a.paragraphs || []).map((x) => `<p>${esc(x)}</p>`).join("")}</div>${a.contactEmail ? `<p class="about-contact"><span class="eyebrow">Get in touch</span><a href="mailto:${esc(a.contactEmail)}">${esc(a.contactEmail)}</a></p>` : ""}</div></section></main>`;
 }
 export function storyMain(data, s) {
   return `<main><section class="story-hero container"><div class="story-meta" aria-label="Story details">${storyMetaChips(s)}</div><h1 class="headline">${esc(s.title)}</h1><p class="intro">${esc(s.summary)}</p>${responsiveImage(photo(data, s.heroPhotoId), { priority: true, sizes: "(max-width: 1220px) calc(100vw - 40px), 1180px", fallbackSize: "full", viewTransitionName: s.slug ? `story-${s.slug}` : "hero-photo" })}</section><article class="story-body">${(s.body || []).map((b) => blockHtmlInteractive(data, b)).join("")}</article>${relatedPanel(data, s)}${sharePanel(data, s)}</main><div id="lightboxRoot"></div>`;

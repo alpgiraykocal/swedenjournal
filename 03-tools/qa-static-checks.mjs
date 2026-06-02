@@ -155,7 +155,7 @@ function checkSitemap(baseDir) {
   const robots = read(robotsPath);
   if (!/<loc>https:\/\/[^<]+\/stories\/[^/]+\/<\/loc>/.test(sitemap)) fail(`${path.relative(root, sitemapPath)} has no clean story URLs`);
   if (sitemap.includes("/story/?slug=")) fail(`${path.relative(root, sitemapPath)} still uses legacy story query URLs`);
-  if (!robots.includes("Sitemap: https://alpgiraykocal.com/sitemap.xml")) fail(`${path.relative(root, robotsPath)} missing production sitemap URL`);
+  if (!robots.includes("Sitemap: https://sweden-journal.com/sitemap.xml")) fail(`${path.relative(root, robotsPath)} missing production sitemap URL`);
 }
 
 function checkRss(baseDir) {
@@ -255,10 +255,10 @@ function checkLegacyStoryShell(baseDir) {
   if (!html.includes('name="robots" content="noindex,follow"')) {
     fail(`${path.relative(root, legacyPath)} should be noindex,follow because clean story URLs live under /stories/:slug/`);
   }
-  if (!html.includes('rel="canonical" href="https://alpgiraykocal.com/stories/"')) {
+  if (!html.includes('rel="canonical" href="https://sweden-journal.com/stories/"')) {
     fail(`${path.relative(root, legacyPath)} should canonicalize to /stories/`);
   }
-  if (html.includes('rel="canonical" href="https://alpgiraykocal.com/story/"')) {
+  if (html.includes('rel="canonical" href="https://sweden-journal.com/story/"')) {
     fail(`${path.relative(root, legacyPath)} still canonicalizes to legacy /story/`);
   }
 }

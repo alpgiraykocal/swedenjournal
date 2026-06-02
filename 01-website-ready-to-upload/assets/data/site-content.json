@@ -7,7 +7,7 @@
     "instagramUrl": "https://www.instagram.com/sweden_journal/",
     "instagramLabel": "@sweden_journal",
     "footerText": "Photography, travel notes, and visual stories.",
-    "baseUrl": "https://alpgiraykocal.com"
+    "baseUrl": "https://sweden-journal.com"
   },
   "home": {
     "eyebrow": "Personal photo blog",
@@ -35,7 +35,8 @@
       "I photograph while walking: old streets, weathered façades, waterlines, ruins, signs, and the small details that make a place feel remembered rather than simply visited.",
       "This site is my quiet archive for travel notes and selected photographs. I keep it slow on purpose: fewer images, more attention, and enough space for each frame to hold its own atmosphere.",
       "I am drawn to Nordic heritage, historic cities, soft light, and places where ordinary movement meets older layers of memory. The result is part visual notebook, part travel journal, part personal map."
-    ]
+    ],
+    "contactEmail": "hej@sweden-journal.com"
   },
   "gallery": {
     "eyebrow": "Gallery",

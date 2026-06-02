@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://alpgiraykocal.com/sitemap.xml
+Sitemap: https://sweden-journal.com/sitemap.xml

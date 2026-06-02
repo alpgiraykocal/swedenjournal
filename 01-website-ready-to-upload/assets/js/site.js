@@ -3,7 +3,7 @@ import {
   sortPhotos, storyPhotos, absoluteUrl, root, header, footer,
   homeMain, galleryMain, storiesMain, aboutMain, storyMain, legacyStoryMain,
   websiteLdObject, imageGalleryLdObject, personLdObject, articleLdObject,
-} from "./templates.mjs?v=9524db1ac7";
+} from "./templates.mjs?v=2f0d46e713";
 
 const DATA_PATH = window.__DATA_PATH__ || "assets/data/site-content.json";
 
