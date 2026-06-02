@@ -1421,7 +1421,11 @@
       "readingTime": "2 min read",
       "featured": true,
       "category": "Ancient Sites",
-      "isoDate": "2026-04-12"
+      "isoDate": "2026-04-12",
+      "coordinates": {
+        "lat": 59.6072,
+        "lng": 16.6447
+      }
     },
     {
       "slug": "landskrona-slott",
@@ -1498,7 +1502,11 @@
       "readingTime": "2 min read",
       "featured": true,
       "category": "Castles",
-      "isoDate": "2026-04-20"
+      "isoDate": "2026-04-20",
+      "coordinates": {
+        "lat": 55.8678,
+        "lng": 12.8517
+      }
     },
     {
       "slug": "ales-stenar",
@@ -1569,7 +1577,11 @@
           "text": "Leaving the stones, the view remains simple: open land, sea beyond the edge, and a line of ancient forms against the sky. The memory of the place is not decorative or romantic. It is quiet, exposed, and grounded — a meeting between landscape and time on the southern coast of Sweden."
         }
       ],
-      "isoDate": "2026-05-03"
+      "isoDate": "2026-05-03",
+      "coordinates": {
+        "lat": 55.3792,
+        "lng": 14.0566
+      }
     },
     {
       "slug": "church-of-old-uppsala",
@@ -1646,7 +1658,11 @@
           "text": "What makes the Church of Old Uppsala memorable is not only its architecture, but its position within a larger cultural landscape. The site feels like a meeting point between eras: Viking Age memory, medieval Christianity, rural Sweden, and the present-day visitor moving slowly through the churchyard. It is a place where history remains visible, but never loud."
         }
       ],
-      "isoDate": "2026-05-10"
+      "isoDate": "2026-05-10",
+      "coordinates": {
+        "lat": 59.8979,
+        "lng": 17.6328
+      }
     },
     {
       "slug": "lovanger-church",
@@ -1736,7 +1752,11 @@
           "text": "What remains after leaving Lövånger is the clarity of the place: the white church, the red cottages, the dark roofs, and the cold brightness of spring. It is a quiet historical landscape, built from practical forms and enduring materials. Its atmosphere comes from simplicity — and from the way each building still seems to belong exactly where it stands."
         }
       ],
-      "isoDate": "2024-04-08"
+      "isoDate": "2024-04-08",
+      "coordinates": {
+        "lat": 64.3661,
+        "lng": 21.2155
+      }
     }
   ]
 }

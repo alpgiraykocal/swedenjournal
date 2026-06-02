@@ -3,7 +3,7 @@ import {
   sortPhotos, storyPhotos, absoluteUrl, root, header, footer,
   homeMain, galleryMain, storiesMain, aboutMain, storyMain, legacyStoryMain,
   websiteLdObject, imageGalleryLdObject, personLdObject, articleLdObject,
-} from "./templates.mjs?v=4aa4909379";
+} from "./templates.mjs?v=4256b46b78";
 
 const DATA_PATH = window.__DATA_PATH__ || "assets/data/site-content.json";
 
@@ -155,7 +155,63 @@ async function hydrate(page){
     bindLightbox(data, () => storyPhotos(data, s));
   }else if(page === "stories"){
     bindStoryFilters();
+    initStoriesMap();
   }
+}
+function loadLeaflet(){
+  if(window.L) return Promise.resolve(window.L);
+  if(window.__leafletPromise) return window.__leafletPromise;
+  const base = window.__ASSET_PREFIX__ || "";
+  window.__leafletPromise = new Promise((resolve, reject) => {
+    if(!document.querySelector('link[data-leaflet]')){
+      const css = document.createElement("link");
+      css.rel = "stylesheet"; css.href = base + "assets/vendor/leaflet.css"; css.setAttribute("data-leaflet","");
+      document.head.appendChild(css);
+    }
+    const js = document.createElement("script");
+    js.src = base + "assets/vendor/leaflet.js"; js.async = true;
+    js.onload = () => resolve(window.L);
+    js.onerror = () => reject(new Error("Leaflet failed to load"));
+    document.head.appendChild(js);
+  });
+  return window.__leafletPromise;
+}
+function initStoriesMap(){
+  const el = document.getElementById("storiesMap");
+  const dataEl = document.getElementById("stories-map-data");
+  if(!el || !dataEl) return;
+  let stories;
+  try{ stories = JSON.parse(dataEl.textContent); }catch(e){ return; }
+  if(!Array.isArray(stories) || !stories.length) return;
+  const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const dark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+  const start = () => loadLeaflet().then(L => {
+    if(el._mapReady) return;
+    el._mapReady = true;
+    const map = L.map(el, { scrollWheelZoom:false, attributionControl:true });
+    L.tileLayer(`https://{s}.basemaps.cartocdn.com/${dark?"dark_all":"light_all"}/{z}/{x}/{y}{r}.png`, {
+      maxZoom:19, subdomains:"abcd",
+      attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
+    }).addTo(map);
+    const markers = stories.map(s => {
+      const icon = L.divIcon({ className:"map-pin", html:`<img src="${esc(s.thumb)}" alt="${esc(s.alt||s.title)}">`, iconSize:[52,52], iconAnchor:[26,26] });
+      const m = L.marker([s.lat, s.lng], { icon, title:s.title, alt:s.title, riseOnHover:true, keyboard:true }).addTo(map);
+      m.bindTooltip(s.title, { direction:"top", offset:[0,-28] });
+      m.on("click", () => { location.href = s.href; });
+      return m;
+    });
+    if(markers.length > 1){
+      map.fitBounds(L.featureGroup(markers).getBounds().pad(0.25), { animate:!reduce });
+    }else{
+      map.setView([stories[0].lat, stories[0].lng], 9, { animate:false });
+    }
+  }).catch(() => {});
+  if("IntersectionObserver" in window){
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if(e.isIntersecting){ start(); io.disconnect(); } });
+    }, { rootMargin:"200px" });
+    io.observe(el);
+  }else{ start(); }
 }
 async function boot(){
   try{

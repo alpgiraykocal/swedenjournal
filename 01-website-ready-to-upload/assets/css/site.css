@@ -674,6 +674,20 @@ body[data-page="gallery"] .photo-card[hidden]{display:none!important}
   .text-link::after,.story-link::after{forced-color-adjust:none}
 }
 
+/* Stories map (Leaflet). Enhancement only — hidden without JS (the story list is
+   the fallback). Fixed height reserves space so the map never causes layout shift. */
+.stories-map-section{display:none}
+.js-reveal .stories-map-section{display:block}
+.stories-map{height:440px;border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow);background:var(--surface-strong)}
+.leaflet-container{font-family:var(--sans);background:var(--surface-strong)}
+.leaflet-container a{color:var(--accent-cool)}
+.leaflet-div-icon.map-pin{background:transparent;border:0}
+.leaflet-marker-icon.map-pin img,.map-pin img{width:52px!important;height:52px!important;border-radius:50%;object-fit:cover;border:3px solid var(--paper);box-shadow:0 4px 14px rgba(31,29,25,.4);background:var(--surface-strong);cursor:pointer;display:block;transition:transform .18s ease}
+.map-pin:hover img,.map-pin:focus img,.map-pin:focus-visible img{transform:scale(1.08);outline:none}
+.leaflet-marker-icon.map-pin:focus-visible{outline:3px solid var(--focus);outline-offset:3px;border-radius:50%}
+@media(max-width:560px){.stories-map{height:320px}}
+@media (prefers-reduced-motion:reduce){.leaflet-tile,.leaflet-zoom-anim .leaflet-zoom-animated{transition:none!important}}
+
 @view-transition {
   navigation: auto;
 }
