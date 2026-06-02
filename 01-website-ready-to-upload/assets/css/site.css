@@ -100,6 +100,9 @@ h2{margin:0;font-family:var(--serif);font-size:3.4rem;font-weight:500;line-heigh
 .text-link::after{content:"";width:28px;height:1px;margin-left:10px;background:currentColor;transition:width .18s ease}
 .text-link:hover::after{width:42px}
 .grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
+.grid-2 .story-card{grid-template-columns:1fr;border-top:0;padding-top:0;gap:0;align-items:start}
+.grid-2 .story-card .story-card-copy{padding-top:14px}
+.grid-2 .story-card .story-card-media{border-radius:var(--radius-lg)}
 .card{display:block;border-top:1px solid var(--line);padding-top:16px;transition:transform .18s ease}
 .card:hover{transform:translateY(-3px)}
 .card picture{margin-bottom:16px}
