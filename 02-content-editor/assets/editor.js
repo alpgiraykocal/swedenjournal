@@ -125,9 +125,11 @@
     if(c.home.galleryPhotoIds.length<3)c.home.galleryPhotoIds=uniqueValues([...c.home.galleryPhotoIds,...c.photos.slice(0,4).map(p=>p.id)]).filter(id=>photoIds.has(id)).slice(0,6);
     c.home.featuredStorySlugs=uniqueValues(c.home.featuredStorySlugs||[]).filter(slug=>storySlugs.has(slug));
     if(!c.home.featuredStorySlugs.length)c.home.featuredStorySlugs=c.stories.slice(0,2).map(s=>s.slug);
-    const generatedFilters=uniqueValues(c.photos.flatMap(photoFilterTokens));
+    // Gallery filters are curated manually (each photo carries a `category` that
+    // matches one of them). Do NOT auto-derive filters from photo theme/tags — that
+    // bloated the list on every save. Just keep the user's list, deduped, "All" first.
     const existing=uniqueValues(c.gallery.filters||[]).filter(x=>x.toLowerCase()!=="all");
-    c.gallery.filters=["All",...uniqueValues([...existing,...generatedFilters])];
+    c.gallery.filters=["All",...existing];
   }
   function publicBaseUrl(c=state.content){return String(c?.site?.baseUrl||"").replace(/\/+$/,"")||"https://alpgiraykocal.com";}
   function storyPath(slug){return `stories/${encodeURIComponent(slug)}/index.html`;}

@@ -47,26 +47,7 @@
       "Waterfront",
       "Churches",
       "Castles",
-      "Ancient Sites",
-      "Street",
-      "Old Town",
-      "Urban Detail",
-      "Urban Life",
-      "Architecture",
-      "Cityscape",
-      "Street Moment",
-      "Old Town Detail",
-      "Nordic Heritage",
-      "Runestone",
-      "Castle Architecture",
-      "Castle",
-      "Historic Architecture",
-      "Courtyard",
-      "Passage",
-      "Historic Detail",
-      "Architectural Detail",
-      "Ancient Landscape",
-      "Coastal Landscape"
+      "Ancient Sites"
     ]
   },
   "storiesPage": {
@@ -1439,7 +1420,7 @@
       ],
       "readingTime": "2 min read",
       "featured": true,
-      "category": "Nordic Heritage",
+      "category": "Ancient Sites",
       "isoDate": "2026-04-12"
     },
     {
@@ -1516,7 +1497,7 @@
       ],
       "readingTime": "2 min read",
       "featured": true,
-      "category": "Castle Architecture",
+      "category": "Castles",
       "isoDate": "2026-04-20"
     },
     {
@@ -1525,7 +1506,7 @@
       "location": "Ales Stenar, Kåseberga, Skåne, Sweden",
       "date": "Spring 2026",
       "readingTime": "2 min read",
-      "category": "Travel Notes",
+      "category": "Ancient Sites",
       "theme": "Nordic Heritage, Coastal Landscape",
       "summary": "Ales Stenar stands on the southern coast of Sweden, where ancient stones, open fields, sea air, and a vast grey sky create one of Skåne’s most atmospheric landscapes. This story follows a quiet walk around the stone ship, observing its scale, silence, and connection to Nordic memory.",
       "heroPhotoId": "ales-stenar-under-a-grey-sky",
@@ -1596,7 +1577,7 @@
       "location": "Gamla Uppsala, Uppsala, Sweden",
       "date": "Spring 2026",
       "readingTime": "2 min read",
-      "category": "Travel Notes",
+      "category": "Churches",
       "theme": "Nordic Heritage, Historic Architecture",
       "summary": "In Gamla Uppsala, history gathers around a quiet medieval church, a wooden bell tower, old stone walls, and a runestone set into the church façade. This story follows a walk through one of Sweden’s most historically layered places, where Christian architecture, Viking Age memory, and the open landscape of Old Uppsala meet.",
       "heroPhotoId": "church-of-old-uppsala",
@@ -1673,7 +1654,7 @@
       "location": "Lövånger, Västerbotten, Sweden",
       "date": "Spring 2024",
       "readingTime": "2 min read",
-      "category": "Travel Notes",
+      "category": "Churches",
       "theme": "Nordic Heritage, Historic Architecture",
       "summary": "In Lövånger, a white historic church, a wooden bell tower, and a preserved church town stand together in the quiet landscape of Västerbotten. This story follows a spring visit shaped by clear northern light, melting snow, red timber cottages, and the calm rhythm of Swedish cultural heritage.",
       "heroPhotoId": "lovanger-church-spring-light",
