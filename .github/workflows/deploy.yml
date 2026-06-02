@@ -1,0 +1,44 @@
+name: Build and deploy to GitHub Pages
+
+# Runs the SSG build (node 03-tools/build.mjs) on every push and publishes
+# 01-website-ready-to-upload to GitHub Pages. You only edit in the content editor
+# and push — this workflow pre-renders and deploys automatically.
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      # build.mjs uses only Node built-ins (no npm packages), so no install needed.
+      - name: Build (SSG pre-render)
+        run: npm run build
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: 01-website-ready-to-upload
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

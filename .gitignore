@@ -1,0 +1,34 @@
+.DS_Store
+._*
+Thumbs.db
+
+.codex-ui-review/
+.upload-package-tmp/
+.upload-package-tmp [0-9]*/
+04-upload-package [0-9]*/
+
+*.log
+*.tmp
+*.temp
+*.swp
+*~
+
+# Dependencies (reinstall with `npm install` when you need to regenerate image variants)
+node_modules/
+
+# Local knowledge-graph output (graphify)
+graphify-out/
+
+# Build output. Cloudflare serves 01-website-ready-to-upload directly; this is just
+# a local clean copy produced by `npm run build`. No need to version it.
+04-upload-package/
+
+# Local-only Claude Code config (preview server, agent settings) — not needed in the repo
+.claude/
+
+# Original full-resolution source photos (~182 MB). Kept out of git to keep the repo
+# lean and to avoid deploying the originals. The site serves only the generated
+# variants (assets/images/generated/), which ARE committed.
+# >>> Keep your own backup of this folder — you need it to re-encode image variants.
+# >>> Delete the line below if you prefer to version the originals in git.
+01-website-ready-to-upload/assets/images/photos/

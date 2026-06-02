@@ -1,0 +1,14 @@
+{
+  "name": "alpgiray-photo-blog-cms",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "generate-variants": "bash 03-tools/generate-image-variants.sh",
+    "build": "node 03-tools/build.mjs",
+    "build:package": "bash 03-tools/build-upload-package.sh",
+    "qa": "node 03-tools/qa-static-checks.mjs"
+  },
+  "devDependencies": {
+    "sharp-cli": "^2.1.0"
+  }
+}

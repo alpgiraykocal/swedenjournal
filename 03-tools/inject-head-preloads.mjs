@@ -1,0 +1,121 @@
+#!/usr/bin/env node
+// Injects a data-driven, idempotent <head> performance block into every page:
+//   - theme-color meta (light + dark)
+//   - preload of the two critical fonts (Fraunces headline, Inter body)
+//   - preload of each page's hero / LCP image, matching the runtime <picture> source
+// The block is marked so re-running (e.g. on every build) keeps it fresh — no staleness.
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const websiteDir = path.join(root, "01-website-ready-to-upload");
+const data = JSON.parse(fs.readFileSync(path.join(websiteDir, "assets/data/site-content.json"), "utf8"));
+
+const START = "<!-- perf-head:start -->";
+const END = "<!-- perf-head:end -->";
+const THEME_LIGHT = "#f3efe7";
+const THEME_DARK = "#1a1815";
+
+// Per-page hero `sizes`, matching exactly what the runtime <picture> renders so the
+// preload scanner selects the same candidate (no wasted / duplicate download).
+const SIZES_STORY = "(max-width: 1220px) calc(100vw - 40px), 1180px";
+const sizesFor = {
+  "index.html": "(max-width: 850px) calc(100vw - 28px), 620px",
+  "gallery/index.html": "(max-width: 560px) calc(100vw - 24px), (max-width: 900px) 50vw, 380px",
+  "stories/index.html": "(max-width: 850px) calc(100vw - 28px), 620px",
+  "about/index.html": "(max-width: 850px) calc(100vw - 28px), 520px",
+};
+
+const photos = Array.isArray(data.photos) ? data.photos : [];
+const photoById = (id) => photos.find((p) => p.id === id) || null;
+const variant = (p, size, format) => p?.variants?.[size]?.[format] || "";
+function srcset(p, format) {
+  return ["thumb", "medium", "full"].map((size) => {
+    const value = variant(p, size, format);
+    const width = p?.variants?.[size]?.width;
+    return value && width ? `${value} ${width}w` : value ? value : "";
+  }).filter(Boolean).join(", ");
+}
+function preferredFormat(p) {
+  return [["avif", "image/avif"], ["webp", "image/webp"], ["jpeg", "image/jpeg"]]
+    .find(([fmt]) => variant(p, "medium", fmt) || srcset(p, fmt)) || ["jpeg", "image/jpeg"];
+}
+function sortPhotos(list) {
+  return [...list].sort((a, b) => {
+    const ao = Number.isFinite(Number(a.sortOrder)) ? Number(a.sortOrder) : 999999;
+    const bo = Number.isFinite(Number(b.sortOrder)) ? Number(b.sortOrder) : 999999;
+    if (ao !== bo) return ao - bo;
+    if (Boolean(a.featured) !== Boolean(b.featured)) return a.featured ? -1 : 1;
+    return String(a.title || "").localeCompare(String(b.title || ""));
+  });
+}
+function featuredStoryHeroId() {
+  const stories = [...(data.stories || [])].sort((a, b) => Number(Boolean(b.featured)) - Number(Boolean(a.featured)));
+  return (stories.find((s) => s.featured) || stories[0])?.heroPhotoId || null;
+}
+
+// page file -> hero photo id (null = no hero, fonts + theme-color only)
+const heroFor = {
+  "index.html": data.home?.heroPhotoId || null,
+  "gallery/index.html": sortPhotos(photos)[0]?.id || null,
+  "stories/index.html": featuredStoryHeroId(),
+  "about/index.html": data.about?.portraitPhotoId || null,
+  "404.html": null,
+  "story/index.html": null,
+};
+for (const s of data.stories || []) {
+  if (s.slug) heroFor[`stories/${s.slug}/index.html`] = s.heroPhotoId || null;
+}
+
+function heroPreloadLine(prefix, heroId, sizes) {
+  const p = photoById(heroId);
+  if (!p) return null;
+  const [fmt, mime] = preferredFormat(p);
+  const href = variant(p, "medium", fmt) || variant(p, "full", fmt) || p.src;
+  if (!href) return null;
+  const set = srcset(p, fmt);
+  const attrs = [
+    `rel="preload"`, `as="image"`, `href="${prefix}${href}"`,
+    set ? `imagesrcset="${set.split(", ").map((s) => prefix + s).join(", ")}"` : "",
+    set ? `imagesizes="${sizes}"` : "",
+    `type="${mime}"`, `fetchpriority="high"`, `data-preload-photo="${p.id}"`,
+  ].filter(Boolean);
+  return `  <link ${attrs.join(" ")}>`;
+}
+
+function buildBlock(prefix, heroId, sizes) {
+  const lines = [
+    `  ${START}`,
+    `  <script>document.documentElement.classList.add('js-reveal')</script>`,
+    `  <meta name="theme-color" content="${THEME_LIGHT}" media="(prefers-color-scheme: light)">`,
+    `  <meta name="theme-color" content="${THEME_DARK}" media="(prefers-color-scheme: dark)">`,
+    `  <link rel="preload" href="${prefix}assets/fonts/fraunces-latin-standard-normal.woff2" as="font" type="font/woff2" crossorigin>`,
+    `  <link rel="preload" href="${prefix}assets/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>`,
+  ];
+  const hero = heroPreloadLine(prefix, heroId, sizes);
+  if (hero) lines.push(hero);
+  lines.push(`  ${END}`);
+  return lines.join("\n");
+}
+
+let changed = 0;
+for (const [rel, heroId] of Object.entries(heroFor)) {
+  const file = path.join(websiteDir, rel);
+  if (!fs.existsSync(file)) continue;
+  let html = fs.readFileSync(file, "utf8");
+  const styleMatch = html.match(/(\s*)<link rel="stylesheet" href="((?:\.\.\/)*)assets\/css\/site\.css/);
+  if (!styleMatch) { console.warn(`! no stylesheet anchor in ${rel}, skipped`); continue; }
+  const prefix = styleMatch[2]; // "", "../", "../../"
+  const sizes = sizesFor[rel] || SIZES_STORY;
+  const block = buildBlock(prefix, heroId, sizes);
+  const between = new RegExp(`[ \\t]*${START}[\\s\\S]*?${END}\\n?`);
+  if (between.test(html)) {
+    html = html.replace(between, block + "\n");
+  } else {
+    html = html.replace(/(\s*)(<link rel="stylesheet" href=)/, `\n${block}$1$2`);
+  }
+  fs.writeFileSync(file, html);
+  changed += 1;
+}
+console.log(`Head preloads injected into ${changed} page(s).`);
