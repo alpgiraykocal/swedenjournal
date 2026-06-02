@@ -69,8 +69,10 @@ n += page("gallery/index.html", { pfx: "../", active: "gallery", mainHtml: () =>
 n += page("stories/index.html", { pfx: "../", active: "stories", mainHtml: () => storiesMain(data) });
 n += page("about/index.html", { pfx: "../", active: "about", mainHtml: () => aboutMain(data), headLd: ld(personLdObject(data)) });
 n += page("story/index.html", { pfx: "../", active: "story", mainHtml: () => legacyStoryMain(data) });
+const liveSlugs = new Set();
 for (const s of data.stories || []) {
   if (!s.slug) continue;
+  liveSlugs.add(s.slug);
   n += page(`stories/${s.slug}/index.html`, {
     pfx: "../../", active: "story",
     mainHtml: () => storyMain(data, s),
@@ -78,4 +80,18 @@ for (const s of data.stories || []) {
     hydrate: { stories: [s], photos: storyPhotos(data, s) },
   });
 }
-console.log(`Pre-rendered ${n} page(s).`);
+
+// Prune orphaned story pages: a story deleted in the editor leaves its
+// stories/<slug>/ folder behind. Remove any story folder no longer in the
+// content so deleted stories disappear from the published site.
+let pruned = 0;
+const storiesDir = path.join(websiteDir, "stories");
+if (fs.existsSync(storiesDir)) {
+  for (const entry of fs.readdirSync(storiesDir, { withFileTypes: true })) {
+    if (entry.isDirectory() && !liveSlugs.has(entry.name)) {
+      fs.rmSync(path.join(storiesDir, entry.name), { recursive: true, force: true });
+      pruned += 1;
+    }
+  }
+}
+console.log(`Pre-rendered ${n} page(s)${pruned ? `, pruned ${pruned} orphaned story folder(s)` : ""}.`);
