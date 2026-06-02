@@ -86,7 +86,7 @@ function checkHtmlMetadata(baseDir) {
     ]) {
       if (!html.includes(required)) fail(`${label} missing ${required}`);
     }
-    if (!page.endsWith("404.html") && !/assets\/js\/site\.js\?v=\d+/.test(html)) {
+    if (!page.endsWith("404.html") && !/assets\/js\/site\.js\?v=[a-f0-9]+/.test(html)) {
       fail(`${label} missing cache-busted site.js reference`);
     }
   }

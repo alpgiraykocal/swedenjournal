@@ -89,7 +89,8 @@ button:disabled{opacity:.48;cursor:not-allowed;transform:none}
 .eyebrow{margin:0 0 15px;color:var(--accent);font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase}
 .headline{margin:0;font-family:var(--serif);font-size:5.8rem;font-weight:500;line-height:.92;letter-spacing:0;text-wrap:balance}
 .intro{max-width:min(620px,100%);margin:22px 0 0;color:var(--text-soft);font-size:18px;line-height:1.7;overflow-wrap:break-word}
-.hero-img,.about-img,.story-hero img{background:var(--surface-strong);box-shadow:var(--shadow)}
+.hero-img,.about-img{background:var(--surface-strong);box-shadow:var(--shadow)}
+.story-hero img{background:var(--surface-strong)}
 .hero-img{width:100%;height:auto;aspect-ratio:auto;object-fit:contain;border-radius:var(--radius-lg)}
 .section{padding:64px 0;border-top:1px solid var(--line)}
 .section-head{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:28px}
@@ -327,7 +328,6 @@ body[data-page="gallery"] .photo-card[hidden]{display:none!important}
 .story-inline-photo{
   width:100%;
   max-width:100%;
-  overflow:hidden;
 }
 .story-inline-photo picture{
   width:100%;
@@ -341,7 +341,6 @@ body[data-page="gallery"] .photo-card[hidden]{display:none!important}
   object-fit:contain;
   border-radius:var(--radius);
   background:var(--surface-strong);
-  box-shadow:var(--shadow);
 }
 .story-inline-photo figcaption{width:100%;max-width:100%;margin-top:10px;color:var(--muted);font-size:14px;line-height:1.55;overflow-wrap:anywhere}
 .story-body img{width:100%;max-width:100%;height:auto;border-radius:var(--radius);background:var(--surface-strong)}
