@@ -4,8 +4,8 @@
     "siteTitle": "Photography & Travel Notes",
     "tagline": "Photography, travel experiences, and quiet visual stories.",
     "description": "A personal photo blog by Alpgiray Koçal: photography, travel notes, visual essays, and quiet observations.",
-    "instagramUrl": "https://www.instagram.com/alpgiraykocal/",
-    "instagramLabel": "@alpgiraykocal",
+    "instagramUrl": "https://www.instagram.com/sweden_journal/",
+    "instagramLabel": "@sweden_journal",
     "footerText": "Photography, travel notes, and visual stories.",
     "baseUrl": "https://alpgiraykocal.com"
   },
@@ -47,7 +47,26 @@
       "Waterfront",
       "Churches",
       "Castles",
-      "Ancient Sites"
+      "Ancient Sites",
+      "Street",
+      "Old Town",
+      "Urban Detail",
+      "Urban Life",
+      "Architecture",
+      "Cityscape",
+      "Street Moment",
+      "Old Town Detail",
+      "Nordic Heritage",
+      "Runestone",
+      "Castle Architecture",
+      "Castle",
+      "Historic Architecture",
+      "Courtyard",
+      "Passage",
+      "Historic Detail",
+      "Architectural Detail",
+      "Ancient Landscape",
+      "Coastal Landscape"
     ]
   },
   "storiesPage": {
