@@ -149,9 +149,9 @@ export function homeMain(data) {
   const storyList = (h.featuredStorySlugs || []).map((slug) => (data.stories || []).find((s) => s.slug === slug)).filter(Boolean);
   const photoList = (h.galleryPhotoIds || []).map((id) => photo(data, id)).filter(Boolean);
   return `<main><section class="hero container"><div class="hero-grid"><div class="hero-copy"><p class="eyebrow">${esc(h.eyebrow)}</p><h1 class="headline">${esc(h.headline)}</h1><p class="intro">${esc(h.intro)}</p></div>${responsiveImage(hp, { className: "hero-img", priority: true, sizes: "(max-width: 850px) calc(100vw - 28px), 620px", fallbackSize: "full", viewTransitionName: "hero-photo" })}</div></section>
-  <section class="section"><div class="container"><div class="section-head"><h2>Featured stories</h2><a class="text-link" href="stories/index.html">View all stories</a></div><div class="grid-2">${storyList.map((s) => storyCard(data, s)).join("")}</div></div></section>
+  <section class="section"><div class="container"><div class="section-head"><div><p class="eyebrow">Stories</p><h2>Featured stories</h2></div><a class="text-link" href="stories/index.html">View all stories</a></div><div class="grid-2">${storyList.map((s) => storyCard(data, s)).join("")}</div></div></section>
   <section class="section selected-section"><div class="container"><div class="section-head"><div><p class="eyebrow">A small edit</p><h2>Selected photographs</h2></div><a class="text-link" href="gallery/index.html">Open full gallery</a></div><div class="gallery-grid selected-grid">${photoList.map((p, i) => photoFigure(p, { priority: i < 2, sizes: "(max-width: 560px) calc(100vw - 24px), (max-width: 850px) 50vw, 560px" })).join("")}</div></div></section>
-  <section class="section"><div class="container closing-panel"><h2>${esc(h.closingTitle)}</h2><p class="intro">${esc(h.closingText)}</p></div></section></main>`;
+  <section class="section"><div class="container closing-panel"><h2>${esc(h.closingTitle)}</h2><p class="intro">${esc(h.closingText)}</p><div class="closing-links"><a class="text-link" href="stories/index.html">Read stories</a><a class="text-link" href="gallery/index.html">Open gallery</a></div></div></section></main>`;
 }
 export function galleryMain(data) {
   const g = data.gallery || {};
