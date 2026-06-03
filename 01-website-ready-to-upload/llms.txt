@@ -1,0 +1,21 @@
+# Sweden Journal
+
+> Sweden Journal: a personal photo blog featuring photography, travel notes, visual essays, and quiet observations from Sweden and beyond.
+
+## Main pages
+- [Home](https://sweden-journal.com/): Featured stories and a curated edit of photographs.
+- [Stories](https://sweden-journal.com/stories/): Long-form visual essays built around place, light, and movement.
+- [Atlas](https://sweden-journal.com/atlas/): Every story mapped to where it happened — explore the journal geographically.
+- [Gallery](https://sweden-journal.com/gallery/): A curated, image-first archive of photographs.
+- [About](https://sweden-journal.com/about/): About the photographer and the project.
+
+## Stories
+- [Anundshög](https://sweden-journal.com/stories/anundshog/): A walk through Anundshög near Västerås, one of Sweden’s most evocative ancient landscapes. This story explores the…
+- [Landskrona Slott](https://sweden-journal.com/stories/landskrona-slott/): Landskrona Slott is one of Sweden’s best-preserved Renaissance fortresses, surrounded by moats, green ramparts, and the…
+- [Ales Stenar](https://sweden-journal.com/stories/ales-stenar/): Ales Stenar stands on the southern coast of Sweden, where ancient stones, open fields, sea air, and a vast grey sky…
+- [Church of Old Uppsala](https://sweden-journal.com/stories/church-of-old-uppsala/): In Gamla Uppsala, history gathers around a quiet medieval church, a wooden bell tower, old stone walls, and a runestone…
+- [Lövånger Church](https://sweden-journal.com/stories/lovanger-church/): In Lövånger, a white historic church, a wooden bell tower, and a preserved church town stand together in the quiet…
+
+## More
+- [RSS feed](https://sweden-journal.com/feed.xml)
+- [Sitemap](https://sweden-journal.com/sitemap.xml)

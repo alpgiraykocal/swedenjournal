@@ -3,7 +3,7 @@ import {
   sortPhotos, storyPhotos, absoluteUrl, root, header, footer,
   homeMain, galleryMain, storiesMain, aboutMain, atlasMain, storyMain, legacyStoryMain,
   websiteLdObject, imageGalleryLdObject, personLdObject, articleLdObject,
-} from "./templates.mjs?v=5025480967";
+} from "./templates.mjs?v=8cde97e47e";
 
 const DATA_PATH = window.__DATA_PATH__ || "assets/data/site-content.json";
 // Signal that the runtime module loaded & executed. The inline <head> failsafe

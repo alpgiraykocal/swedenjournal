@@ -21,6 +21,7 @@ for (const step of [
   "sync-image-variants.mjs",
   "generate-rss.mjs",
   "generate-sitemap.mjs",
+  "generate-llms.mjs",
   "inject-head-preloads.mjs",
   "render-site.mjs",
 ]) {

@@ -190,9 +190,9 @@ export function atlasMain(data) {
     .filter((s) => s.coordinates && Number.isFinite(Number(s.coordinates.lat)) && Number.isFinite(Number(s.coordinates.lng)))
     .map((s) => {
       const hero = photo(data, s.heroPhotoId);
-      return { slug: s.slug, title: s.title, location: s.location || "", date: s.date || "", lat: Number(s.coordinates.lat), lng: Number(s.coordinates.lng), href: storyHref(s.slug), thumb: variant(hero, "thumb", "jpeg") || imgPath(hero), alt: (hero && hero.alt) || s.title };
+      return { slug: s.slug, title: s.title, location: s.location || "", date: s.date || "", summary: s.summary || "", lat: Number(s.coordinates.lat), lng: Number(s.coordinates.lng), href: storyHref(s.slug), thumb: variant(hero, "thumb", "jpeg") || imgPath(hero), alt: (hero && hero.alt) || s.title };
     });
-  const places = mapStories.map((s) => `<li><a class="atlas-place" href="${s.href}"><span class="atlas-place-thumb">${s.thumb ? `<img src="${esc(s.thumb)}" alt="" loading="lazy">` : ""}</span><span class="atlas-place-copy"><span class="atlas-place-title">${esc(s.title)}</span>${metaText([s.location, s.date]) ? `<span class="meta">${esc(metaText([s.location, s.date]))}</span>` : ""}</span></a></li>`).join("");
+  const places = mapStories.map((s) => `<li><a class="atlas-place" href="${s.href}"><span class="atlas-place-thumb">${s.thumb ? `<img src="${esc(s.thumb)}" alt="" loading="lazy">` : ""}</span><span class="atlas-place-copy"><span class="atlas-place-title">${esc(s.title)}</span>${metaText([s.location, s.date]) ? `<span class="meta">${esc(metaText([s.location, s.date]))}</span>` : ""}${s.summary ? `<span class="atlas-place-snippet">${esc(s.summary)}</span>` : ""}</span></a></li>`).join("");
   const mapData = JSON.stringify(mapStories).replace(/</g, "\\u003c");
   return `<main><section class="hero container atlas-hero"><p class="eyebrow">${esc(ap.eyebrow || "Explore by place")}</p><h1 class="headline">${esc(ap.headline || "An atlas of quiet places")}</h1><p class="intro">${esc(ap.intro || "Every story mapped to where it happened. Wander the journal geographically — or browse the places below.")}</p></section>
   <section class="section atlas-section"><div class="container atlas-layout"><div class="atlas-map-wrap"><div id="atlasMap" class="stories-map atlas-map" role="region" aria-label="Map of story locations"></div><script type="application/json" id="atlas-map-data">${mapData}</script></div><nav class="atlas-places" aria-label="Places in the journal"><p class="eyebrow">${mapStories.length} ${mapStories.length === 1 ? "place" : "places"}</p><ul>${places}</ul></nav></div></section></main>`;
@@ -231,5 +231,16 @@ export function personLdObject(data) {
 }
 export function articleLdObject(data, story, heroPhoto) {
   const base = String(data.site?.baseUrl || "").replace(/\/+$/, "");
-  return { "@context": "https://schema.org", "@type": "Article", headline: story.title || "", description: story.summary || data.site?.description || "", image: jsonLdImageUrl(data, heroPhoto), datePublished: machineDate(story.isoDate) || machineDate(story.date), author: { "@type": "Person", name: data.site?.ownerName || "", url: base || undefined }, publisher: { "@type": "Person", name: data.site?.ownerName || "" }, url: absoluteUrl(data, "stories/" + encodeURIComponent(story.slug) + "/") };
+  return { "@context": "https://schema.org", "@type": "Article", headline: story.title || "", description: story.summary || data.site?.description || "", image: jsonLdImageUrl(data, heroPhoto), datePublished: machineDate(story.isoDate) || machineDate(story.date), author: { "@type": "Person", name: data.site?.ownerName || "", url: base || undefined }, publisher: { "@type": "Organization", name: data.site?.siteTitle || data.site?.ownerName || "", logo: { "@type": "ImageObject", url: (base || "") + "/icon-512.png" } }, url: absoluteUrl(data, "stories/" + encodeURIComponent(story.slug) + "/") };
+}
+export function breadcrumbLdObject(data, trail) {
+  return { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: (trail || []).map((t, i) => ({ "@type": "ListItem", position: i + 1, name: t.name, item: absoluteUrl(data, t.path) })) };
+}
+export function storiesLdObject(data) {
+  const stories = (data.stories || []).filter((s) => s.slug && s.title);
+  return { "@context": "https://schema.org", "@type": "CollectionPage", name: data.storiesPage?.headline || "Stories", description: data.storiesPage?.intro || data.site?.description || "", url: absoluteUrl(data, "stories/"), mainEntity: { "@type": "ItemList", itemListElement: stories.map((s, i) => ({ "@type": "ListItem", position: i + 1, name: s.title, url: absoluteUrl(data, "stories/" + encodeURIComponent(s.slug) + "/") })) } };
+}
+export function atlasLdObject(data) {
+  const placed = (data.stories || []).filter((s) => s.coordinates && Number.isFinite(Number(s.coordinates.lat)) && Number.isFinite(Number(s.coordinates.lng)));
+  return { "@context": "https://schema.org", "@type": "CollectionPage", name: data.atlasPage?.headline || "Atlas", description: data.atlasPage?.intro || data.site?.description || "", url: absoluteUrl(data, "atlas/"), mainEntity: { "@type": "ItemList", itemListElement: placed.map((s, i) => ({ "@type": "ListItem", position: i + 1, item: { "@type": "Place", name: s.title, url: absoluteUrl(data, "stories/" + encodeURIComponent(s.slug) + "/"), geo: { "@type": "GeoCoordinates", latitude: Number(s.coordinates.lat), longitude: Number(s.coordinates.lng) } } })) } };
 }
