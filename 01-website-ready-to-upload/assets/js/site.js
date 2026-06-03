@@ -3,7 +3,7 @@ import {
   sortPhotos, storyPhotos, absoluteUrl, root, header, footer,
   homeMain, galleryMain, storiesMain, aboutMain, atlasMain, storyMain, legacyStoryMain,
   websiteLdObject, imageGalleryLdObject, personLdObject, articleLdObject,
-} from "./templates.mjs?v=390f5ec1b8";
+} from "./templates.mjs?v=5025480967";
 
 const DATA_PATH = window.__DATA_PATH__ || "assets/data/site-content.json";
 // Signal that the runtime module loaded & executed. The inline <head> failsafe
@@ -321,6 +321,7 @@ function bindImageLoadFade(){const sel=".photo-media img,.story-card-media img,.
   const empty = $("#storyEmpty");
   const normalize = value => String(value || "").trim().toLowerCase();
   const reset = $(".story-reset");
+  const featuredSection = $(".featured-story-section");
   const apply = (category, syncUrl=true) => {
     const active = normalize(category || "All");
     let visible = 0;
@@ -332,6 +333,9 @@ function bindImageLoadFade(){const sel=".photo-media img,.story-card-media img,.
     if(count) count.textContent = `${visible} of ${cards.length} stories`;
     if(empty) empty.hidden = visible !== 0;
     if(reset) reset.disabled = active === "all";
+    // The "Featured story" highlight only makes sense in the browse-all view —
+    // hide it when a specific category is active so the filter result is clean.
+    if(featuredSection) featuredSection.hidden = active !== "all";
     document.querySelectorAll("[data-story-filter]").forEach(btn => {
       const selected = normalize(btn.dataset.storyFilter) === active;
       btn.classList.toggle("active", selected);
