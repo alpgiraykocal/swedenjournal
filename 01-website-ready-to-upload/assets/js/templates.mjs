@@ -214,7 +214,7 @@ export function notFoundMain(data) {
 
 // ---- JSON-LD object builders (pure) ----
 export const machineDate = (v) => (/^\d{4}-\d{2}-\d{2}$/.test(String(v || "").trim()) ? String(v).trim() : undefined);
-export const jsonLdImageUrl = (data, p) => (p ? absoluteUrl(data, (variant(p, "full", "jpeg") || imgPath(p)).replace(/^\.\.\//, "")) : undefined);
+export const jsonLdImageUrl = (data, p) => (p ? absoluteUrl(data, (variant(p, "full", "jpeg") || imgPath(p)).replace(/^(?:\.\.\/)+/, "")) : undefined);
 export function websiteLdObject(data) {
   const base = String(data.site?.baseUrl || "").replace(/\/+$/, "");
   if (!base) return null;
@@ -222,7 +222,7 @@ export function websiteLdObject(data) {
 }
 export function imageGalleryLdObject(data, list) {
   list = list || sortPhotos(photos(data));
-  return { "@context": "https://schema.org", "@type": "ImageGallery", name: data.gallery?.headline || "Gallery", description: data.gallery?.intro || data.site?.description || "", url: absoluteUrl(data, "gallery/"), image: (list || []).slice(0, 24).map((p) => ({ "@type": "ImageObject", name: p.title || "", caption: p.caption || "", contentUrl: jsonLdImageUrl(data, p), thumbnailUrl: variant(p, "thumb", "jpeg") ? absoluteUrl(data, variant(p, "thumb", "jpeg").replace(/^\.\.\//, "")) : undefined })) };
+  return { "@context": "https://schema.org", "@type": "ImageGallery", name: data.gallery?.headline || "Gallery", description: data.gallery?.intro || data.site?.description || "", url: absoluteUrl(data, "gallery/"), image: (list || []).slice(0, 24).map((p) => ({ "@type": "ImageObject", name: p.title || "", caption: p.caption || "", contentUrl: jsonLdImageUrl(data, p), thumbnailUrl: variant(p, "thumb", "jpeg") ? absoluteUrl(data, variant(p, "thumb", "jpeg").replace(/^(?:\.\.\/)+/, "")) : undefined })) };
 }
 export function personLdObject(data) {
   const base = String(data.site?.baseUrl || "").replace(/\/+$/, "");

@@ -3,7 +3,7 @@ import {
   sortPhotos, storyPhotos, absoluteUrl, root, header, footer,
   homeMain, galleryMain, storiesMain, aboutMain, atlasMain, storyMain, legacyStoryMain,
   websiteLdObject, imageGalleryLdObject, personLdObject, articleLdObject,
-} from "./templates.mjs?v=8cde97e47e";
+} from "./templates.mjs?v=76c0f3d814";
 
 const DATA_PATH = window.__DATA_PATH__ || "assets/data/site-content.json";
 // Signal that the runtime module loaded & executed. The inline <head> failsafe
@@ -74,7 +74,7 @@ function updateMeta(data, {title, description, path="", imagePhoto=null, robots=
   if(imagePhoto){
     const ogImage = ensureMeta('meta[property="og:image"]', "meta", {property:"og:image"});
     const twitterImage = ensureMeta('meta[name="twitter:image"]', "meta", {name:"twitter:image"});
-    const imageUrl = absoluteUrl(data, (variant(imagePhoto, "full", "jpeg") || imgPath(imagePhoto)).replace(/^\.\.\//,""));
+    const imageUrl = absoluteUrl(data, (variant(imagePhoto, "full", "jpeg") || imgPath(imagePhoto)).replace(/^(?:\.\.\/)+/,""));
     ogImage.setAttribute("content", imageUrl);
     twitterImage.setAttribute("content", imageUrl);
   }
