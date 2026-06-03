@@ -30,7 +30,7 @@
   "about": {
     "eyebrow": "About",
     "headline": "A personal archive of photographs, travel notes, and quiet observation.",
-    "portraitPhotoId": "ales-stenar-on-the-horizon",
+    "portraitPhotoId": "anundshog-runestone-vs-13",
     "paragraphs": [
       "I photograph while walking: old streets, weathered façades, waterlines, ruins, signs, and the small details that make a place feel remembered rather than simply visited.",
       "This site is my quiet archive for travel notes and selected photographs. I keep it slow on purpose: fewer images, more attention, and enough space for each frame to hold its own atmosphere.",
@@ -1420,7 +1420,7 @@
         }
       ],
       "readingTime": "2 min read",
-      "featured": true,
+      "featured": false,
       "category": "Ancient Sites",
       "isoDate": "2026-04-12",
       "coordinates": {
@@ -1519,7 +1519,7 @@
       "theme": "Nordic Heritage, Coastal Landscape",
       "summary": "Ales Stenar stands on the southern coast of Sweden, where ancient stones, open fields, sea air, and a vast grey sky create one of Skåne’s most atmospheric landscapes. This story follows a quiet walk around the stone ship, observing its scale, silence, and connection to Nordic memory.",
       "heroPhotoId": "ales-stenar-under-a-grey-sky",
-      "featured": true,
+      "featured": false,
       "tags": [
         "Ales Stenar",
         "Kåseberga",
