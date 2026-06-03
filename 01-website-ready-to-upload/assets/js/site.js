@@ -3,9 +3,13 @@ import {
   sortPhotos, storyPhotos, absoluteUrl, root, header, footer,
   homeMain, galleryMain, storiesMain, aboutMain, storyMain, legacyStoryMain,
   websiteLdObject, imageGalleryLdObject, personLdObject, articleLdObject,
-} from "./templates.mjs?v=04a3ee1555";
+} from "./templates.mjs?v=cb0e600a76";
 
 const DATA_PATH = window.__DATA_PATH__ || "assets/data/site-content.json";
+// Signal that the runtime module loaded & executed. The inline <head> failsafe
+// removes `.js-reveal` if this is still false after a timeout, so a module that
+// fails to load can never leave the pre-rendered content hidden at opacity:0.
+window.__siteBooted = true;
 
 function inlineData(){
   const el = document.getElementById("hydration-data");
@@ -424,9 +428,12 @@ function bindLightbox(data, getVisiblePhotos){
     return visible.some(item => item.id === current.id) ? visible : photos(data);
   };
   const open = (p, mode="push") => {
+    // Only capture the origin element when opening from a closed state. step()
+    // re-opens with mode "replace"; capturing there would overwrite lastFocus
+    // with the (soon-hidden) close button and break focus restoration on close.
+    if(box.hidden) lastFocus = document.activeElement;
     current = p;
-    lastFocus = document.activeElement;
-    media.innerHTML = responsiveImage(p,{className:"lightbox-img is-loading",priority:true,sizes:"1200px",fallbackSize:"full"});
+    media.innerHTML = responsiveImage(p,{className:"lightbox-img is-loading",priority:true,sizes:"(max-width: 850px) 100vw, 1200px",fallbackSize:"full"});
     const fullImg = media.querySelector(".lightbox-img");
     if(fullImg){
       const thumbUrl = variant(p,"thumb","avif") || variant(p,"thumb","webp") || variant(p,"thumb","jpeg") || imgPath(p);
@@ -507,6 +514,7 @@ function bindLightbox(data, getVisiblePhotos){
     const dy = touch.clientY - touchStartY;
     if(Math.abs(dx) > 52 && Math.abs(dx) > Math.abs(dy) * 1.4) step(dx < 0 ? 1 : -1);
   }, {passive:true});
+  if(!navigator.share) share.hidden = true;
   share.addEventListener("click", async () => {
     if(!current) return;
     const url = urlFor(current);
