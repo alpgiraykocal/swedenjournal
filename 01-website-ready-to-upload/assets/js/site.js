@@ -3,7 +3,7 @@ import {
   sortPhotos, storyPhotos, absoluteUrl, root, header, footer,
   homeMain, galleryMain, storiesMain, aboutMain, storyMain, legacyStoryMain,
   websiteLdObject, imageGalleryLdObject, personLdObject, articleLdObject,
-} from "./templates.mjs?v=cb0e600a76";
+} from "./templates.mjs?v=12c62477d8";
 
 const DATA_PATH = window.__DATA_PATH__ || "assets/data/site-content.json";
 // Signal that the runtime module loaded & executed. The inline <head> failsafe
@@ -224,6 +224,7 @@ async function boot(){
     if(document.body.dataset.prerendered === "1"){
       await hydrate(page);
       bindScrollReveal();
+      bindImageLoadFade();
       return;
     }
     const data = await loadContent();
@@ -245,6 +246,7 @@ async function boot(){
     if(page === "about") renderAbout(data);
     if(page === "story") renderStory(data);
     bindScrollReveal();
+    bindImageLoadFade();
   }catch(e){
     $("#app").innerHTML = `<main class="container section"><h1 class="headline">Content could not be loaded.</h1><p class="intro">${esc(e.message)}</p></main>`;
   }
@@ -300,7 +302,8 @@ function renderStory(data){
   bindShareControls();
   bindLightbox(data, () => storyPhotos(data, s));
 }
-function bindScrollReveal(){const els=[...document.querySelectorAll(".photo-card,.story-card,.related-photos .photo-card,.story-inline-photo,.story-body > p,.story-body > h2,.story-body > blockquote")];if(typeof IntersectionObserver==="undefined"){els.forEach(el=>el.classList.add("revealed"));return;}const io=new IntersectionObserver((entries)=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add("revealed");io.unobserve(e.target);}});},{threshold:0.08,rootMargin:"0px 0px -40px 0px"});els.forEach(el=>{if(!el.classList.contains("revealed"))io.observe(el);});}function bindStoryFilters(){
+function bindScrollReveal(){const els=[...document.querySelectorAll(".photo-card,.story-card,.related-photos .photo-card,.story-inline-photo,.story-body > p,.story-body > h2,.story-body > blockquote")];if(typeof IntersectionObserver==="undefined"){els.forEach(el=>el.classList.add("revealed"));return;}const io=new IntersectionObserver((entries)=>{let i=0;entries.forEach(e=>{if(!e.isIntersecting)return;const el=e.target;const delay=Math.min(i,6)*55;i++;if(delay){el.style.transitionDelay=delay+"ms";setTimeout(()=>{el.style.transitionDelay="";},delay+650);}el.classList.add("revealed");io.unobserve(el);});},{threshold:0.08,rootMargin:"0px 0px -40px 0px"});els.forEach(el=>{if(!el.classList.contains("revealed"))io.observe(el);});}
+function bindImageLoadFade(){const sel=".photo-media img,.story-card-media img,.featured-story-media img,.story-inline-img,.hero-img,.about-img,.story-hero img";document.querySelectorAll(sel).forEach(img=>{if(img.complete&&img.naturalWidth){img.classList.add("img-loaded");return;}img.classList.add("img-loading");const done=()=>{img.classList.remove("img-loading");img.classList.add("img-loaded");};img.addEventListener("load",done,{once:true});img.addEventListener("error",done,{once:true});});}function bindStoryFilters(){
   const scope = $(".stories-section") || document;
   const cards = [...scope.querySelectorAll("[data-story-card]")];
   const count = $("#storyCount");
