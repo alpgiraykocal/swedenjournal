@@ -47,6 +47,7 @@ entries.push(urlEntry({ loc: `${base}/`, lastmod: latestStory }));
 entries.push(urlEntry({ loc: `${base}/gallery/`, lastmod: buildDay, images: imageTags(photos) }));
 entries.push(urlEntry({ loc: `${base}/stories/`, lastmod: latestStory }));
 entries.push(urlEntry({ loc: `${base}/about/`, lastmod: buildDay }));
+entries.push(urlEntry({ loc: `${base}/atlas/`, lastmod: buildDay }));
 for (const s of stories.filter((s) => s.title && s.slug)) {
   entries.push(urlEntry({
     loc: `${base}/stories/${encodeURIComponent(s.slug)}/`,

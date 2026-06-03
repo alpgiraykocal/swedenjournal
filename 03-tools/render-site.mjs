@@ -9,7 +9,7 @@ import fs from "node:fs";
 import path from "node:path";
 import {
   setContext, photos, photo, storyPhotos, sortPhotos,
-  header, footer, homeMain, galleryMain, storiesMain, aboutMain, storyMain, legacyStoryMain,
+  header, footer, homeMain, galleryMain, storiesMain, aboutMain, atlasMain, storyMain, legacyStoryMain,
   websiteLdObject, imageGalleryLdObject, personLdObject, articleLdObject,
 } from "../01-website-ready-to-upload/assets/js/templates.mjs";
 
@@ -68,6 +68,7 @@ n += page("index.html", { pfx: "", active: "home", mainHtml: () => homeMain(data
 n += page("gallery/index.html", { pfx: "../", active: "gallery", mainHtml: () => galleryMain(data), headLd: ld(imageGalleryLdObject(data)) });
 n += page("stories/index.html", { pfx: "../", active: "stories", mainHtml: () => storiesMain(data) });
 n += page("about/index.html", { pfx: "../", active: "about", mainHtml: () => aboutMain(data), headLd: ld(personLdObject(data)) });
+n += page("atlas/index.html", { pfx: "../", active: "atlas", mainHtml: () => atlasMain(data) });
 n += page("story/index.html", { pfx: "../", active: "story", mainHtml: () => legacyStoryMain(data) });
 const liveSlugs = new Set();
 for (const s of data.stories || []) {

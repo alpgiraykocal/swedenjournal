@@ -1,0 +1,15 @@
+{
+  "name": "Sweden Journal",
+  "short_name": "Sweden Journal",
+  "description": "A personal photo journal — photography, travel notes, and quiet observations from Sweden and beyond.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f3efe7",
+  "theme_color": "#f3efe7",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/favicon.svg", "type": "image/svg+xml", "sizes": "any" }
+  ]
+}

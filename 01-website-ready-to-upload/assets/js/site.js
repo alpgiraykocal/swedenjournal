@@ -1,9 +1,9 @@
 import {
   setContext, esc, photos, photo, imgPath, metaText, variant, srcset, responsiveImage,
   sortPhotos, storyPhotos, absoluteUrl, root, header, footer,
-  homeMain, galleryMain, storiesMain, aboutMain, storyMain, legacyStoryMain,
+  homeMain, galleryMain, storiesMain, aboutMain, atlasMain, storyMain, legacyStoryMain,
   websiteLdObject, imageGalleryLdObject, personLdObject, articleLdObject,
-} from "./templates.mjs?v=aa170b3df5";
+} from "./templates.mjs?v=9cd5e51fd9";
 
 const DATA_PATH = window.__DATA_PATH__ || "assets/data/site-content.json";
 // Signal that the runtime module loaded & executed. The inline <head> failsafe
@@ -159,7 +159,8 @@ async function hydrate(page){
     bindLightbox(data, () => storyPhotos(data, s));
   }else if(page === "stories"){
     bindStoryFilters();
-    initStoriesMap();
+  }else if(page === "atlas"){
+    initMap("atlasMap", "atlas-map-data");
   }
 }
 function loadLeaflet(){
@@ -180,9 +181,9 @@ function loadLeaflet(){
   });
   return window.__leafletPromise;
 }
-function initStoriesMap(){
-  const el = document.getElementById("storiesMap");
-  const dataEl = document.getElementById("stories-map-data");
+function initMap(elId, dataId){
+  const el = document.getElementById(elId);
+  const dataEl = document.getElementById(dataId);
   if(!el || !dataEl) return;
   let stories;
   try{ stories = JSON.parse(dataEl.textContent); }catch(e){ return; }
@@ -237,6 +238,7 @@ async function boot(){
       gallery: sortPhotos(photos(data))[0],
       stories: storyPhotos(data, [...(data.stories || [])].sort((a,b)=>Number(Boolean(b.featured))-Number(Boolean(a.featured)))[0] || {})[0],
       about: photo(data, data.about?.portraitPhotoId),
+      atlas: null,
       story: photo(data, ((data.stories || []).find(x => x.slug===currentStorySlug()) || data.stories?.[0])?.heroPhotoId)
     };
     injectPreload(preloadMap[page], "(max-width: 850px) calc(100vw - 28px), 1180px", "medium");
@@ -244,6 +246,7 @@ async function boot(){
     if(page === "gallery") renderGallery(data);
     if(page === "stories") renderStories(data);
     if(page === "about") renderAbout(data);
+    if(page === "atlas") renderAtlas(data);
     if(page === "story") renderStory(data);
     bindScrollReveal();
     bindImageLoadFade();
@@ -278,6 +281,14 @@ function renderAbout(data){
   updateMeta(data, {title:"About", description:(a.paragraphs||[])[0] || data.site?.description, path:"about/", imagePhoto:p});
   jsonLdPerson(data);
   $("#app").innerHTML = aboutMain(data);
+}
+function renderAtlas(data){
+  const ap = data.atlasPage || {};
+  const firstPlaced = (data.stories||[]).find(s => s.coordinates && Number.isFinite(Number(s.coordinates.lat)));
+  const hp = firstPlaced ? photo(data, firstPlaced.heroPhotoId) : null;
+  updateMeta(data, {title: ap.headline || "Atlas", description: ap.intro || data.site?.description, path:"atlas/", imagePhoto:hp});
+  $("#app").innerHTML = atlasMain(data);
+  initMap("atlasMap", "atlas-map-data");
 }
 function renderStory(data){
   if(isLegacyStoryShell()){

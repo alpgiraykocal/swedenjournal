@@ -61,6 +61,7 @@ const heroFor = {
   "gallery/index.html": sortPhotos(photos)[0]?.id || null,
   "stories/index.html": featuredStoryHeroId(),
   "about/index.html": data.about?.portraitPhotoId || null,
+  "atlas/index.html": null,
   "404.html": null,
   "story/index.html": null,
 };
@@ -87,9 +88,12 @@ function heroPreloadLine(prefix, heroId, sizes) {
 function buildBlock(prefix, heroId, sizes) {
   const lines = [
     `  ${START}`,
-    `  <script>document.documentElement.classList.add('js-reveal')</script>`,
+    `  <script>document.documentElement.classList.add('js-reveal');setTimeout(function(){if(!window.__siteBooted){document.documentElement.classList.remove('js-reveal')}},2500)</script>`,
     `  <meta name="theme-color" content="${THEME_LIGHT}" media="(prefers-color-scheme: light)">`,
     `  <meta name="theme-color" content="${THEME_DARK}" media="(prefers-color-scheme: dark)">`,
+    `  <link rel="icon" href="${prefix}favicon.svg" type="image/svg+xml">`,
+    `  <link rel="apple-touch-icon" href="${prefix}apple-touch-icon.png">`,
+    `  <link rel="manifest" href="${prefix}site.webmanifest">`,
     `  <link rel="preload" href="${prefix}assets/fonts/fraunces-latin-standard-normal.woff2" as="font" type="font/woff2" crossorigin>`,
     `  <link rel="preload" href="${prefix}assets/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>`,
   ];
