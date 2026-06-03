@@ -486,7 +486,7 @@ body[data-page="gallery"] .photo-card[hidden]{display:none!important}
 .footer-row{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
 .footer-row a{min-height:44px;display:inline-flex;align-items:center;color:var(--accent);font-weight:650}
 .ig-icon{width:18px;height:18px;flex-shrink:0;display:block}
-.ig-nav-link{padding:0 10px!important}
+.ig-nav-link{padding:0 10px!important;border-color:transparent!important;background:none!important}
 .ig-footer-link{gap:7px}
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
