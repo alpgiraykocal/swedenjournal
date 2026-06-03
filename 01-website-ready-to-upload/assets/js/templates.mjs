@@ -208,6 +208,10 @@ export function legacyStoryMain(data) {
   return `<main class="container section"><p class="eyebrow">Stories</p><h1 class="headline">${esc(data.storiesPage?.headline || "Stories")}</h1><p class="intro">${esc(data.storiesPage?.intro || data.site?.description || "")}</p><p><a class="text-link" href="${root()}stories/index.html">Return to stories</a></p></main>`;
 }
 
+export function notFoundMain(data) {
+  return `<main><section class="hero container"><p class="eyebrow">Page not found</p><h1 class="headline">This page is not available.</h1><p class="intro">The link may be outdated, or the page may have moved. Return to the archive and continue from there.</p><div class="closing-links" style="margin-top:32px"><a class="text-link" href="${root()}index.html">Return home</a><a class="text-link" href="${root()}stories/index.html">Read stories</a><a class="text-link" href="${root()}atlas/index.html">Explore the atlas</a></div></section></main>`;
+}
+
 // ---- JSON-LD object builders (pure) ----
 export const machineDate = (v) => (/^\d{4}-\d{2}-\d{2}$/.test(String(v || "").trim()) ? String(v).trim() : undefined);
 export const jsonLdImageUrl = (data, p) => (p ? absoluteUrl(data, (variant(p, "full", "jpeg") || imgPath(p)).replace(/^\.\.\//, "")) : undefined);

@@ -267,6 +267,7 @@ function checkNoDuplicateCopyArtifacts(baseDir) {
   const stack = [baseDir];
   while (stack.length) {
     const current = stack.pop();
+    if (!fs.existsSync(current)) continue; // 04-upload-package is optional/gitignored
     for (const entry of fs.readdirSync(current, { withFileTypes: true })) {
       const nextPath = path.join(current, entry.name);
       if (/ [0-9]+$/.test(entry.name)) fail(`Duplicate copy artifact found: ${path.relative(root, nextPath)}`);
@@ -356,28 +357,35 @@ function checkPublicRuntime(baseDir) {
 checkRootCleanliness();
 checkWorkspaceCleanliness();
 checkContent(websiteDir, { requireSourcePhotos: true });
-checkContent(packageDir, { requireSourcePhotos: false });
 checkHtmlMetadata(websiteDir);
-checkHtmlMetadata(packageDir);
 checkSitemap(websiteDir);
-checkSitemap(packageDir);
 checkRss(websiteDir);
-checkRss(packageDir);
 checkStoryShells(websiteDir);
-checkStoryShells(packageDir);
 checkFallbackFiles(websiteDir);
-checkFallbackFiles(packageDir);
 checkLegacyStoryShell(websiteDir);
-checkLegacyStoryShell(packageDir);
 checkSourcePhotoGuard();
-checkUploadPackagePrivacy();
 checkAvifEfficiency(websiteDir);
-checkAvifEfficiency(packageDir);
 checkNoDuplicateCopyArtifacts(websiteDir);
-checkNoDuplicateCopyArtifacts(packageDir);
 checkEditor();
 checkPublicRuntime(websiteDir);
-checkPublicRuntime(packageDir);
+
+// 04-upload-package is an optional, gitignored local artifact produced by
+// `npm run build:package`. The deployed site is 01-website-ready-to-upload
+// (see .github/workflows/deploy.yml), so only validate the package when it
+// actually exists — otherwise QA would flood false "missing" failures.
+if (fs.existsSync(packageDir)) {
+  checkContent(packageDir, { requireSourcePhotos: false });
+  checkHtmlMetadata(packageDir);
+  checkSitemap(packageDir);
+  checkRss(packageDir);
+  checkStoryShells(packageDir);
+  checkFallbackFiles(packageDir);
+  checkLegacyStoryShell(packageDir);
+  checkUploadPackagePrivacy();
+  checkAvifEfficiency(packageDir);
+  checkNoDuplicateCopyArtifacts(packageDir);
+  checkPublicRuntime(packageDir);
+}
 
 if (failures.length) {
   console.error("Static QA failed:");
