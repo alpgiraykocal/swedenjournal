@@ -102,7 +102,9 @@ n += page("gallery/index.html", { pfx: "../", active: "gallery", mainHtml: () =>
 n += page("stories/index.html", { pfx: "../", active: "stories", mainHtml: () => storiesMain(data), headLd: ld(storiesLdObject(data)) + ld(crumbs({ name: "Home", path: "" }, { name: "Stories", path: "stories/" })) });
 n += page("about/index.html", { pfx: "../", active: "about", mainHtml: () => aboutMain(data), headLd: ld(personLdObject(data)) + ld(crumbs({ name: "Home", path: "" }, { name: "About", path: "about/" })) });
 n += page("atlas/index.html", { pfx: "../", active: "atlas", mainHtml: () => atlasMain(data), headLd: ld(atlasLdObject(data)) + ld(crumbs({ name: "Home", path: "" }, { name: "Atlas", path: "atlas/" })) });
-n += page("404.html", { pfx: "", active: "", mainHtml: () => notFoundMain(data) });
+// 404 is served by the host at ANY URL depth (catch-all). Its links/assets must be
+// root-absolute ("/…") so they resolve the same from "/" and "/deep/missing/path/".
+n += page("404.html", { pfx: "/", active: "", mainHtml: () => notFoundMain(data) });
 n += page("story/index.html", { pfx: "../", active: "story", mainHtml: () => legacyStoryMain(data) });
 const liveSlugs = new Set();
 for (const s of data.stories || []) {

@@ -32,3 +32,6 @@ graphify-out/
 # >>> Keep your own backup of this folder — you need it to re-encode image variants.
 # >>> Delete the line below if you prefer to version the originals in git.
 01-website-ready-to-upload/assets/images/photos/
+
+# Playwright MCP session scratch (snapshots, console logs)
+.playwright-mcp/

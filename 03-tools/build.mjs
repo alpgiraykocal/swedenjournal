@@ -63,7 +63,7 @@ for (const f of walkHtml(websiteDir)) {
     (_m, src) => `<script type="module" src="${src}?v=${V}">`,
   );
   html = html.replace(
-    /<link rel="stylesheet" href="((?:\.\.\/)*assets\/css\/site\.css)(?:\?v=[A-Za-z0-9]+)?">/g,
+    /<link rel="stylesheet" href="((?:(?:\.\.\/)*|\/)assets\/css\/site\.css)(?:\?v=[A-Za-z0-9]+)?">/g,
     (_m, href) => `<link rel="stylesheet" href="${href}?v=${V}">`,
   );
   fs.writeFileSync(f, html);

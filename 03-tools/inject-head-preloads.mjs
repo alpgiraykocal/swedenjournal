@@ -41,15 +41,6 @@ function preferredFormat(p) {
   return [["avif", "image/avif"], ["webp", "image/webp"], ["jpeg", "image/jpeg"]]
     .find(([fmt]) => variant(p, "medium", fmt) || srcset(p, fmt)) || ["jpeg", "image/jpeg"];
 }
-function sortPhotos(list) {
-  return [...list].sort((a, b) => {
-    const ao = Number.isFinite(Number(a.sortOrder)) ? Number(a.sortOrder) : 999999;
-    const bo = Number.isFinite(Number(b.sortOrder)) ? Number(b.sortOrder) : 999999;
-    if (ao !== bo) return ao - bo;
-    if (Boolean(a.featured) !== Boolean(b.featured)) return a.featured ? -1 : 1;
-    return String(a.title || "").localeCompare(String(b.title || ""));
-  });
-}
 function featuredStoryHeroId() {
   const stories = [...(data.stories || [])].sort((a, b) => Number(Boolean(b.featured)) - Number(Boolean(a.featured)));
   return (stories.find((s) => s.featured) || stories[0])?.heroPhotoId || null;
@@ -58,7 +49,11 @@ function featuredStoryHeroId() {
 // page file -> hero photo id (null = no hero, fonts + theme-color only)
 const heroFor = {
   "index.html": data.home?.heroPhotoId || null,
-  "gallery/index.html": sortPhotos(photos)[0]?.id || null,
+  // No hero preload for the gallery: it's a grid with no single dominant LCP, and the
+  // first grid images already render eager + fetchpriority="high". Preloading one thumb
+  // made the scanner fetch a `thumb` candidate the render never used (medium), wasting
+  // bandwidth + emitting a "preloaded but not used" console warning.
+  "gallery/index.html": null,
   "stories/index.html": featuredStoryHeroId(),
   "about/index.html": data.about?.portraitPhotoId || null,
   "atlas/index.html": null,
@@ -108,9 +103,9 @@ for (const [rel, heroId] of Object.entries(heroFor)) {
   const file = path.join(websiteDir, rel);
   if (!fs.existsSync(file)) continue;
   let html = fs.readFileSync(file, "utf8");
-  const styleMatch = html.match(/(\s*)<link rel="stylesheet" href="((?:\.\.\/)*)assets\/css\/site\.css/);
+  const styleMatch = html.match(/(\s*)<link rel="stylesheet" href="((?:\.\.\/)*|\/)assets\/css\/site\.css/);
   if (!styleMatch) { console.warn(`! no stylesheet anchor in ${rel}, skipped`); continue; }
-  const prefix = styleMatch[2]; // "", "../", "../../"
+  const prefix = styleMatch[2]; // "", "../", "../../", or "/" (404 catch-all → root-absolute)
   const sizes = sizesFor[rel] || SIZES_STORY;
   const block = buildBlock(prefix, heroId, sizes);
   const between = new RegExp(`[ \\t]*${START}[\\s\\S]*?${END}\\n?`);
