@@ -1459,6 +1459,50 @@
         }
       },
       "category": "Castles"
+    },
+    {
+      "id": "saltangsbron-runestone-vs9",
+      "title": "Saltängsbron Runestone (Vs 9)",
+      "location": "Saltängsbron, Västmanland, Sweden",
+      "date": "Summer 2025",
+      "season": "Summer",
+      "theme": "Runestone, Viking Age, Ancient Inscription, Nordic Heritage",
+      "tags": [
+        "Saltängsbron",
+        "Vs 9",
+        "Västmanland",
+        "Sweden",
+        "runestone",
+        "rune stone",
+        "Viking Age",
+        "inscription",
+        "ancient sites"
+      ],
+      "src": "assets/images/photos/saltangsbron-runestone-vs-9.jpeg",
+      "width": 6240,
+      "height": 4160,
+      "alt": "A weathered grey runestone stands upright in a green late-summer meadow, its looping runic band and serpent ornament picked out in red, with birch trees and open Västmanland fields behind it.",
+      "caption": "Raised by Gísl in memory of his son Ásl, who died in England — its runes still traced in red across the granite.",
+      "sortOrder": 40,
+      "featured": true,
+      "variants": {
+        "thumb": {
+          "jpeg": "assets/images/generated/thumb/saltangsbron-runestone-vs-9.jpeg",
+          "webp": "assets/images/generated/thumb/saltangsbron-runestone-vs-9.webp",
+          "width": 480
+        },
+        "medium": {
+          "jpeg": "assets/images/generated/medium/saltangsbron-runestone-vs-9.jpeg",
+          "webp": "assets/images/generated/medium/saltangsbron-runestone-vs-9.webp",
+          "width": 1200
+        },
+        "full": {
+          "jpeg": "assets/images/generated/full/saltangsbron-runestone-vs-9.jpeg",
+          "webp": "assets/images/generated/full/saltangsbron-runestone-vs-9.webp",
+          "width": 2200
+        }
+      },
+      "category": "Ancient Sites"
     }
   ],
   "stories": [
