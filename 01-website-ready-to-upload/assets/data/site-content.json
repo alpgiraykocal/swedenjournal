@@ -1398,17 +1398,20 @@
         "thumb": {
           "jpeg": "assets/images/generated/thumb/glimmingehus-across-the-moat.jpeg",
           "webp": "assets/images/generated/thumb/glimmingehus-across-the-moat.webp",
-          "width": 480
+          "width": 480,
+          "avif": "assets/images/generated/thumb/glimmingehus-across-the-moat.avif"
         },
         "medium": {
           "jpeg": "assets/images/generated/medium/glimmingehus-across-the-moat.jpeg",
           "webp": "assets/images/generated/medium/glimmingehus-across-the-moat.webp",
-          "width": 1200
+          "width": 1200,
+          "avif": "assets/images/generated/medium/glimmingehus-across-the-moat.avif"
         },
         "full": {
           "jpeg": "assets/images/generated/full/glimmingehus-across-the-moat.jpeg",
           "webp": "assets/images/generated/full/glimmingehus-across-the-moat.webp",
-          "width": 2200
+          "width": 2200,
+          "avif": "assets/images/generated/full/glimmingehus-across-the-moat.avif"
         }
       },
       "category": "Castles"

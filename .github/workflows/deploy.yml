@@ -26,7 +26,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-      # build.mjs uses only Node built-ins (no npm packages), so no install needed.
+          cache: "npm"
+      # sharp (via the backfill-avif build step) is the only runtime dependency: it
+      # encodes AVIF for editor-added photos that shipped without it. Everything else
+      # in build.mjs uses Node built-ins. npm ci installs the pinned sharp-cli/sharp.
+      - name: Install dependencies
+        run: npm ci
       - name: Build (SSG pre-render)
         run: npm run build
       - uses: actions/upload-pages-artifact@v3

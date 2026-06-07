@@ -9,6 +9,7 @@
     "qa": "node 03-tools/qa-static-checks.mjs"
   },
   "devDependencies": {
+    "sharp": "^0.30.6",
     "sharp-cli": "^2.1.0"
   }
 }

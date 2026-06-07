@@ -18,6 +18,7 @@ const websiteDir = path.join(root, "01-website-ready-to-upload");
 
 // 1. Generators + pre-render — each writes into 01-website-ready-to-upload in place.
 for (const step of [
+  "backfill-avif.mjs",
   "sync-image-variants.mjs",
   "generate-rss.mjs",
   "generate-sitemap.mjs",
