@@ -187,6 +187,15 @@ function loadLeaflet(){
   });
   return window.__leafletPromise;
 }
+function placePopupHtml(s){
+  const meta = metaText([s.location, s.date]);
+  return `<a class="map-popup" href="${esc(s.href)}">`
+    + (s.thumb ? `<img src="${esc(s.thumb)}" alt="" loading="lazy">` : "")
+    + `<span class="map-popup-body"><strong>${esc(s.title)}</strong>`
+    + (meta ? `<span class="map-popup-meta">${esc(meta)}</span>` : "")
+    + (s.summary ? `<span class="map-popup-snippet">${esc(s.summary)}</span>` : "")
+    + `<span class="map-popup-cta">Read story &rarr;</span></span></a>`;
+}
 function initMap(elId, dataId){
   const el = document.getElementById(elId);
   const dataEl = document.getElementById(dataId);
@@ -196,6 +205,7 @@ function initMap(elId, dataId){
   if(!Array.isArray(stories) || !stories.length) return;
   const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const dark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+  const cards = Array.from(document.querySelectorAll(".atlas-place[data-place-slug]"));
   const start = () => loadLeaflet().then(L => {
     if(el._mapReady) return;
     el._mapReady = true;
@@ -204,18 +214,60 @@ function initMap(elId, dataId){
       maxZoom:19, subdomains:"abcd",
       attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
     }).addTo(map);
+    const bySlug = new Map();
     const markers = stories.map(s => {
       const icon = L.divIcon({ className:"map-pin", html:`<img src="${esc(s.thumb)}" alt="${esc(s.alt||s.title)}">`, iconSize:[52,52], iconAnchor:[26,26] });
       const m = L.marker([s.lat, s.lng], { icon, title:s.title, alt:s.title, riseOnHover:true, keyboard:true }).addTo(map);
+      m._slug = s.slug;
       m.bindTooltip(s.title, { direction:"top", offset:[0,-28] });
-      m.on("click", () => { location.href = s.href; });
+      m.bindPopup(placePopupHtml(s), { className:"map-popup-wrap", minWidth:230, maxWidth:260, autoPanPadding:[28,28] });
+      if(s.slug) bySlug.set(s.slug, m);
       return m;
     });
-    if(markers.length > 1){
-      map.fitBounds(L.featureGroup(markers).getBounds().pad(0.25), { animate:!reduce });
-    }else{
-      map.setView([stories[0].lat, stories[0].lng], 9, { animate:false });
+    const fitAll = () => {
+      if(markers.length > 1) map.fitBounds(L.featureGroup(markers).getBounds().pad(0.25), { animate:!reduce });
+      else map.setView([stories[0].lat, stories[0].lng], 9, { animate:false });
+    };
+    fitAll();
+    // Deep-link focus: /atlas/?place=<slug> (from a story's "View on the map") opens
+    // that pin and centres on it.
+    let focused = null;
+    try{ focused = new URLSearchParams(location.search).get("place"); }catch(e){}
+    if(focused && bySlug.has(focused)){
+      const tm = bySlug.get(focused);
+      const go = () => { map.setView(tm.getLatLng(), Math.max(map.getZoom(), 7), { animate:!reduce }); tm.openPopup(); };
+      if(reduce) go(); else setTimeout(go, 350);
     }
+    // Recenter control — refit every marker into view.
+    const Recenter = L.Control.extend({ options:{ position:"topleft" }, onAdd:function(){
+      const b = L.DomUtil.create("button", "map-recenter");
+      b.type = "button"; b.title = "Tüm yerleri göster"; b.setAttribute("aria-label", "Tüm yerleri göster"); b.innerHTML = "&#9974;";
+      L.DomEvent.on(b, "click", L.DomEvent.stop).on(b, "click", fitAll);
+      return b;
+    }});
+    map.addControl(new Recenter());
+    // Two-way highlight between the place list and the map pins.
+    const setActive = (slug) => {
+      cards.forEach(c => c.classList.toggle("is-active", !!slug && c.dataset.placeSlug === slug));
+      markers.forEach(m => { const ic = m.getElement && m.getElement(); if(ic) ic.classList.toggle("map-pin--active", m._slug === slug); });
+    };
+    cards.forEach(card => {
+      const slug = card.dataset.placeSlug, m = bySlug.get(slug);
+      card.addEventListener("mouseenter", () => { setActive(slug); if(m) m.setZIndexOffset(1000); });
+      card.addEventListener("mouseleave", () => setActive(null));
+      card.addEventListener("focus", () => { setActive(slug); if(m) map.panTo(m.getLatLng(), { animate:!reduce }); });
+      card.addEventListener("blur", () => setActive(null));
+    });
+    markers.forEach(m => {
+      m.on("mouseover", () => setActive(m._slug));
+      m.on("mouseout", () => setActive(null));
+      m.on("popupopen", () => {
+        setActive(m._slug);
+        const card = cards.find(c => c.dataset.placeSlug === m._slug);
+        if(card && card.scrollIntoView) card.scrollIntoView({ block:"nearest", behavior: reduce ? "auto" : "smooth" });
+      });
+      m.on("popupclose", () => setActive(null));
+    });
   }).catch(() => {});
   if("IntersectionObserver" in window){
     const io = new IntersectionObserver((entries) => {
