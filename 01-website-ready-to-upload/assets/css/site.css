@@ -699,6 +699,20 @@ body[data-page="gallery"] .photo-card[hidden]{display:none!important}
   .lightbox-img {
     background: rgba(26,24,21,.18);
   }
+  /* The photo "expand" affordance and the lightbox are ALWAYS-dark glass surfaces
+     (their background is a fixed dark rgba in both themes). Their foreground uses
+     var(--paper), which flips to a dark tone in dark mode — making the lightbox
+     title, close (x), prev/next and Share/Copy controls near-invisible (~1.1:1).
+     Pin these to a fixed light ink so they stay legible in dark mode. */
+  .photo-open,
+  .lightbox,
+  .lightbox-copy h2,
+  .lightbox-close,
+  .lightbox-nav,
+  .lightbox .share-action,
+  .lightbox .share-action:hover {
+    color: #fff8ef;
+  }
 }
 
 @media (prefers-color-scheme: dark) and (prefers-reduced-motion: no-preference) {
