@@ -1415,6 +1415,50 @@
         }
       },
       "category": "Castles"
+    },
+    {
+      "id": "cobbled-courtyard-at-glimmingehus",
+      "title": "Cobbled Courtyard at Glimmingehus",
+      "location": "Glimmingehus, Hammenhög, Sweden",
+      "date": "Spring 2026",
+      "season": "Spring",
+      "theme": "Castle, Courtyard, Medieval Heritage, Cobblestone",
+      "tags": [
+        "Glimmingehus",
+        "Skåne",
+        "Hammenhög",
+        "Sweden",
+        "castle",
+        "courtyard",
+        "cobblestone",
+        "pillory",
+        "medieval"
+      ],
+      "src": "assets/images/photos/cobbled-courtyard-at-glimmingehus.jpeg",
+      "width": 6240,
+      "height": 4160,
+      "alt": "The empty cobblestone courtyard of Glimmingehus, enclosed by ochre-yellow outbuildings with red tile roofs, with a wooden replica pillory standing at its centre under an overcast spring sky.",
+      "caption": "Inside the walls at Glimmingehus, a cobbled courtyard with a wooden pillory at its heart.",
+      "sortOrder": 39,
+      "featured": false,
+      "variants": {
+        "thumb": {
+          "jpeg": "assets/images/generated/thumb/cobbled-courtyard-at-glimmingehus.jpeg",
+          "webp": "assets/images/generated/thumb/cobbled-courtyard-at-glimmingehus.webp",
+          "width": 480
+        },
+        "medium": {
+          "jpeg": "assets/images/generated/medium/cobbled-courtyard-at-glimmingehus.jpeg",
+          "webp": "assets/images/generated/medium/cobbled-courtyard-at-glimmingehus.webp",
+          "width": 1200
+        },
+        "full": {
+          "jpeg": "assets/images/generated/full/cobbled-courtyard-at-glimmingehus.jpeg",
+          "webp": "assets/images/generated/full/cobbled-courtyard-at-glimmingehus.webp",
+          "width": 2200
+        }
+      },
+      "category": "Castles"
     }
   ],
   "stories": [
