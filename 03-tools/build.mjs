@@ -43,6 +43,15 @@ const V = hashOf(
   path.join(websiteDir, "assets/css/site.css"),
 );
 
+// Content-data version: hash of the runtime-fetched JSON. The runtime appends this as
+// ?v= to the gallery.json / site-content.json fetches (via window.__DATA_VERSION__,
+// injected below). The JSON is long-cached at the CDN and _headers is ignored by the
+// host, so this content-versioned URL is what makes a published edit actually appear.
+const DV = hashOf(
+  path.join(websiteDir, "assets/data/site-content.json"),
+  path.join(websiteDir, "assets/data/gallery.json"),
+);
+
 // 3. Normalize every HTML: site.js MUST be type="module" (it imports templates.mjs),
 //    and both site.js + site.css get the content-hashed ?v=. Fixes anything the editor
 //    wrote (non-module tag, stale version).
@@ -65,6 +74,12 @@ for (const f of walkHtml(websiteDir)) {
   html = html.replace(
     /<link rel="stylesheet" href="((?:(?:\.\.\/)*|\/)assets\/css\/site\.css)(?:\?v=[A-Za-z0-9]+)?">/g,
     (_m, href) => `<link rel="stylesheet" href="${href}?v=${V}">`,
+  );
+  // Inject the content-data version right after the asset-prefix bootstrap so the runtime
+  // can cache-bust its JSON fetches. Idempotent: replaces any prior __DATA_VERSION__.
+  html = html.replace(
+    /(window\.__ASSET_PREFIX__="[^"]*";)(window\.__DATA_VERSION__="[^"]*";)?/,
+    `$1window.__DATA_VERSION__="${DV}";`,
   );
   fs.writeFileSync(f, html);
   pages += 1;

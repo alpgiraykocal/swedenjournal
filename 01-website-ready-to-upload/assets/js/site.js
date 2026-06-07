@@ -3,9 +3,15 @@ import {
   sortPhotos, storyPhotos, absoluteUrl, root, header, footer,
   homeMain, galleryMain, storiesMain, aboutMain, atlasMain, storyMain, legacyStoryMain,
   websiteLdObject, imageGalleryLdObject, personLdObject, articleLdObject,
-} from "./templates.mjs?v=76c0f3d814";
+} from "./templates.mjs?v=162ce37f43";
 
-const DATA_PATH = window.__DATA_PATH__ || "assets/data/site-content.json";
+// Cache-bust the runtime content fetches. /assets/data/*.json is served with a long
+// edge cache (the host ignores _headers), so without a content-versioned URL a freshly
+// published edit (e.g. a new gallery photo) stays invisible until the CDN cache expires.
+// build.mjs injects window.__DATA_VERSION__ (a hash of the JSON) into the short-cached
+// HTML, so each content change yields a new fetch URL that bypasses the stale cache.
+const DATA_VERSION = window.__DATA_VERSION__ ? ("?v=" + window.__DATA_VERSION__) : "";
+const DATA_PATH = (window.__DATA_PATH__ || "assets/data/site-content.json") + DATA_VERSION;
 // Signal that the runtime module loaded & executed. The inline <head> failsafe
 // removes `.js-reveal` if this is still false after a timeout, so a module that
 // fails to load can never leave the pre-rendered content hidden at opacity:0.
@@ -24,7 +30,7 @@ async function loadContent(){
   return res.json();
 }
 async function loadGalleryData(){
-  const src = (window.__ASSET_PREFIX__ || "") + "assets/data/gallery.json";
+  const src = (window.__ASSET_PREFIX__ || "") + "assets/data/gallery.json" + DATA_VERSION;
   const res = await fetch(src);
   if(!res.ok) throw new Error("Could not load gallery data");
   return res.json();
