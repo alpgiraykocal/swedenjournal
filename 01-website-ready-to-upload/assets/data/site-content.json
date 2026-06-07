@@ -1849,6 +1849,70 @@
         "lat": 64.3661,
         "lng": 21.2155
       }
+    },
+    {
+      "slug": "glimmingehus",
+      "title": "The Stronghold at Glimmingehus",
+      "location": "Glimmingehus, Hammenhög, Sweden",
+      "date": "Spring 2026",
+      "readingTime": "2 min read",
+      "category": "Castles",
+      "theme": "Nordic Heritage / Medieval Fortress",
+      "summary": "Standing alone among the fields of southeastern Skåne, Glimmingehus is the best-preserved medieval stronghold in Scandinavia — a tall stone house raised around 1500, when this corner of Sweden still answered to the Danish crown.",
+      "heroPhotoId": "glimmingehus-across-the-moat",
+      "featured": false,
+      "tags": [
+        "Glimmingehus",
+        "Skåne",
+        "Hammenhög",
+        "Sweden",
+        "castle",
+        "medieval fortress",
+        "stronghold",
+        "moat",
+        "Nordic heritage"
+      ],
+      "body": [
+        {
+          "type": "paragraph",
+          "text": "You see Glimmingehus long before you reach it: a single grey block of stone rising out of flat Skåne farmland, with no town around it and nothing to soften its outline against the sky. Up close the walls are immense, broken only by small windows set deep into the stone, and a still moat wraps the whole building like a dark ribbon."
+        },
+        {
+          "type": "paragraph",
+          "text": "It was built in the years around 1500 by Jens Holgersen Ulfstand, a Danish knight and naval commander — for this was Danish land then, and would stay so for another century and a half. Less a comfortable manor than a fortified house, it was designed to be defended: thick walls, narrow stairs, and clever traps built into the very fabric of the place."
+        },
+        {
+          "type": "image",
+          "photoId": "glimmingehus-across-the-moat",
+          "caption": "The stone keep mirrored in its moat, with the white manor wing alongside."
+        },
+        {
+          "type": "heading",
+          "text": "Behind the Walls"
+        },
+        {
+          "type": "paragraph",
+          "text": "Step through the gate and the mood shifts. The cobbled courtyard is enclosed by low ochre-yellow outbuildings with red tile roofs — later additions from the farming centuries, when the great house had stopped being a fortress and become the heart of an estate."
+        },
+        {
+          "type": "image",
+          "photoId": "cobbled-courtyard-at-glimmingehus",
+          "caption": "The inner courtyard, with a wooden replica pillory at its centre."
+        },
+        {
+          "type": "paragraph",
+          "text": "On a grey spring afternoon the yard is empty and quiet, the kind of quiet that makes you aware of how many ordinary lives passed across these stones long after the knights were gone. The fortress and the farmyard sit a few steps apart, five hundred years of history folded into one small enclosure."
+        },
+        {
+          "type": "quote",
+          "text": "A stronghold built to keep the world out, standing today with its gates wide open."
+        }
+      ],
+      "isoDate": "2026-04-03",
+      "coordinates": {
+        "lat": 55.5007,
+        "lng": 14.2301
+      }
     }
   ]
 }
