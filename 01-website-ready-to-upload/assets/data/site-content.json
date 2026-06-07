@@ -1368,6 +1368,50 @@
           "avif": "assets/images/generated/full/weathered-window-at-lovanger-kyrkstad.avif"
         }
       }
+    },
+    {
+      "id": "glimmingehus-across-the-moat",
+      "title": "Glimmingehus Across the Moat",
+      "location": "Glimmingehus, Hammenhög, Sweden",
+      "date": "Spring 2026",
+      "season": "Spring",
+      "theme": "Castle, Medieval Architecture, Moat, Stone Keep",
+      "tags": [
+        "Glimmingehus",
+        "Skåne",
+        "Hammenhög",
+        "Sweden",
+        "castle",
+        "medieval fortress",
+        "moat",
+        "stone keep",
+        "reflection"
+      ],
+      "src": "assets/images/photos/glimmingehus-across-the-moat.jpeg",
+      "width": 6240,
+      "height": 4160,
+      "alt": "The tall stone keep of Glimmingehus rises beside a white-walled manor house, reflected in the surrounding moat under an overcast spring sky, with a wooden footbridge crossing the water to the right.",
+      "caption": "Scandinavia's best-preserved medieval stronghold, mirrored in its moat.",
+      "sortOrder": 38,
+      "featured": false,
+      "variants": {
+        "thumb": {
+          "jpeg": "assets/images/generated/thumb/glimmingehus-across-the-moat.jpeg",
+          "webp": "assets/images/generated/thumb/glimmingehus-across-the-moat.webp",
+          "width": 480
+        },
+        "medium": {
+          "jpeg": "assets/images/generated/medium/glimmingehus-across-the-moat.jpeg",
+          "webp": "assets/images/generated/medium/glimmingehus-across-the-moat.webp",
+          "width": 1200
+        },
+        "full": {
+          "jpeg": "assets/images/generated/full/glimmingehus-across-the-moat.jpeg",
+          "webp": "assets/images/generated/full/glimmingehus-across-the-moat.webp",
+          "width": 2200
+        }
+      },
+      "category": "Castles"
     }
   ],
   "stories": [
