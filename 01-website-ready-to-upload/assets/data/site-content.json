@@ -1463,7 +1463,7 @@
     {
       "id": "saltangsbron-runestone-vs9",
       "title": "Saltängsbron Runestone (Vs 9)",
-      "location": "Saltängsbron, Västmanland, Sweden",
+      "location": "Västerås, Västmanland, Sweden",
       "date": "Summer 2025",
       "season": "Summer",
       "theme": "Runestone, Viking Age, Ancient Inscription, Nordic Heritage",
@@ -1499,6 +1499,51 @@
         "full": {
           "jpeg": "assets/images/generated/full/saltangsbron-runestone-vs-9.jpeg",
           "webp": "assets/images/generated/full/saltangsbron-runestone-vs-9.webp",
+          "width": 2200
+        }
+      },
+      "category": "Ancient Sites"
+    },
+    {
+      "id": "runestone-vs10-vasteras",
+      "title": "Runestone Vs 10, Västerås",
+      "location": "Västerås, Västmanland, Sweden",
+      "date": "Summer 2025",
+      "season": "Summer",
+      "theme": "Runestone, Viking Age, Zoomorphic Ornament, Nordic Heritage",
+      "tags": [
+        "s 10",
+        "Västerås",
+        "Västmanland",
+        "Sweden",
+        "runestone",
+        "rune stone",
+        "Viking Age",
+        "Livsten",
+        "serpent ornament",
+        "ancient sites"
+      ],
+      "src": "assets/images/photos/runestone-vs-10-vasteras.jpeg",
+      "width": 6240,
+      "height": 4160,
+      "alt": "A gabled grey granite runestone stands in a green late-summer meadow, its face covered by an interlaced serpent design painted deep red, with leafy trees behind it.",
+      "caption": "Attributed to the carver Livsten, its whole face is filled by a single looping serpent in red.",
+      "sortOrder": 41,
+      "featured": false,
+      "variants": {
+        "thumb": {
+          "jpeg": "assets/images/generated/thumb/runestone-vs-10-vasteras.jpeg",
+          "webp": "assets/images/generated/thumb/runestone-vs-10-vasteras.webp",
+          "width": 480
+        },
+        "medium": {
+          "jpeg": "assets/images/generated/medium/runestone-vs-10-vasteras.jpeg",
+          "webp": "assets/images/generated/medium/runestone-vs-10-vasteras.webp",
+          "width": 1200
+        },
+        "full": {
+          "jpeg": "assets/images/generated/full/runestone-vs-10-vasteras.jpeg",
+          "webp": "assets/images/generated/full/runestone-vs-10-vasteras.webp",
           "width": 2200
         }
       },
