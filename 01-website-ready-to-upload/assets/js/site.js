@@ -3,7 +3,7 @@ import {
   sortPhotos, storyPhotos, absoluteUrl, root, header, footer,
   homeMain, galleryMain, storiesMain, aboutMain, atlasMain, storyMain, legacyStoryMain,
   websiteLdObject, imageGalleryLdObject, personLdObject, articleLdObject,
-} from "./templates.mjs?v=b034dcec37";
+} from "./templates.mjs?v=3039674abb";
 
 // Cache-bust the runtime content fetches. /assets/data/*.json is served with a long
 // edge cache (the host ignores _headers), so without a content-versioned URL a freshly
@@ -228,16 +228,25 @@ function initMap(elId, dataId){
       if(markers.length > 1) map.fitBounds(L.featureGroup(markers).getBounds().pad(0.25), { animate:!reduce });
       else map.setView([stories[0].lat, stories[0].lng], 9, { animate:false });
     };
-    fitAll();
-    // Deep-link focus: /atlas/?place=<slug> (from a story's "View on the map") opens
-    // that pin and centres on it.
+    // Deep-link focus: /atlas/?place=<slug> (from a story's "View on the map").
     let focused = null;
     try{ focused = new URLSearchParams(location.search).get("place"); }catch(e){}
-    if(focused && bySlug.has(focused)){
-      const tm = bySlug.get(focused);
-      const go = () => { map.setView(tm.getLatLng(), Math.max(map.getZoom(), 7), { animate:!reduce }); tm.openPopup(); };
-      if(reduce) go(); else setTimeout(go, 350);
-    }
+    const focusTarget = focused && bySlug.has(focused) ? bySlug.get(focused) : null;
+    const applyView = () => {
+      if(focusTarget) map.setView(focusTarget.getLatLng(), 8, { animate:!reduce });
+      else fitAll();
+    };
+    // A lazily-initialised map inside a flex / limited-height column can start with a
+    // stale container size, so Leaflet's pixel origin is wrong and the markers get
+    // positioned outside the clipped map pane — they silently "disappear". Recompute
+    // the size before fitting, and again after layout settles, so pins always show.
+    map.invalidateSize(false);
+    applyView();
+    if(focusTarget){ if(reduce) focusTarget.openPopup(); else setTimeout(() => focusTarget.openPopup(), 380); }
+    const settle = () => { map.invalidateSize(false); applyView(); };
+    requestAnimationFrame(settle);
+    setTimeout(settle, 400);
+    window.addEventListener("resize", () => map.invalidateSize(false));
     // Recenter control — refit every marker into view.
     const Recenter = L.Control.extend({ options:{ position:"topleft" }, onAdd:function(){
       const b = L.DomUtil.create("button", "map-recenter");
