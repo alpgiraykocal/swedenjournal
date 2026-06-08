@@ -5,7 +5,7 @@
     <link>https://sweden-journal.com/</link>
     <description>Sweden Journal: a personal photo blog featuring photography, travel notes, visual essays, and quiet observations from Sweden and beyond.</description>
     <language>en</language>
-    <lastBuildDate>Sun, 07 Jun 2026 20:18:38 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 08 Jun 2026 10:28:15 GMT</lastBuildDate>
     <atom:link href="https://sweden-journal.com/feed.xml" rel="self" type="application/rss+xml"/>
   <item>
     <title>Anundshög</title>
@@ -54,6 +54,14 @@
     <description>Standing alone among the fields of southeastern Skåne, Glimmingehus is the best-preserved medieval stronghold in Scandinavia — a tall stone house raised around 1500, when this corner of Sweden still answered to the Danish crown.</description>
     <pubDate>Fri, 03 Apr 2026 00:00:00 GMT</pubDate>
     <category>Castles</category>
+  </item>
+  <item>
+    <title>The Sigurd Carving at Ramsund</title>
+    <link>https://sweden-journal.com/stories/sigurd-carving-ramsund-story/</link>
+    <guid isPermaLink="true">https://sweden-journal.com/stories/sigurd-carving-ramsund-story/</guid>
+    <description>On a low rock at Sundbyholm outside Eskilstuna, an eleventh-century carving spells out the saga of Sigurd the dragon-slayer in red-painted line, while its runes quietly record a bridge raised across the Ramsund channel.</description>
+    <pubDate>Sat, 14 Jun 2025 00:00:00 GMT</pubDate>
+    <category>Ancient Sites</category>
   </item>
   </channel>
 </rss>
