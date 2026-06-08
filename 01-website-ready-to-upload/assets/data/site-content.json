@@ -1794,17 +1794,20 @@
         "thumb": {
           "jpeg": "assets/images/generated/thumb/karnan-tower-in-helsingborg.jpeg",
           "webp": "assets/images/generated/thumb/karnan-tower-in-helsingborg.webp",
-          "width": 480
+          "width": 480,
+          "avif": "assets/images/generated/thumb/karnan-tower-in-helsingborg.avif"
         },
         "medium": {
           "jpeg": "assets/images/generated/medium/karnan-tower-in-helsingborg.jpeg",
           "webp": "assets/images/generated/medium/karnan-tower-in-helsingborg.webp",
-          "width": 1200
+          "width": 1200,
+          "avif": "assets/images/generated/medium/karnan-tower-in-helsingborg.avif"
         },
         "full": {
           "jpeg": "assets/images/generated/full/karnan-tower-in-helsingborg.jpeg",
           "webp": "assets/images/generated/full/karnan-tower-in-helsingborg.webp",
-          "width": 2200
+          "width": 2200,
+          "avif": "assets/images/generated/full/karnan-tower-in-helsingborg.avif"
         }
       }
     },
@@ -1839,17 +1842,20 @@
         "thumb": {
           "jpeg": "assets/images/generated/thumb/at-the-foot-of-karnan-helsingborg.jpeg",
           "webp": "assets/images/generated/thumb/at-the-foot-of-karnan-helsingborg.webp",
-          "width": 480
+          "width": 480,
+          "avif": "assets/images/generated/thumb/at-the-foot-of-karnan-helsingborg.avif"
         },
         "medium": {
           "jpeg": "assets/images/generated/medium/at-the-foot-of-karnan-helsingborg.jpeg",
           "webp": "assets/images/generated/medium/at-the-foot-of-karnan-helsingborg.webp",
-          "width": 1200
+          "width": 1200,
+          "avif": "assets/images/generated/medium/at-the-foot-of-karnan-helsingborg.avif"
         },
         "full": {
           "jpeg": "assets/images/generated/full/at-the-foot-of-karnan-helsingborg.jpeg",
           "webp": "assets/images/generated/full/at-the-foot-of-karnan-helsingborg.webp",
-          "width": 2200
+          "width": 2200,
+          "avif": "assets/images/generated/full/at-the-foot-of-karnan-helsingborg.avif"
         }
       }
     },
@@ -1883,17 +1889,20 @@
         "thumb": {
           "jpeg": "assets/images/generated/thumb/climbing-the-terrace-steps-to-karnan.jpeg",
           "webp": "assets/images/generated/thumb/climbing-the-terrace-steps-to-karnan.webp",
-          "width": 480
+          "width": 480,
+          "avif": "assets/images/generated/thumb/climbing-the-terrace-steps-to-karnan.avif"
         },
         "medium": {
           "jpeg": "assets/images/generated/medium/climbing-the-terrace-steps-to-karnan.jpeg",
           "webp": "assets/images/generated/medium/climbing-the-terrace-steps-to-karnan.webp",
-          "width": 1200
+          "width": 1200,
+          "avif": "assets/images/generated/medium/climbing-the-terrace-steps-to-karnan.avif"
         },
         "full": {
           "jpeg": "assets/images/generated/full/climbing-the-terrace-steps-to-karnan.jpeg",
           "webp": "assets/images/generated/full/climbing-the-terrace-steps-to-karnan.webp",
-          "width": 2200
+          "width": 2200,
+          "avif": "assets/images/generated/full/climbing-the-terrace-steps-to-karnan.avif"
         }
       }
     },
@@ -1928,17 +1937,20 @@
         "thumb": {
           "jpeg": "assets/images/generated/thumb/the-terrace-staircase-below-karnan.jpeg",
           "webp": "assets/images/generated/thumb/the-terrace-staircase-below-karnan.webp",
-          "width": 480
+          "width": 480,
+          "avif": "assets/images/generated/thumb/the-terrace-staircase-below-karnan.avif"
         },
         "medium": {
           "jpeg": "assets/images/generated/medium/the-terrace-staircase-below-karnan.jpeg",
           "webp": "assets/images/generated/medium/the-terrace-staircase-below-karnan.webp",
-          "width": 1200
+          "width": 1200,
+          "avif": "assets/images/generated/medium/the-terrace-staircase-below-karnan.avif"
         },
         "full": {
           "jpeg": "assets/images/generated/full/the-terrace-staircase-below-karnan.jpeg",
           "webp": "assets/images/generated/full/the-terrace-staircase-below-karnan.webp",
-          "width": 2200
+          "width": 2200,
+          "avif": "assets/images/generated/full/the-terrace-staircase-below-karnan.avif"
         }
       }
     }

@@ -3,7 +3,7 @@ import {
   sortPhotos, storyPhotos, absoluteUrl, root, header, footer,
   homeMain, galleryMain, storiesMain, aboutMain, atlasMain, storyMain, legacyStoryMain,
   websiteLdObject, imageGalleryLdObject, personLdObject, articleLdObject,
-} from "./templates.mjs?v=c7b768e2af";
+} from "./templates.mjs?v=d20c3eac49";
 
 // Cache-bust the runtime content fetches. /assets/data/*.json is served with a long
 // edge cache (the host ignores _headers), so without a content-versioned URL a freshly
@@ -228,7 +228,35 @@ function initMap(elId, dataId){
       if(markers.length > 1) map.fitBounds(L.featureGroup(markers).getBounds().pad(0.25), { animate:!reduce });
       else map.setView([stories[0].lat, stories[0].lng], 9, { animate:false });
     };
+    // Declutter: spread markers that project within ~46px of each other into a
+    // small ring so overlapping pins (e.g. two stories in the same region) stay
+    // individually visible and clickable. Offset via margin so Leaflet's transform
+    // positioning is untouched and the click hit-area moves with the icon.
+    const declutter = () => {
+      markers.forEach(m => { const ic = m.getElement(); if(ic){ ic.style.marginLeft = ""; ic.style.marginTop = ""; } });
+      const pts = markers.map(m => ({ m, p: map.latLngToContainerPoint(m.getLatLng()) }));
+      const used = new Set();
+      for(let i = 0; i < pts.length; i++){
+        if(used.has(i)) continue;
+        const group = [pts[i]];
+        for(let j = i + 1; j < pts.length; j++){
+          if(used.has(j)) continue;
+          if(pts[i].p.distanceTo(pts[j].p) < 46){ group.push(pts[j]); used.add(j); }
+        }
+        if(group.length > 1){
+          used.add(i);
+          const n = group.length, R = 18 + (n - 1) * 5;
+          group.forEach((g, idx) => {
+            const ang = (2 * Math.PI * idx) / n - Math.PI / 2;
+            const ic = g.m.getElement();
+            if(ic){ ic.style.marginLeft = Math.round(Math.cos(ang) * R) + "px"; ic.style.marginTop = Math.round(Math.sin(ang) * R) + "px"; }
+          });
+        }
+      }
+    };
     fitAll();
+    map.on("zoomend moveend", declutter);
+    map.whenReady(declutter);
     // Deep-link focus: /atlas/?place=<slug> (from a story's "View on the map") opens
     // that pin and centres on it.
     let focused = null;
