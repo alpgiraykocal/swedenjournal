@@ -790,6 +790,7 @@ body[data-page="gallery"] .photo-card[hidden]{display:none!important}
 .atlas-cta-arrow{flex-shrink:0;width:50px;height:50px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;border:1px solid var(--line-strong);color:var(--accent-cool);transition:background .18s var(--ease),color .18s var(--ease),border-color .18s var(--ease)}
 .atlas-cta-arrow svg{width:22px;height:22px}
 .atlas-cta:hover .atlas-cta-arrow{background:var(--accent-cool);color:var(--accent-ink);border-color:var(--accent-cool)}
+@media(min-width:851px){.atlas-places{display:flex;flex-direction:column;max-height:min(70vh,600px)}.atlas-places ul{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding-right:7px;scrollbar-width:thin;scrollbar-color:var(--line-strong) transparent}.atlas-places ul::-webkit-scrollbar{width:8px}.atlas-places ul::-webkit-scrollbar-thumb{background:var(--line-strong);border-radius:999px}.atlas-places ul::-webkit-scrollbar-track{background:transparent}}
 @media(max-width:850px){.atlas-layout{grid-template-columns:1fr;gap:24px}.atlas-map{height:54vh}}
 @media(max-width:560px){.atlas-cta{flex-direction:column;align-items:flex-start;gap:16px;padding:22px}.atlas-cta h2{font-size:2rem}.atlas-map{height:60vh}}
 .leaflet-container{font-family:var(--sans);background:var(--surface-strong)}
