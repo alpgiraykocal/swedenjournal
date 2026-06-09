@@ -87,6 +87,9 @@ button{font:inherit}
 button:disabled{opacity:.48;cursor:not-allowed;transform:none}
 .skip-link{position:fixed;left:18px;top:14px;z-index:50;transform:translateY(-140%);background:var(--text);color:var(--paper);padding:10px 14px;border-radius:999px}
 .skip-link:focus{transform:translateY(0)}
+/* Off-screen but screen-reader accessible. Names content regions (e.g. the
+   gallery photo grid) without altering the visual design. */
+.visually-hidden{position:absolute;width:1px;height:1px;margin:-1px;padding:0;border:0;clip:rect(0 0 0 0);clip-path:inset(50%);overflow:hidden;white-space:nowrap}
 .container{width:min(1180px,calc(100% - 40px));margin-inline:auto}
 .site-header{position:sticky;top:0;z-index:20;background:rgba(243,239,231,.82);border-bottom:1px solid var(--line);backdrop-filter:blur(18px)}
 .nav{min-height:72px;display:flex;align-items:center;justify-content:space-between;gap:24px}
