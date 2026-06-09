@@ -99,6 +99,13 @@ button:disabled{opacity:.48;cursor:not-allowed;transform:none}
 .nav-links a{min-height:44px;display:inline-flex;align-items:center;border-radius:999px;padding:0 12px;border:1px solid transparent;transition:background .18s var(--ease),color .18s var(--ease),border-color .18s var(--ease)}
 .nav-links a:hover,.nav-links a[aria-current="page"]{color:var(--text);background:rgba(31,29,25,.055);border-color:var(--line)}
 .nav-links a:last-child{color:var(--accent-cool);border-color:rgba(36,91,106,.28)}
+.theme-toggle{min-height:44px;min-width:44px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:0 10px;border:1px solid transparent;background:none;color:var(--muted);cursor:pointer;transition:background .18s var(--ease),color .18s var(--ease),border-color .18s var(--ease)}
+.theme-toggle:hover{color:var(--text);background:rgba(31,29,25,.055);border-color:var(--line)}
+:root[data-theme="dark"] .theme-toggle:hover{background:rgba(240,236,228,.08)}
+.theme-toggle svg{width:18px;height:18px;display:block}
+.theme-toggle .icon-sun{display:none}
+.theme-toggle[data-mode="dark"] .icon-moon{display:none}
+.theme-toggle[data-mode="dark"] .icon-sun{display:block}
 .hero{padding:56px 0 82px}
 .hero-grid{display:grid;grid-template-columns:minmax(0,.88fr) minmax(0,1.12fr);gap:54px;align-items:end}
 .hero-copy{padding-bottom:10px}
@@ -449,7 +456,7 @@ body[data-page="gallery"] .photo-card[hidden]{display:none!important}
 .lightbox[hidden]{display:none}
 .lightbox-media{min-width:0;display:flex;align-items:center;justify-content:center}
 .lightbox-media picture{display:flex;align-items:center;justify-content:center;width:100%;max-width:100%;min-width:0}
-.lightbox-img{display:block;width:auto;height:auto;max-width:100%;max-height:calc(100vh - 56px);object-fit:contain;margin:auto;border-radius:18px;background:rgba(255,253,248,.12);background-size:contain;background-position:center;background-repeat:no-repeat;transition:filter .45s ease}
+.lightbox-img{display:block;width:auto;height:auto;max-width:100%;max-height:calc(100dvh - 56px);object-fit:contain;margin:auto;border-radius:18px;background:rgba(255,253,248,.12);background-size:contain;background-position:center;background-repeat:no-repeat;transition:filter .45s ease}
 .lightbox-img.is-loading{filter:blur(16px);transform:scale(1.012)}
 .lightbox-copy{align-self:end;padding:0 10px 18px}
 .lightbox-copy h2{font-size:2.4rem;color:var(--paper)}
@@ -669,8 +676,10 @@ body[data-page="gallery"] .photo-card[hidden]{display:none!important}
   .lightbox-copy h2{font-size:1.8rem}
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
+/* Dark theme. Applied via [data-theme="dark"] on <html> — an inline <head> script
+   sets data-theme from saved choice or the OS preference before first paint, and the
+   header toggle flips/persists it. (No-JS falls back to the light theme.) */
+:root[data-theme="dark"] {
     --bg: #1a1815;
     --paper: #201e1b;
     --surface: #242019;
@@ -686,37 +695,36 @@ body[data-page="gallery"] .photo-card[hidden]{display:none!important}
     --focus: #5fa8b8;
     --shadow: 0 1px 2px rgba(0,0,0,.2),0 6px 16px rgba(0,0,0,.28),0 22px 50px rgba(0,0,0,.4);
     --hairline: rgba(240,236,228,.12);
-  }
-  body {
+}
+:root[data-theme="dark"] body {
     background:
       linear-gradient(180deg, rgba(32,30,27,.82), rgba(26,24,21,0) 22rem),
       var(--bg);
-  }
-  body::before{opacity:.045}
-  .site-header {
+}
+:root[data-theme="dark"] body::before{opacity:.045}
+:root[data-theme="dark"] .site-header {
     background: rgba(26,24,21,.88);
-  }
-  .lightbox-img {
+}
+:root[data-theme="dark"] .lightbox-img {
     background: rgba(26,24,21,.18);
-  }
-  /* The photo "expand" affordance and the lightbox are ALWAYS-dark glass surfaces
-     (their background is a fixed dark rgba in both themes). Their foreground uses
-     var(--paper), which flips to a dark tone in dark mode — making the lightbox
-     title, close (x), prev/next and Share/Copy controls near-invisible (~1.1:1).
-     Pin these to a fixed light ink so they stay legible in dark mode. */
-  .photo-open,
-  .lightbox,
-  .lightbox-copy h2,
-  .lightbox-close,
-  .lightbox-nav,
-  .lightbox .share-action,
-  .lightbox .share-action:hover {
+}
+/* The photo "expand" affordance and the lightbox are ALWAYS-dark glass surfaces
+   (their background is a fixed dark rgba in both themes). Their foreground uses
+   var(--paper), which flips to a dark tone in dark mode — making the lightbox
+   title, close (x), prev/next and Share/Copy controls near-invisible (~1.1:1).
+   Pin these to a fixed light ink so they stay legible in dark mode. */
+:root[data-theme="dark"] .photo-open,
+:root[data-theme="dark"] .lightbox,
+:root[data-theme="dark"] .lightbox-copy h2,
+:root[data-theme="dark"] .lightbox-close,
+:root[data-theme="dark"] .lightbox-nav,
+:root[data-theme="dark"] .lightbox .share-action,
+:root[data-theme="dark"] .lightbox .share-action:hover {
     color: #fff8ef;
-  }
 }
 
-@media (prefers-color-scheme: dark) and (prefers-reduced-motion: no-preference) {
-  .photo-card, .story-card { transition: opacity .55s var(--ease-out), transform .55s var(--ease-out); }
+@media (prefers-reduced-motion: no-preference) {
+  :root[data-theme="dark"] .photo-card, :root[data-theme="dark"] .story-card { transition: opacity .55s var(--ease-out), transform .55s var(--ease-out); }
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -805,6 +813,9 @@ body[data-page="gallery"] .photo-card[hidden]{display:none!important}
 .map-recenter{width:34px;height:34px;display:flex;align-items:center;justify-content:center;background:var(--paper);border:1px solid var(--line-strong);border-radius:9px;cursor:pointer;font-size:17px;line-height:1;color:var(--text);box-shadow:0 2px 7px rgba(31,29,25,.2)}
 .map-recenter:hover{background:var(--surface)}
 .map-recenter:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.map-hint{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);z-index:500;background:var(--paper);color:var(--text-soft);border:1px solid var(--line-strong);border-radius:999px;padding:6px 12px;font-size:12px;font-weight:600;box-shadow:var(--shadow);pointer-events:none;opacity:1;transition:opacity .3s var(--ease)}
+.map-zoom-on .map-hint{opacity:0}
+@media (pointer:coarse){.map-hint{display:none}}
 .map-popup-wrap .leaflet-popup-content-wrapper{border-radius:14px;padding:0;overflow:hidden;box-shadow:var(--shadow);background:var(--paper)}
 .map-popup-wrap .leaflet-popup-content{margin:0}
 .map-popup-wrap .leaflet-popup-tip{background:var(--paper)}

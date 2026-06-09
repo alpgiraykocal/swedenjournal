@@ -83,7 +83,7 @@ function heroPreloadLine(prefix, heroId, sizes) {
 function buildBlock(prefix, heroId, sizes) {
   const lines = [
     `  ${START}`,
-    `  <script>document.documentElement.classList.add('js-reveal');setTimeout(function(){if(!window.__siteBooted){document.documentElement.classList.remove('js-reveal')}},2500)</script>`,
+    `  <script>(function(){try{var t=localStorage.getItem('theme');if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t)}catch(e){}})();document.documentElement.classList.add('js-reveal');setTimeout(function(){if(!window.__siteBooted){document.documentElement.classList.remove('js-reveal')}},2500)</script>`,
     `  <meta name="theme-color" content="${THEME_LIGHT}" media="(prefers-color-scheme: light)">`,
     `  <meta name="theme-color" content="${THEME_DARK}" media="(prefers-color-scheme: dark)">`,
     `  <link rel="icon" href="${prefix}favicon.svg" type="image/svg+xml">`,

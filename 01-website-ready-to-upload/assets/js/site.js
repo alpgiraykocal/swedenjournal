@@ -3,7 +3,7 @@ import {
   sortPhotos, storyPhotos, absoluteUrl, root, header, footer,
   homeMain, galleryMain, storiesMain, aboutMain, atlasMain, storyMain, legacyStoryMain,
   websiteLdObject, imageGalleryLdObject, personLdObject, articleLdObject,
-} from "./templates.mjs?v=3039674abb";
+} from "./templates.mjs?v=42e6474857";
 
 // Cache-bust the runtime content fetches. /assets/data/*.json is served with a long
 // edge cache (the host ignores _headers), so without a content-versioned URL a freshly
@@ -204,16 +204,19 @@ function initMap(elId, dataId){
   try{ stories = JSON.parse(dataEl.textContent); }catch(e){ return; }
   if(!Array.isArray(stories) || !stories.length) return;
   const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const dark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+  const themeDark = () => (document.documentElement.getAttribute("data-theme") || (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")) === "dark";
   const cards = Array.from(document.querySelectorAll(".atlas-place[data-place-slug]"));
   const start = () => loadLeaflet().then(L => {
     if(el._mapReady) return;
     el._mapReady = true;
     const map = L.map(el, { scrollWheelZoom:false, attributionControl:true });
-    L.tileLayer(`https://{s}.basemaps.cartocdn.com/${dark?"dark_all":"light_all"}/{z}/{x}/{y}{r}.png`, {
+    const tileUrl = d => `https://{s}.basemaps.cartocdn.com/${d?"dark_all":"light_all"}/{z}/{x}/{y}{r}.png`;
+    const tiles = L.tileLayer(tileUrl(themeDark()), {
       maxZoom:19, subdomains:"abcd",
       attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
     }).addTo(map);
+    // Match the basemap to the active theme, and swap it live when the user toggles.
+    window.addEventListener("themechange", () => tiles.setUrl(tileUrl(themeDark())));
     const bySlug = new Map();
     const markers = stories.map(s => {
       const icon = L.divIcon({ className:"map-pin", html:`<img src="${esc(s.thumb)}" alt="${esc(s.alt||s.title)}">`, iconSize:[52,52], iconAnchor:[26,26] });
@@ -255,6 +258,18 @@ function initMap(elId, dataId){
       return b;
     }});
     map.addControl(new Recenter());
+    // Scroll-wheel zoom stays off so the map never hijacks page scrolling. Enable it
+    // only once the user deliberately clicks (or keyboard-focuses) the map, and turn it
+    // back off when the pointer leaves. A small hint makes the affordance discoverable.
+    const hint = L.DomUtil.create("div", "map-hint", el);
+    hint.textContent = "Click the map to zoom";
+    hint.setAttribute("aria-hidden", "true");
+    const enableWheel = () => { map.scrollWheelZoom.enable(); el.classList.add("map-zoom-on"); };
+    const disableWheel = () => { map.scrollWheelZoom.disable(); el.classList.remove("map-zoom-on"); };
+    map.on("click", enableWheel);
+    el.addEventListener("focusin", enableWheel);
+    el.addEventListener("mouseleave", disableWheel);
+    el.addEventListener("focusout", e => { if(!el.contains(e.relatedTarget)) disableWheel(); });
     // Two-way highlight between the place list and the map pins.
     const setActive = (slug) => {
       cards.forEach(c => c.classList.toggle("is-active", !!slug && c.dataset.placeSlug === slug));
@@ -289,10 +304,36 @@ function initMap(elId, dataId){
     io.observe(el);
   }else{ start(); }
 }
+function initThemeToggle(){
+  const root = document.documentElement;
+  const mq = window.matchMedia ? matchMedia("(prefers-color-scheme: dark)") : null;
+  const effective = () => root.getAttribute("data-theme") || (mq && mq.matches ? "dark" : "light");
+  const buttons = [...document.querySelectorAll("[data-theme-toggle]")];
+  if(!buttons.length) return;
+  const sync = () => {
+    const dark = effective() === "dark";
+    buttons.forEach(btn => {
+      btn.dataset.mode = dark ? "dark" : "light";
+      btn.setAttribute("aria-pressed", String(dark));
+      btn.setAttribute("aria-label", dark ? "Switch to light theme" : "Switch to dark theme");
+    });
+    window.dispatchEvent(new Event("themechange"));
+  };
+  buttons.forEach(btn => btn.addEventListener("click", () => {
+    const next = effective() === "dark" ? "light" : "dark";
+    root.setAttribute("data-theme", next);
+    try{ localStorage.setItem("theme", next); }catch(e){}
+    sync();
+  }));
+  // If the user hasn't made an explicit choice, follow OS changes live.
+  if(mq) mq.addEventListener("change", () => { let saved; try{ saved = localStorage.getItem("theme"); }catch(e){} if(!saved) sync(); });
+  sync();
+}
 async function boot(){
   try{
     const page = document.body.dataset.page;
     setContext({root: window.__ROOT__ || "", prefix: window.__ASSET_PREFIX__ || "", page});
+    initThemeToggle();
     if(document.body.dataset.prerendered === "1"){
       await hydrate(page);
       bindScrollReveal();
