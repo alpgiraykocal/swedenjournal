@@ -3,7 +3,7 @@ import {
   sortPhotos, storyPhotos, absoluteUrl, root, header, footer,
   homeMain, galleryMain, storiesMain, aboutMain, atlasMain, storyMain, legacyStoryMain,
   websiteLdObject, imageGalleryLdObject, personLdObject, articleLdObject,
-} from "./templates.mjs?v=42e6474857";
+} from "./templates.mjs?v=f31835f7e0";
 
 // Cache-bust the runtime content fetches. /assets/data/*.json is served with a long
 // edge cache (the host ignores _headers), so without a content-versioned URL a freshly
@@ -253,7 +253,7 @@ function initMap(elId, dataId){
     // Recenter control — refit every marker into view.
     const Recenter = L.Control.extend({ options:{ position:"topleft" }, onAdd:function(){
       const b = L.DomUtil.create("button", "map-recenter");
-      b.type = "button"; b.title = "Tüm yerleri göster"; b.setAttribute("aria-label", "Tüm yerleri göster"); b.innerHTML = "&#9974;";
+      b.type = "button"; b.title = "Show all places"; b.setAttribute("aria-label", "Show all places"); b.innerHTML = "&#9974;";
       L.DomEvent.on(b, "click", L.DomEvent.stop).on(b, "click", fitAll);
       return b;
     }});
