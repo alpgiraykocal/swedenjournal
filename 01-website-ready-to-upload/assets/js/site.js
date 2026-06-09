@@ -338,6 +338,7 @@ async function boot(){
       await hydrate(page);
       bindScrollReveal();
       bindImageLoadFade();
+      forceLoadColumnImages();
       return;
     }
     const data = await loadContent();
@@ -362,6 +363,7 @@ async function boot(){
     if(page === "story") renderStory(data);
     bindScrollReveal();
     bindImageLoadFade();
+    forceLoadColumnImages();
   }catch(e){
     $("#app").innerHTML = `<main class="container section"><h1 class="headline">Content could not be loaded.</h1><p class="intro">${esc(e.message)}</p></main>`;
   }
@@ -426,7 +428,23 @@ function renderStory(data){
   bindLightbox(data, () => storyPhotos(data, s));
 }
 function bindScrollReveal(){const els=[...document.querySelectorAll(".photo-card,.story-card,.related-photos .photo-card,.story-inline-photo,.story-body > p,.story-body > h2,.story-body > blockquote")];if(typeof IntersectionObserver==="undefined"){els.forEach(el=>el.classList.add("revealed"));return;}const io=new IntersectionObserver((entries)=>{let i=0;entries.forEach(e=>{if(!e.isIntersecting)return;const el=e.target;const delay=Math.min(i,6)*55;i++;if(delay){el.style.transitionDelay=delay+"ms";setTimeout(()=>{el.style.transitionDelay="";},delay+650);}el.classList.add("revealed");io.unobserve(el);});},{threshold:0.08,rootMargin:"0px 0px -40px 0px"});els.forEach(el=>{if(!el.classList.contains("revealed"))io.observe(el);});}
-function bindImageLoadFade(){const sel=".photo-media img,.story-card-media img,.featured-story-media img,.story-inline-img,.hero-img,.about-img,.story-hero img";document.querySelectorAll(sel).forEach(img=>{if(img.complete&&img.naturalWidth){img.classList.add("img-loaded");return;}img.classList.add("img-loading");const done=()=>{img.classList.remove("img-loading");img.classList.add("img-loaded");};img.addEventListener("load",done,{once:true});img.addEventListener("error",done,{once:true});});}function bindStoryFilters(){
+function bindImageLoadFade(){const sel=".photo-media img,.story-card-media img,.featured-story-media img,.story-inline-img,.hero-img,.about-img,.story-hero img";document.querySelectorAll(sel).forEach(img=>{if(img.complete&&img.naturalWidth){img.classList.add("img-loaded");return;}img.classList.add("img-loading");const done=()=>{img.classList.remove("img-loading");img.classList.add("img-loaded");};img.addEventListener("load",done,{once:true});img.addEventListener("error",done,{once:true});});}
+// The gallery uses CSS multi-column masonry, which breaks native loading="lazy"
+// in Chromium: the scroll intersection for images in non-first columns is
+// mis-computed, so they can stay blank even after scrolling into view. Drive
+// loading ourselves — flip lazy gallery images to eager as they approach the
+// viewport (generous margin) so none stay blank. No-op off the gallery page.
+function forceLoadColumnImages(){
+  if(document.body.dataset.page !== "gallery") return;
+  const imgs=[...document.querySelectorAll("#galleryGrid img[loading='lazy']")];
+  if(!imgs.length) return;
+  if(typeof IntersectionObserver==="undefined"){ imgs.forEach(img=>{ img.loading="eager"; }); return; }
+  const io=new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.loading="eager"; io.unobserve(e.target); } });
+  },{rootMargin:"1200px 0px"});
+  imgs.forEach(img=>io.observe(img));
+}
+function bindStoryFilters(){
   const scope = $(".stories-section") || document;
   const cards = [...scope.querySelectorAll("[data-story-card]")];
   const count = $("#storyCount");
