@@ -266,7 +266,7 @@ h2{margin:0;font-family:var(--serif);font-size:3.4rem;font-weight:500;line-heigh
 @media(hover:none){.photo-open{opacity:.82;transform:translateY(0)}}
 .photo-card figcaption{padding:10px 0 0;color:var(--muted);font-size:14px;line-height:1.55}
 .photo-card strong{color:var(--text);font-weight:700}
-.photo-story-link{display:inline-flex;align-items:center;gap:6px;min-height:32px;margin-top:6px;color:var(--accent-cool);font-size:13px;font-weight:650}
+.photo-story-link{display:inline-flex;align-items:center;gap:6px;min-height:44px;margin-top:4px;color:var(--accent-cool);font-size:13px;font-weight:650}
 .photo-story-link span{transition:transform .28s var(--ease)}
 .photo-story-link:hover{text-decoration:underline}
 .photo-story-link:hover span{transform:translateX(3px)}
@@ -507,7 +507,7 @@ body[data-page="gallery"] .photo-card[hidden]{display:none!important}
 }
 .lightbox-prev{left:18px}
 .lightbox-next{right:18px}
-.lightbox-story-link{display:inline-flex;align-items:center;gap:6px;min-height:32px;margin-top:14px;color:#9ec4cf;font-size:14px;font-weight:650}
+.lightbox-story-link{display:inline-flex;align-items:center;gap:6px;min-height:44px;margin-top:10px;color:#9ec4cf;font-size:14px;font-weight:650}
 .lightbox-story-link[hidden]{display:none}
 .lightbox-story-link span{transition:transform .28s var(--ease)}
 .lightbox-story-link:hover{text-decoration:underline}
