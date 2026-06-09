@@ -3,7 +3,7 @@ import {
   sortPhotos, storyPhotos, storyHref, absoluteUrl, root, header, footer,
   homeMain, galleryMain, storiesMain, aboutMain, atlasMain, storyMain, legacyStoryMain,
   websiteLdObject, imageGalleryLdObject, personLdObject, articleLdObject,
-} from "./templates.mjs?v=f8d20951b7";
+} from "./templates.mjs?v=df45306ce2";
 
 // Cache-bust the runtime content fetches. /assets/data/*.json is served with a long
 // edge cache (the host ignores _headers), so without a content-versioned URL a freshly
@@ -455,10 +455,19 @@ function bindImageLoadFade(){const sel=".photo-media img,.story-card-media img,.
     });
     if(syncUrl) setUrlParam("category", category || "All");
   };
-  document.querySelectorAll("[data-story-filter]").forEach(btn => btn.addEventListener("click", () => apply(btn.dataset.storyFilter)));
+  // Filtering shows/hides the tall featured block ABOVE the toolbar, which would
+  // yank the results up (or down) and out of view. Keep the toolbar visually
+  // anchored by compensating scroll for the height change it causes.
+  const withToolbarAnchor = fn => {
+    const tb = $(".story-toolbar");
+    const before = tb ? tb.getBoundingClientRect().top : 0;
+    fn();
+    if(tb) window.scrollBy({ top: tb.getBoundingClientRect().top - before, behavior: "instant" });
+  };
+  document.querySelectorAll("[data-story-filter]").forEach(btn => btn.addEventListener("click", () => withToolbarAnchor(() => apply(btn.dataset.storyFilter))));
   bindFilterKeyboard(scope.querySelector(".filters"));
   reset?.addEventListener("click", () => {
-    apply("All");
+    withToolbarAnchor(() => apply("All"));
     $("[data-story-filter]")?.focus();
   });
   // Sort toggle: reorder the story cards by their [data-date] (newest default).
