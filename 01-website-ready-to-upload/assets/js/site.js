@@ -1,9 +1,9 @@
 import {
   setContext, esc, photos, photo, imgPath, metaText, variant, srcset, responsiveImage,
-  sortPhotos, storyPhotos, absoluteUrl, root, header, footer,
+  sortPhotos, storyPhotos, storyHref, absoluteUrl, root, header, footer,
   homeMain, galleryMain, storiesMain, aboutMain, atlasMain, storyMain, legacyStoryMain,
   websiteLdObject, imageGalleryLdObject, personLdObject, articleLdObject,
-} from "./templates.mjs?v=f31835f7e0";
+} from "./templates.mjs?v=f8d20951b7";
 
 // Cache-bust the runtime content fetches. /assets/data/*.json is served with a long
 // edge cache (the host ignores _headers), so without a content-versioned URL a freshly
@@ -461,6 +461,30 @@ function bindImageLoadFade(){const sel=".photo-media img,.story-card-media img,.
     apply("All");
     $("[data-story-filter]")?.focus();
   });
+  // Sort toggle: reorder the story cards by their [data-date] (newest default).
+  const list = $(".story-list");
+  const sortStories = order => {
+    if(!list) return;
+    const items = [...list.querySelectorAll("[data-story-card]")];
+    items.sort((a, b) => {
+      const av = a.dataset.date || "", bv = b.dataset.date || "";
+      return order === "oldest" ? av.localeCompare(bv) : bv.localeCompare(av);
+    });
+    items.forEach(el => list.appendChild(el));
+  };
+  const applySort = (order, syncUrl = true) => {
+    const o = order === "oldest" ? "oldest" : "newest";
+    sortStories(o);
+    document.querySelectorAll("[data-story-sort]").forEach(btn => {
+      const selected = btn.dataset.storySort === o;
+      btn.classList.toggle("active", selected);
+      btn.setAttribute("aria-pressed", selected ? "true" : "false");
+    });
+    if(syncUrl) setUrlParam("sort", o === "newest" ? null : o);
+  };
+  document.querySelectorAll("[data-story-sort]").forEach(btn => btn.addEventListener("click", () => applySort(btn.dataset.storySort)));
+  bindFilterKeyboard(scope.querySelector(".story-sort"));
+  applySort(query().get("sort") === "oldest" ? "oldest" : "newest", false);
   const initialCategory = query().get("category") || "All";
   const hasInitialCategory = [...document.querySelectorAll("[data-story-filter]")].some(btn => normalize(btn.dataset.storyFilter) === normalize(initialCategory));
   apply(hasInitialCategory ? initialCategory : "All", !hasInitialCategory);
@@ -509,12 +533,13 @@ function bindGalleryControls(data, list){
 function bindLightbox(data, getVisiblePhotos){
   const rootEl = $("#lightboxRoot");
   if(!rootEl) return;
-  rootEl.innerHTML = `<div class="lightbox" role="dialog" aria-modal="true" aria-labelledby="lightboxTitle" hidden><button class="lightbox-close" type="button" aria-label="Close photo">×</button><button class="lightbox-nav lightbox-prev" type="button" aria-label="Previous photo">‹</button><button class="lightbox-nav lightbox-next" type="button" aria-label="Next photo">›</button><div class="lightbox-media"></div><div class="lightbox-copy"><p class="eyebrow lightbox-meta"></p><h2 id="lightboxTitle"></h2><p class="muted lightbox-caption"></p><p class="lightbox-position" aria-live="polite"></p><div class="share-actions lightbox-actions"><button class="share-action" type="button" data-lightbox-share>Share</button><button class="share-action" type="button" data-lightbox-copy data-default-label="Copy link">Copy link</button></div><p class="share-status" aria-live="polite"></p></div></div>`;
+  rootEl.innerHTML = `<div class="lightbox" role="dialog" aria-modal="true" aria-labelledby="lightboxTitle" hidden><button class="lightbox-close" type="button" aria-label="Close photo">×</button><button class="lightbox-nav lightbox-prev" type="button" aria-label="Previous photo">‹</button><button class="lightbox-nav lightbox-next" type="button" aria-label="Next photo">›</button><div class="lightbox-media"></div><div class="lightbox-copy"><p class="eyebrow lightbox-meta"></p><h2 id="lightboxTitle"></h2><p class="muted lightbox-caption"></p><a class="lightbox-story-link" hidden></a><p class="lightbox-position" aria-live="polite"></p><div class="share-actions lightbox-actions"><button class="share-action" type="button" data-lightbox-share>Share</button><button class="share-action" type="button" data-lightbox-copy data-default-label="Copy link">Copy link</button></div><p class="share-status" aria-live="polite"></p></div></div>`;
   const box = $(".lightbox", rootEl);
   const media = $(".lightbox-media", rootEl);
   const title = $("#lightboxTitle", rootEl);
   const meta = $(".lightbox-meta", rootEl);
   const caption = $(".lightbox-caption", rootEl);
+  const storyLink = $(".lightbox-story-link", rootEl);
   const status = $(".share-status", rootEl);
   const share = $("[data-lightbox-share]", rootEl);
   const copy = $("[data-lightbox-copy]", rootEl);
@@ -575,6 +600,16 @@ function bindLightbox(data, getVisiblePhotos){
     title.textContent = p.title || "";
     meta.textContent = metaText([p.location,p.date,p.theme]);
     caption.textContent = p.caption || "";
+    if(storyLink){
+      if(p.story && p.story.slug){
+        storyLink.href = storyHref(p.story.slug);
+        storyLink.innerHTML = `From the story: ${esc(p.story.title)} <span aria-hidden="true">→</span>`;
+        storyLink.hidden = false;
+      }else{
+        storyLink.hidden = true;
+        storyLink.removeAttribute("href");
+      }
+    }
     const visible = currentList();
     const currentIndex = visible.findIndex(item => item.id === p.id);
     if(position) position.textContent = currentIndex >= 0 ? `${currentIndex + 1} of ${visible.length}` : "";

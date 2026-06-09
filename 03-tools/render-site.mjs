@@ -8,7 +8,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import {
-  setContext, photos, photo, storyPhotos, sortPhotos,
+  setContext, photos, photo, storyPhotos, sortPhotos, photoStoryMap,
   header, footer, homeMain, galleryMain, storiesMain, aboutMain, atlasMain, storyMain, legacyStoryMain, notFoundMain,
   websiteLdObject, imageGalleryLdObject, personLdObject, articleLdObject,
   breadcrumbLdObject, storiesLdObject, atlasLdObject,
@@ -94,7 +94,14 @@ function page(rel, { pfx, active, mainHtml, headLd = "", hydrate = null }) {
 // Gallery hydration data is large (all photos) and only needed for the lightbox
 // (user-triggered) — write it to a separate cacheable file fetched lazily instead
 // of inlining ~40KB into the document. Story pages keep tiny inline data.
-fs.writeFileSync(path.join(websiteDir, "assets/data/gallery.json"), JSON.stringify({ photos: photos(data) }));
+// Enrich each gallery photo with the story it belongs to (if any) so the
+// lightbox can offer a "From the story: …" link without loading site-content.
+const photoStories = photoStoryMap(data);
+const galleryPhotos = photos(data).map((p) => {
+  const st = photoStories.get(p.id);
+  return st ? { ...p, story: { slug: st.slug, title: st.title } } : p;
+});
+fs.writeFileSync(path.join(websiteDir, "assets/data/gallery.json"), JSON.stringify({ photos: galleryPhotos }));
 
 let n = 0;
 n += page("index.html", { pfx: "", active: "home", mainHtml: () => homeMain(data), headLd: ld(websiteLdObject(data)) });

@@ -60,6 +60,22 @@ export function storyPhotos(data, story) {
   const ids = [story.heroPhotoId, ...(story.body || []).filter((b) => b.type === "image").map((b) => b.photoId)];
   return [...new Set(ids)].map((id) => photo(data, id)).filter(Boolean);
 }
+// Reverse index photoId -> {slug,title} of the story that uses the photo (first
+// story wins if a photo appears in several). Lets the gallery link a photo back
+// to the story it belongs to. Memoized per `data` object.
+const _photoStoryCache = new WeakMap();
+export function photoStoryMap(data) {
+  if (_photoStoryCache.has(data)) return _photoStoryCache.get(data);
+  const map = new Map();
+  for (const s of (data.stories || [])) {
+    if (!s.slug) continue;
+    const ids = [s.heroPhotoId, ...(s.body || []).filter((b) => b.type === "image").map((b) => b.photoId)];
+    for (const id of ids) { if (id && !map.has(id)) map.set(id, { slug: s.slug, title: s.title }); }
+  }
+  _photoStoryCache.set(data, map);
+  return map;
+}
+export const photoStory = (data, id) => photoStoryMap(data).get(id) || null;
 export function storyShareUrl(data, story) {
   const base = String(data.site?.baseUrl || "").replace(/\/+$/, "");
   if (base) return `${base}/stories/${encodeURIComponent(story.slug)}/`;
@@ -89,7 +105,7 @@ export function storyCard(data, s) {
   const p = sequence[0];
   const tags = (s.tags || []).slice(0, 3);
   const strip = sequence.slice(0, 3).map((item) => `<span>${responsiveImage(item, { className: "story-strip-img", sizes: "96px", fallbackSize: "thumb", alt: "" })}</span>`).join("");
-  return `<a class="card story-card" href="${storyHref(s.slug)}" data-story-card data-category="${esc(storyCategory(s))}"><div class="story-card-media"${mediaRatioStyle(p)}>${responsiveImage(p, { className: "story-card-img", sizes: "(max-width: 850px) calc(100vw - 28px), 48vw", viewTransitionName: s.slug ? `story-${s.slug}` : undefined })}</div><div class="story-card-copy"><span class="meta">${esc(storyCardMeta(s))}</span><h3>${esc(s.title)}</h3><p class="muted">${esc(s.summary)}</p>${strip ? `<span class="story-strip" aria-label="Story photographs">${strip}</span>` : ""}${tags.length ? `<span class="story-tags">${tags.map((t) => `<span>${esc(t)}</span>`).join("")}</span>` : ""}<span class="story-link">Read story${s.readingTime ? ` · ${esc(s.readingTime)}` : ""}</span></div></a>`;
+  return `<a class="card story-card" href="${storyHref(s.slug)}" data-story-card data-category="${esc(storyCategory(s))}" data-date="${esc(s.isoDate || s.date || "")}"><div class="story-card-media"${mediaRatioStyle(p)}>${responsiveImage(p, { className: "story-card-img", sizes: "(max-width: 850px) calc(100vw - 28px), 48vw", viewTransitionName: s.slug ? `story-${s.slug}` : undefined })}</div><div class="story-card-copy"><span class="meta">${esc(storyCardMeta(s))}</span><h3>${esc(s.title)}</h3><p class="muted">${esc(s.summary)}</p>${strip ? `<span class="story-strip" aria-label="Story photographs">${strip}</span>` : ""}${tags.length ? `<span class="story-tags">${tags.map((t) => `<span>${esc(t)}</span>`).join("")}</span>` : ""}<span class="story-link">Read story${s.readingTime ? ` · ${esc(s.readingTime)}` : ""}</span></div></a>`;
 }
 export function featuredStoryBlock(data, story) {
   const p = storyPhotos(data, story)[0];
@@ -98,7 +114,7 @@ export function featuredStoryBlock(data, story) {
 export function photoFigure(p, options = {}) {
   const opts = typeof options === "object" ? options : {};
   const button = opts.interactive ? `<button class="photo-open" type="button" data-open-photo="${esc(p.id)}" aria-label="Open ${esc(p.title)}"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M10 2h4v4M14 2l-5 5M6 14H2v-4M2 14l5-5"/></svg></button>` : "";
-  return `<figure class="photo-card ${p.featured ? "featured" : ""}" data-photo-id="${esc(p.id)}" data-category="${esc(p.category || "")}" data-tags="${esc((p.tags || []).join("|"))}" data-theme="${esc(p.theme || "")}"><div class="photo-media"${mediaRatioStyle(p)}>${responsiveImage(p, { priority: opts.priority, eager: opts.eager, sizes: opts.sizes || "(max-width: 560px) calc(100vw - 24px), (max-width: 900px) 50vw, 380px" })}${button}</div><figcaption><strong>${esc(p.title)}</strong>${p.location ? ` — ${esc(p.location)}` : ""}${p.caption ? `<br>${esc(p.caption)}` : ""}</figcaption></figure>`;
+  return `<figure class="photo-card ${p.featured ? "featured" : ""}" data-photo-id="${esc(p.id)}" data-category="${esc(p.category || "")}" data-tags="${esc((p.tags || []).join("|"))}" data-theme="${esc(p.theme || "")}"><div class="photo-media"${mediaRatioStyle(p)}>${responsiveImage(p, { priority: opts.priority, eager: opts.eager, sizes: opts.sizes || "(max-width: 560px) calc(100vw - 24px), (max-width: 900px) 50vw, 380px" })}${button}</div><figcaption><strong>${esc(p.title)}</strong>${p.location ? ` — ${esc(p.location)}` : ""}${p.caption ? `<br>${esc(p.caption)}` : ""}${opts.story && opts.story.slug ? `<a class="photo-story-link" href="${storyHref(opts.story.slug)}">From the story: ${esc(opts.story.title)} <span aria-hidden="true">→</span></a>` : ""}</figcaption></figure>`;
 }
 export function blockHtmlInteractive(data, block) {
   if (!block) return "";
@@ -170,11 +186,14 @@ export function galleryMain(data) {
   const g = data.gallery || {};
   const list = sortPhotos(photos(data));
   return `<main><section class="hero container"><p class="eyebrow">${esc(g.eyebrow)}</p><h1 class="headline">${esc(g.headline)}</h1><p class="intro">${esc(g.intro)}</p></section>
-  <section class="section"><div class="container"><div class="gallery-toolbar"><div><div class="filters" role="group" aria-label="Gallery filters">${(g.filters || ["All"]).map((f, i) => `<button class="filter ${i === 0 ? "active" : ""}" data-filter="${esc(f)}" aria-pressed="${i === 0 ? "true" : "false"}">${esc(f)}</button>`).join("")}</div><p class="gallery-count" id="galleryCount" aria-live="polite">${list.length} photographs</p></div><button class="filter-reset" type="button">Reset</button></div><div class="gallery-empty" id="galleryEmpty" hidden><h2>No photographs found.</h2><p class="muted">Reset the filters to return to the full edit.</p></div><div class="gallery-grid" id="galleryGrid">${list.map((p, i) => photoFigure(p, { priority: i < 2, eager: i < 12, interactive: true })).join("")}</div></div></section><div id="lightboxRoot"></div></main>`;
+  <section class="section"><div class="container"><div class="gallery-toolbar"><div><div class="filters" role="group" aria-label="Gallery filters">${(g.filters || ["All"]).map((f, i) => `<button class="filter ${i === 0 ? "active" : ""}" data-filter="${esc(f)}" aria-pressed="${i === 0 ? "true" : "false"}">${esc(f)}</button>`).join("")}</div><p class="gallery-count" id="galleryCount" aria-live="polite">${list.length} photographs</p></div><button class="filter-reset" type="button">Reset</button></div><div class="gallery-empty" id="galleryEmpty" hidden><h2>No photographs found.</h2><p class="muted">Reset the filters to return to the full edit.</p></div><div class="gallery-grid" id="galleryGrid">${list.map((p, i) => photoFigure(p, { priority: i < 2, eager: i < 12, interactive: true, story: photoStory(data, p.id) })).join("")}</div></div></section><div id="lightboxRoot"></div></main>`;
 }
 export function storiesMain(data) {
   const sp = data.storiesPage || {};
   const stories = [...(data.stories || [])].sort((a, b) => Number(Boolean(b.featured)) - Number(Boolean(a.featured)));
+  // Story list is ordered newest-first by date; the featured pick above stays
+  // independent. Client-side sort toggle (site.js) reorders by [data-date].
+  const byDate = [...stories].sort((a, b) => String(b.isoDate || b.date || "").localeCompare(String(a.isoDate || a.date || "")));
   const featured = stories.find((s) => s.featured) || stories[0];
   const categories = ["All", ...new Set(stories.map(storyCategory))];
   const mapStories = stories.filter((s) => s.coordinates && Number.isFinite(Number(s.coordinates.lat)) && Number.isFinite(Number(s.coordinates.lng))).map((s) => {
@@ -182,7 +201,7 @@ export function storiesMain(data) {
     return { slug: s.slug, title: s.title, lat: Number(s.coordinates.lat), lng: Number(s.coordinates.lng), href: storyHref(s.slug), thumb: variant(hero, "thumb", "jpeg") || imgPath(hero), alt: (hero && hero.alt) || s.title };
   });
   const mapSection = mapStories.length ? `<section class="section stories-map-cta"><div class="container"><a class="atlas-cta" href="${root()}atlas/index.html"><span class="atlas-cta-copy"><p class="eyebrow">Explore by place</p><h2>Open the atlas</h2><p class="muted">See every story mapped to where it happened — wander the journal geographically.</p></span><span class="atlas-cta-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a></div></section>` : "";
-  return `<main><section class="hero container"><p class="eyebrow">${esc(sp.eyebrow)}</p><h1 class="headline">${esc(sp.headline)}</h1><p class="intro">${esc(sp.intro)}</p></section>${featured ? `<section class="section featured-story-section"><div class="container"><div class="section-head"><div><p class="eyebrow">${esc(sp.featuredLabel || "Featured story")}</p><h2>${esc(featured.title)}</h2></div><a class="text-link" href="${storyHref(featured.slug)}">Read featured</a></div>${featuredStoryBlock(data, featured)}</div></section>` : ""}${mapSection}<section class="section stories-section"><div class="container"><div class="gallery-toolbar story-toolbar"><div><p class="eyebrow">${esc(sp.categoryLabel || "Browse by category")}</p><div class="filters" role="group" aria-label="Story categories">${categories.map((category, i) => `<button class="filter story-filter ${i === 0 ? "active" : ""}" data-story-filter="${esc(category)}" aria-pressed="${i === 0 ? "true" : "false"}">${esc(category)}</button>`).join("")}</div><p class="gallery-count" id="storyCount" aria-live="polite">${stories.length} stories</p></div><button class="filter-reset story-reset" type="button">Reset</button></div><div class="story-list">${stories.map((s) => storyCard(data, s)).join("")}</div><div class="gallery-empty story-empty" id="storyEmpty" hidden><h2>No stories found.</h2><p class="muted">Reset the category filter to return to the archive.</p></div></div></section></main>`;
+  return `<main><section class="hero container"><p class="eyebrow">${esc(sp.eyebrow)}</p><h1 class="headline">${esc(sp.headline)}</h1><p class="intro">${esc(sp.intro)}</p></section>${featured ? `<section class="section featured-story-section"><div class="container"><div class="section-head"><div><p class="eyebrow">${esc(sp.featuredLabel || "Featured story")}</p><h2>${esc(featured.title)}</h2></div><a class="text-link" href="${storyHref(featured.slug)}">Read featured</a></div>${featuredStoryBlock(data, featured)}</div></section>` : ""}${mapSection}<section class="section stories-section"><div class="container"><div class="gallery-toolbar story-toolbar"><div><p class="eyebrow">${esc(sp.categoryLabel || "Browse by category")}</p><div class="filters" role="group" aria-label="Story categories">${categories.map((category, i) => `<button class="filter story-filter ${i === 0 ? "active" : ""}" data-story-filter="${esc(category)}" aria-pressed="${i === 0 ? "true" : "false"}">${esc(category)}</button>`).join("")}</div><p class="gallery-count" id="storyCount" aria-live="polite">${stories.length} stories</p></div><div class="story-controls"><div class="story-sort" role="group" aria-label="Sort stories"><span class="story-sort-label">Sort</span><button class="filter story-sort-btn active" type="button" data-story-sort="newest" aria-pressed="true">Newest</button><button class="filter story-sort-btn" type="button" data-story-sort="oldest" aria-pressed="false">Oldest</button></div><button class="filter-reset story-reset" type="button">Reset</button></div></div><div class="story-list">${byDate.map((s) => storyCard(data, s)).join("")}</div><div class="gallery-empty story-empty" id="storyEmpty" hidden><h2>No stories found.</h2><p class="muted">Reset the category filter to return to the archive.</p></div></div></section></main>`;
 }
 export function atlasMain(data) {
   const ap = data.atlasPage || {};

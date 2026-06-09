@@ -266,6 +266,10 @@ h2{margin:0;font-family:var(--serif);font-size:3.4rem;font-weight:500;line-heigh
 @media(hover:none){.photo-open{opacity:.82;transform:translateY(0)}}
 .photo-card figcaption{padding:10px 0 0;color:var(--muted);font-size:14px;line-height:1.55}
 .photo-card strong{color:var(--text);font-weight:700}
+.photo-story-link{display:inline-flex;align-items:center;gap:6px;min-height:32px;margin-top:6px;color:var(--accent-cool);font-size:13px;font-weight:650}
+.photo-story-link span{transition:transform .28s var(--ease)}
+.photo-story-link:hover{text-decoration:underline}
+.photo-story-link:hover span{transform:translateX(3px)}
 .selected-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:28px}
 .selected-grid .photo-card,
 .selected-grid .photo-card:nth-child(n){grid-column:auto}
@@ -315,6 +319,10 @@ body[data-page="gallery"] .photo-card[hidden]{display:none!important}
 .gallery-empty h2{font-size:2.2rem}
 .story-empty{padding-top:28px}
 .story-toolbar{margin-bottom:34px}
+.story-controls{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.story-sort{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.story-sort-label{color:var(--muted);font-size:13px;font-weight:650}
+.story-sort-btn{min-height:44px}
 .about-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:40px;align-items:start}
 .about-img{width:100%;height:auto;aspect-ratio:4/5;object-fit:cover;border-radius:var(--radius-lg)}
 .prose{max-width:720px;color:var(--text-soft);font-size:18px;line-height:1.75}
@@ -499,6 +507,11 @@ body[data-page="gallery"] .photo-card[hidden]{display:none!important}
 }
 .lightbox-prev{left:18px}
 .lightbox-next{right:18px}
+.lightbox-story-link{display:inline-flex;align-items:center;gap:6px;min-height:32px;margin-top:14px;color:#9ec4cf;font-size:14px;font-weight:650}
+.lightbox-story-link[hidden]{display:none}
+.lightbox-story-link span{transition:transform .28s var(--ease)}
+.lightbox-story-link:hover{text-decoration:underline}
+.lightbox-story-link:hover span{transform:translateX(3px)}
 .lightbox-position{margin:12px 0 0;color:rgba(255,248,239,.62);font-size:13px;font-variant-numeric:tabular-nums}
 .lightbox .share-action{background:rgba(255,253,248,.1);border-color:rgba(255,253,248,.22);color:var(--paper)}
 .lightbox .share-action:hover{background:rgba(255,253,248,.18);color:var(--paper)}
