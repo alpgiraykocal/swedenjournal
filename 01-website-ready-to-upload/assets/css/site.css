@@ -263,7 +263,7 @@ h2{margin:0;font-family:var(--serif);font-size:3.4rem;font-weight:500;line-heigh
 .photo-media:hover .photo-open,
 .photo-open:focus-visible{opacity:1;transform:translateY(0)}
 .photo-open:hover{background:rgba(31,29,25,.76)}
-@media(hover:none){.photo-open{opacity:.82;transform:translateY(0)}}
+@media(hover:none){.photo-open{min-width:44px;min-height:44px;opacity:.82;transform:translateY(0)}}
 .photo-card figcaption{padding:10px 0 0;color:var(--muted);font-size:14px;line-height:1.55}
 .photo-card strong{color:var(--text);font-weight:700}
 .photo-story-link{display:inline-flex;align-items:center;gap:6px;min-height:44px;margin-top:4px;color:var(--accent-cool);font-size:13px;font-weight:650}
@@ -688,7 +688,7 @@ body[data-page="gallery"] .photo-card[hidden]{display:none!important}
   .related-container{width:calc(100% - 24px)}
   .share-title{font-size:1.75rem}
   .share-action{flex:1 1 auto}
-  .photo-open{min-height:44px;opacity:1;transform:none}
+  .photo-open{min-width:44px;min-height:44px;opacity:1;transform:none}
   .lightbox{padding:12px}
   .lightbox-close{top:10px;right:10px}
   .lightbox-nav{width:44px;height:44px;bottom:12px;font-size:32px}
