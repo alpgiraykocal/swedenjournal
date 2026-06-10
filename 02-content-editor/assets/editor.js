@@ -160,7 +160,8 @@
       "gallery/index.html":{title:"Gallery",description:c.gallery?.intro||c.site.description||"",image:imageFor(c.photos?.[0]?.id)},
       "stories/index.html":{title:"Stories",description:c.storiesPage?.intro||c.site.description||"",image:storyImage(featuredStory)},
       "story/index.html":{title:"Stories",description:c.storiesPage?.intro||c.site.description||"",image:storyImage(featuredStory),canonicalPath:"stories/",robots:"noindex,follow"},
-      "about/index.html":{title:"About",description:c.about?.paragraphs?.[0]||c.site.description||"",image:imageFor(c.about?.portraitPhotoId)}
+      "about/index.html":{title:"About",description:c.about?.paragraphs?.[0]||c.site.description||"",image:imageFor(c.about?.portraitPhotoId)},
+      "atlas/index.html":{title:"Atlas",description:c.atlasPage?.intro||"An atlas of quiet places — every story in the journal mapped to where it happened. Wander Sweden Journal geographically.",image:imageFor(c.home?.heroPhotoId)}
     };
     for(const story of c.stories||[]){
       pages[storyPath(story.slug)]={title:story.title||story.slug,description:story.summary||c.site.description||"",image:storyImage(story),story};
@@ -169,7 +170,7 @@
   }
   function sitemapXml(c=state.content){
     const base=publicBaseUrl(c);
-    const urls=["", "gallery/", "stories/", "about/", ...(c.stories||[]).map(s=>storyPublicPath(s.slug))];
+    const urls=["", "gallery/", "stories/", "about/", "atlas/", ...(c.stories||[]).map(s=>storyPublicPath(s.slug))];
     return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(path=>`  <url><loc>${escXml(`${base}/${path}`)}</loc></url>`).join("\n")}\n</urlset>\n`;
   }
   function robotsTxt(c=state.content){const base=publicBaseUrl(c);return `User-agent: *\nAllow: /\n\nSitemap: ${base}/sitemap.xml\n`;}
@@ -209,7 +210,7 @@
   <div id="app" tabindex="-1"></div>
   <div id="footer"></div>
   <script>window.__DATA_PATH__="${prefix}assets/data/site-content.json";window.__ROOT__="${prefix}";window.__ASSET_PREFIX__="${prefix}";</script>
-  <script src="${prefix}assets/js/site.js?v=20260601"></script>
+  <script type="module" src="${prefix}assets/js/site.js?v=20260601"></script>
 </body>
 </html>
 `;
