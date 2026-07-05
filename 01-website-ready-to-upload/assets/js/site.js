@@ -3,7 +3,7 @@ import {
   sortPhotos, storyPhotos, storyHref, absoluteUrl, root, header, footer,
   homeMain, galleryMain, storiesMain, aboutMain, atlasMain, storyMain, legacyStoryMain,
   websiteLdObject, imageGalleryLdObject, personLdObject, articleLdObject,
-} from "./templates.mjs?v=ea43971963";
+} from "./templates.mjs?v=0b2bb86fc0";
 
 // Cache-bust the runtime content fetches. /assets/data/*.json is served with a long
 // edge cache (the host ignores _headers), so without a content-versioned URL a freshly
@@ -725,16 +725,14 @@ function bindLightbox(data, getVisiblePhotos){
     const dy = touch.clientY - touchStartY;
     if(Math.abs(dx) > 52 && Math.abs(dx) > Math.abs(dy) * 1.4) step(dx < 0 ? 1 : -1);
   }, {passive:true});
+  // The share button is hidden entirely when the Web Share API is unavailable;
+  // the separate "Copy link" button covers that case.
   if(!navigator.share) share.hidden = true;
   share.addEventListener("click", async () => {
     if(!current) return;
     const url = urlFor(current);
-    if(navigator.share){
-      try{ await navigator.share({title:current.title, text:current.caption || current.title, url}); setStatus("Shared."); }
-      catch(e){ if(e.name !== "AbortError") setStatus("Sharing was not available."); }
-    }else{
-      await copyText(url) ? setStatus("Link copied.") : setStatus("Copy failed.");
-    }
+    try{ await navigator.share({title:current.title, text:current.caption || current.title, url}); setStatus("Shared."); }
+    catch(e){ if(e.name !== "AbortError") setStatus("Sharing was not available."); }
   });
   copy.addEventListener("click", async () => {
     if(!current) return;

@@ -277,7 +277,8 @@
   function storyBySlug(slug){return state.content.stories.find(s=>s.slug===slug)||null;}
   function categoryFromStory(s){return s?.category||String(s?.theme||"").split(/[,/]/).map(x=>x.trim()).filter(Boolean)[0]||"Travel Notes";}
   function storyCategories(){return [...new Set((state.content.stories||[]).map(categoryFromStory))];}
-  function sortedPhotos(){return [...state.content.photos].sort((a,b)=>{const ao=Number(a.sortOrder)||999999,bo=Number(b.sortOrder)||999999;if(ao!==bo)return ao-bo;return String(a.title||"").localeCompare(String(b.title||""));});}
+  function sortOrderValue(raw){const n=Number(raw);return (raw!==""&&raw!=null&&Number.isFinite(n))?n:999999;}
+  function sortedPhotos(){return [...state.content.photos].sort((a,b)=>{const ao=sortOrderValue(a.sortOrder),bo=sortOrderValue(b.sortOrder);if(ao!==bo)return ao-bo;return String(a.title||"").localeCompare(String(b.title||""));});}
   function validateContent(c=state.content){const errors=[], warnings=[];if(!c){errors.push("İçerik yüklenmedi.");return{errors,warnings};}
     const ids=c.photos.map(p=>p.id).filter(Boolean), slugs=c.stories.map(s=>s.slug).filter(Boolean);const photoSet=new Set(ids), slugSet=new Set(slugs);
     if(ids.length!==photoSet.size)errors.push("Tekrarlanan fotoğraf ID tespit edildi. Her fotoğrafın benzersiz bir ID değeri olmalı.");

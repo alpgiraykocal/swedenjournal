@@ -160,7 +160,10 @@ export function relatedPanel(data, story) {
 }
 
 export function storyNav(data, story) {
-  const list = (data.stories || []).filter((s) => s.slug);
+  // Same newest-first date order as the Stories archive (storiesMain), so
+  // prev/next here walks the same sequence the reader saw on the list page.
+  const list = (data.stories || []).filter((s) => s.slug)
+    .sort((a, b) => String(b.isoDate || b.date || "").localeCompare(String(a.isoDate || a.date || "")));
   const idx = list.findIndex((s) => s.slug === story.slug);
   if (idx < 0) return "";
   const prev = list[idx - 1];
