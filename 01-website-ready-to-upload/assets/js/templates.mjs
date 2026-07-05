@@ -252,7 +252,9 @@ export function personLdObject(data) {
 }
 export function articleLdObject(data, story, heroPhoto) {
   const base = String(data.site?.baseUrl || "").replace(/\/+$/, "");
-  return { "@context": "https://schema.org", "@type": "Article", headline: story.title || "", description: story.summary || data.site?.description || "", image: jsonLdImageUrl(data, heroPhoto), datePublished: machineDate(story.isoDate) || machineDate(story.date), author: { "@type": "Person", name: data.site?.ownerName || "", url: base || undefined }, publisher: { "@type": "Organization", name: data.site?.siteTitle || data.site?.ownerName || "", logo: { "@type": "ImageObject", url: (base || "") + "/icon-512.png" } }, url: absoluteUrl(data, "stories/" + encodeURIComponent(story.slug) + "/") };
+  const hasGeo = story.coordinates && Number.isFinite(Number(story.coordinates.lat)) && Number.isFinite(Number(story.coordinates.lng));
+  const contentLocation = hasGeo ? { "@type": "Place", name: story.location || story.title || "", geo: { "@type": "GeoCoordinates", latitude: Number(story.coordinates.lat), longitude: Number(story.coordinates.lng) } } : undefined;
+  return { "@context": "https://schema.org", "@type": "Article", headline: story.title || "", description: story.summary || data.site?.description || "", image: jsonLdImageUrl(data, heroPhoto), datePublished: machineDate(story.isoDate) || machineDate(story.date), author: { "@type": "Person", name: data.site?.ownerName || "", url: base || undefined }, publisher: { "@type": "Organization", name: data.site?.siteTitle || data.site?.ownerName || "", logo: { "@type": "ImageObject", url: (base || "") + "/icon-512.png" } }, contentLocation, url: absoluteUrl(data, "stories/" + encodeURIComponent(story.slug) + "/") };
 }
 export function breadcrumbLdObject(data, trail) {
   return { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: (trail || []).map((t, i) => ({ "@type": "ListItem", position: i + 1, name: t.name, item: absoluteUrl(data, t.path) })) };
