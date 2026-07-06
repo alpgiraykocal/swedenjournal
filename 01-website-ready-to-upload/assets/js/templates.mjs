@@ -56,9 +56,26 @@ export function absoluteUrl(data, path = "") {
 }
 export const storyCategory = (story) => story?.category || String(story?.theme || "").split(/[,/]/).map((x) => x.trim()).filter(Boolean)[0] || "Travel Notes";
 export const storyMetaChips = (s) => [s.location, s.date, s.readingTime, storyCategory(s)].filter(Boolean).map((item) => `<span>${esc(item)}</span>`).join("");
+// Photo ids referenced by a story body block, across every image-bearing block type.
+export function blockPhotoIds(block) {
+  if (!block) return [];
+  if (block.type === "image" || block.type === "panorama") return block.photoId ? [block.photoId] : [];
+  if (block.type === "image-pair") return (block.photoIds || []).filter(Boolean);
+  return [];
+}
 export function storyPhotos(data, story) {
-  const ids = [story.heroPhotoId, ...(story.body || []).filter((b) => b.type === "image").map((b) => b.photoId)];
+  const ids = [story.heroPhotoId, ...(story.body || []).flatMap(blockPhotoIds)];
   return [...new Set(ids)].map((id) => photo(data, id)).filter(Boolean);
+}
+export const photoHref = (id) => `${root()}photos/${encodeURIComponent(id)}/`;
+// Rendered pixel size of the "full" variant (source scaled to max 2200 wide) — used
+// for og:image:width/height and ImageObject width/height so scrapers can reserve
+// the correct aspect ratio before fetching the image.
+export function fullVariantDims(p) {
+  const w = Number(p?.width), h = Number(p?.height);
+  if (!Number.isFinite(w) || !Number.isFinite(h) || w <= 0 || h <= 0) return null;
+  const dw = Math.min(2200, w);
+  return { width: dw, height: Math.round(h * dw / w) };
 }
 // Reverse index photoId -> {slug,title} of the story that uses the photo (first
 // story wins if a photo appears in several). Lets the gallery link a photo back
@@ -69,7 +86,7 @@ export function photoStoryMap(data) {
   const map = new Map();
   for (const s of (data.stories || [])) {
     if (!s.slug) continue;
-    const ids = [s.heroPhotoId, ...(s.body || []).filter((b) => b.type === "image").map((b) => b.photoId)];
+    const ids = [s.heroPhotoId, ...(s.body || []).flatMap(blockPhotoIds)];
     for (const id of ids) { if (id && !map.has(id)) map.set(id, { slug: s.slug, title: s.title }); }
   }
   _photoStoryCache.set(data, map);
@@ -94,7 +111,7 @@ export function sortPhotos(list) {
 export const mediaRatioStyle = (p) => (p?.width && p?.height ? ` style="aspect-ratio:${esc(p.width)} / ${esc(p.height)}"` : "");
 export function header(data) {
   const page = CTX.page;
-  const activePage = page === "story" ? "stories" : page;
+  const activePage = page === "story" ? "stories" : page === "photo" ? "gallery" : page;
   const item = (id, href, label) => `<a href="${href}" ${activePage === id ? `aria-current="page"` : ""}>${label}</a>`;
   return `<a class="skip-link" href="#app">Skip to content</a><header class="site-header"><div class="container nav"><a class="brand" href="${root()}index.html" aria-label="${esc(data.site.ownerName)} — home"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" focusable="false"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="3.4" fill="currentColor"/></svg></span><span class="brand-text">${esc(data.site.ownerName)}<span class="brand-tagline">${esc(data.site.siteTitle || "")}</span></span></a><nav class="nav-links" aria-label="Primary navigation">
   ${item("home", `${root()}index.html`, "Home")}${item("stories", `${root()}stories/index.html`, "Stories")}${item("atlas", `${root()}atlas/index.html`, "Atlas")}${item("gallery", `${root()}gallery/index.html`, "Gallery")}${item("about", `${root()}about/index.html`, "About")}<button type="button" class="theme-toggle" data-theme-toggle aria-label="Toggle dark and light theme" title="Toggle dark / light theme"><svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.1"/><path d="M12 2.4v2.2M12 19.4v2.2M4.6 4.6l1.6 1.6M17.8 17.8l1.6 1.6M2.4 12h2.2M19.4 12h2.2M4.6 19.4l1.6-1.6M17.8 6.2l1.6-1.6"/></svg><svg class="icon-moon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M20.5 14.8A8.3 8.3 0 0 1 9.2 3.5a8.3 8.3 0 1 0 11.3 11.3z"/></svg></button><a href="${esc(data.site.instagramUrl)}" target="_blank" rel="noopener" aria-label="Instagram: ${esc(data.site.instagramLabel || "@sweden_journal")}" class="ig-nav-link"><svg class="ig-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98C.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></a></nav></div></header>`;
@@ -122,27 +139,55 @@ export function blockHtmlInteractive(data, block) {
     const p = photo(data, block.photoId);
     return p ? `<figure class="story-inline-photo">${responsiveImage(p, { className: "story-inline-img", sizes: "(max-width: 920px) calc(100vw - 40px), 840px", fallbackSize: "full" })}<figcaption>${esc(block.caption || p.caption || "")}<button class="photo-open" type="button" data-open-photo="${esc(p.id)}" aria-label="Open ${esc(p.title)}" style="position:relative;right:auto;bottom:auto;opacity:1;transform:none;margin-left:10px;display:inline-flex;vertical-align:middle">View</button></figcaption></figure>` : "";
   }
+  if (block.type === "panorama") {
+    // Strict lookup: a missing photoId renders nothing (no first-photo fallback).
+    const p = photos(data).find((x) => x.id === block.photoId) || null;
+    return p ? `<figure class="story-inline-photo story-panorama">${responsiveImage(p, { className: "story-inline-img", sizes: "(max-width: 1220px) calc(100vw - 40px), 1180px", fallbackSize: "full" })}<figcaption>${esc(block.caption || p.caption || "")}<button class="photo-open" type="button" data-open-photo="${esc(p.id)}" aria-label="Open ${esc(p.title)}" style="position:relative;right:auto;bottom:auto;opacity:1;transform:none;margin-left:10px;display:inline-flex;vertical-align:middle">View</button></figcaption></figure>` : "";
+  }
+  if (block.type === "image-pair") {
+    const pair = (block.photoIds || []).map((id) => photos(data).find((x) => x.id === id)).filter(Boolean).slice(0, 2);
+    if (!pair.length) return "";
+    const items = pair.map((p) => `<span class="pair-item">${responsiveImage(p, { className: "story-inline-img", sizes: "(max-width: 700px) calc(100vw - 40px), 420px" })}<button class="photo-open" type="button" data-open-photo="${esc(p.id)}" aria-label="Open ${esc(p.title)}"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M10 2h4v4M14 2l-5 5M6 14H2v-4M2 14l5-5"/></svg></button></span>`).join("");
+    return `<figure class="story-inline-photo story-photo-pair"><span class="pair-grid">${items}</span>${block.caption ? `<figcaption>${esc(block.caption)}</figcaption>` : ""}</figure>`;
+  }
   if (block.type === "quote") return `<blockquote>${esc(block.text)}</blockquote>`;
   if (block.type === "heading") return `<h2>${esc(block.text)}</h2>`;
   return `<p>${esc(block.text || "")}</p>`;
 }
-export function sharePanel(data, story) {
-  const url = storyShareUrl(data, story);
-  const subject = encodeURIComponent(story.title || data.site?.siteTitle || "Photo story");
-  const body = encodeURIComponent(`${story.summary || story.title}\n\n${url}`);
+function sharePanelHtml({ url, title, text, heading, blurb }) {
+  const subject = encodeURIComponent(title || "Photo story");
+  const body = encodeURIComponent(`${text || title}\n\n${url}`);
   return `<aside class="share-panel container" aria-labelledby="share-title">
     <div class="share-copy">
       <p class="eyebrow">Share</p>
-      <h2 id="share-title" class="share-title">Share this story</h2>
-      <p class="muted">Send it to someone who would enjoy this place, light, or walk.</p>
+      <h2 id="share-title" class="share-title">${esc(heading)}</h2>
+      <p class="muted">${esc(blurb)}</p>
     </div>
     <div class="share-actions" role="group" aria-label="Share options">
-      <button class="share-action" type="button" data-native-share data-share-url="${esc(url)}" data-share-title="${esc(story.title)}" data-share-text="${esc(story.summary || "")}">Share</button>
+      <button class="share-action" type="button" data-native-share data-share-url="${esc(url)}" data-share-title="${esc(title)}" data-share-text="${esc(text || "")}">Share</button>
       <button class="share-action" type="button" data-copy-link data-share-url="${esc(url)}" data-default-label="Copy link">Copy link</button>
       <a class="share-action" href="mailto:?subject=${subject}&body=${body}">Email</a>
     </div>
     <p class="share-status" aria-live="polite"></p>
   </aside>`;
+}
+export function sharePanel(data, story) {
+  return sharePanelHtml({
+    url: storyShareUrl(data, story),
+    title: story.title || data.site?.siteTitle || "Photo story",
+    text: story.summary || story.title,
+    heading: "Share this story",
+    blurb: "Send it to someone who would enjoy this place, light, or walk.",
+  });
+}
+export function photoSharePanel(data, p) {
+  return sharePanelHtml({
+    url: absoluteUrl(data, "photos/" + encodeURIComponent(p.id) + "/"),
+    title: p.title || data.site?.siteTitle || "Photograph",
+    text: p.caption || p.alt || p.title,
+    heading: "Share this photograph",
+    blurb: "Send it to someone who would enjoy this place and light.",
+  });
 }
 export function relatedPanel(data, story) {
   const storyTags = new Set((story.tags || []).map((x) => x.toLowerCase()));
@@ -228,6 +273,23 @@ export function storyMain(data, s) {
   const mapLink = hasGeo ? `<a class="story-map-link" href="${root()}atlas/index.html?place=${encodeURIComponent(s.slug)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true" focusable="false"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.6"/></svg>View on the map</a>` : "";
   return `<main><section class="story-hero container"><div class="story-meta" role="group" aria-label="Story details">${storyMetaChips(s)}</div><h1 class="headline">${esc(s.title)}</h1><p class="intro">${esc(s.summary)}</p>${mapLink}${responsiveImage(photo(data, s.heroPhotoId), { priority: true, sizes: "(max-width: 1220px) calc(100vw - 40px), 1180px", fallbackSize: "full", viewTransitionName: s.slug ? `story-${s.slug}` : "hero-photo" })}</section><article class="story-body">${(s.body || []).map((b) => blockHtmlInteractive(data, b)).join("")}</article>${relatedPanel(data, s)}${sharePanel(data, s)}${storyNav(data, s)}</main><div id="lightboxRoot"></div>`;
 }
+export function photoMain(data, p) {
+  const st = photoStory(data, p.id);
+  const list = sortPhotos(photos(data));
+  const idx = list.findIndex((x) => x.id === p.id);
+  const prev = idx > 0 ? list[idx - 1] : null;
+  const next = idx >= 0 && idx < list.length - 1 ? list[idx + 1] : null;
+  const chips = [p.location, p.date, p.season, p.category].filter(Boolean).map((x) => `<span>${esc(x)}</span>`).join("");
+  const storyLink = st ? `<a class="story-map-link" href="${storyHref(st.slug)}">From the story: ${esc(st.title)} <span aria-hidden="true">→</span></a>` : "";
+  const related = list.filter((x) => x.id !== p.id && x.category && x.category === p.category).slice(0, 3);
+  const walkLink = (ph, dir, label) => ph
+    ? `<a class="story-walk-link story-walk-${dir}" href="${photoHref(ph.id)}"><span class="story-walk-dir">${label}</span><span class="story-walk-title">${esc(ph.title)}</span></a>`
+    : `<span class="story-walk-link is-empty" aria-hidden="true"></span>`;
+  const walk = (prev || next)
+    ? `<nav class="story-walk container" aria-label="More photographs"><p class="eyebrow story-walk-eyebrow">More from the gallery</p><div class="story-walk-row">${walkLink(prev, "prev", "Previous")}${walkLink(next, "next", "Next")}</div></nav>`
+    : "";
+  return `<main><section class="story-hero container photo-page-hero"><div class="story-meta" role="group" aria-label="Photograph details">${chips}</div><h1 class="headline">${esc(p.title)}</h1>${p.caption ? `<p class="intro">${esc(p.caption)}</p>` : ""}${storyLink}${responsiveImage(p, { priority: true, sizes: "(max-width: 1220px) calc(100vw - 40px), 1180px", fallbackSize: "full", viewTransitionName: p.id ? `photo-${p.id}` : undefined })}${(p.tags || []).length ? `<p class="photo-page-tags">${(p.tags || []).slice(0, 6).map((t) => `<span>${esc(t)}</span>`).join("")}</p>` : ""}<p class="photo-page-back"><a class="text-link" href="${root()}gallery/index.html">Back to the gallery</a></p></section>${related.length ? `<section class="section related-section"><div class="container related-container"><div class="section-head"><div><p class="eyebrow">Same collection</p><h2>Related photographs</h2></div></div><div class="gallery-grid selected-grid related-photos">${related.map((rp) => `<a class="photo-page-related" href="${photoHref(rp.id)}">${photoFigure(rp, { sizes: "(max-width: 560px) calc(100vw - 24px), 280px" })}</a>`).join("")}</div></div></section>` : ""}${photoSharePanel(data, p)}${walk}</main>`;
+}
 export function legacyStoryMain(data) {
   return `<main class="container section"><p class="eyebrow">Stories</p><h1 class="headline">${esc(data.storiesPage?.headline || "Stories")}</h1><p class="intro">${esc(data.storiesPage?.intro || data.site?.description || "")}</p><p><a class="text-link" href="${root()}stories/index.html">Return to stories</a></p></main>`;
 }
@@ -259,6 +321,27 @@ export function articleLdObject(data, story, heroPhoto) {
   const contentLocation = hasGeo ? { "@type": "Place", name: story.location || story.title || "", geo: { "@type": "GeoCoordinates", latitude: Number(story.coordinates.lat), longitude: Number(story.coordinates.lng) } } : undefined;
   return { "@context": "https://schema.org", "@type": "Article", headline: story.title || "", description: story.summary || data.site?.description || "", image: jsonLdImageUrl(data, heroPhoto), datePublished: machineDate(story.isoDate) || machineDate(story.date), author: { "@type": "Person", name: data.site?.ownerName || "", url: base || undefined }, publisher: { "@type": "Organization", name: data.site?.siteTitle || data.site?.ownerName || "", logo: { "@type": "ImageObject", url: (base || "") + "/icon-512.png" } }, contentLocation, url: absoluteUrl(data, "stories/" + encodeURIComponent(story.slug) + "/") };
 }
+export function photoLdObject(data, p) {
+  const st = photoStory(data, p.id);
+  const dims = fullVariantDims(p);
+  return {
+    "@context": "https://schema.org",
+    "@type": "ImageObject",
+    name: p.title || "",
+    caption: p.caption || "",
+    description: p.alt || p.caption || "",
+    contentUrl: jsonLdImageUrl(data, p),
+    thumbnailUrl: variant(p, "thumb", "jpeg") ? absoluteUrl(data, variant(p, "thumb", "jpeg").replace(/^(?:\.\.\/)+/, "")) : undefined,
+    width: dims ? dims.width : undefined,
+    height: dims ? dims.height : undefined,
+    representativeOfPage: true,
+    contentLocation: p.location ? { "@type": "Place", name: p.location } : undefined,
+    creator: { "@type": "Person", name: data.site?.ownerName || "" },
+    copyrightNotice: data.site?.ownerName ? `© ${data.site.ownerName}` : undefined,
+    isPartOf: st ? { "@type": "Article", headline: st.title || "", url: absoluteUrl(data, "stories/" + encodeURIComponent(st.slug) + "/") } : undefined,
+    url: absoluteUrl(data, "photos/" + encodeURIComponent(p.id) + "/"),
+  };
+}
 export function breadcrumbLdObject(data, trail) {
   return { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: (trail || []).map((t, i) => ({ "@type": "ListItem", position: i + 1, name: t.name, item: absoluteUrl(data, t.path) })) };
 }
@@ -269,4 +352,105 @@ export function storiesLdObject(data) {
 export function atlasLdObject(data) {
   const placed = (data.stories || []).filter((s) => s.coordinates && Number.isFinite(Number(s.coordinates.lat)) && Number.isFinite(Number(s.coordinates.lng)));
   return { "@context": "https://schema.org", "@type": "CollectionPage", name: data.atlasPage?.headline || "Atlas", description: data.atlasPage?.intro || data.site?.description || "", url: absoluteUrl(data, "atlas/"), mainEntity: { "@type": "ItemList", itemListElement: placed.map((s, i) => ({ "@type": "ListItem", position: i + 1, item: { "@type": "Place", name: s.title, url: absoluteUrl(data, "stories/" + encodeURIComponent(s.slug) + "/"), geo: { "@type": "GeoCoordinates", latitude: Number(s.coordinates.lat), longitude: Number(s.coordinates.lng) } } })) } };
+}
+
+// ---- Canonical feed.xml / sitemap.xml builders ----
+// SINGLE source of truth for both files. The node generators (03-tools) call these
+// directly; the editor (02-content-editor/assets/editor.js) mirrors them line for
+// line, and qa-static-checks.mjs regenerates both from here and byte-compares
+// against what is on disk — so an editor save can never silently degrade either file.
+const escX = (s) => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+export const xmlMachineDate = (v) => (/^\d{4}-\d{2}-\d{2}$/.test(String(v || "").trim()) ? String(v).trim() : "");
+export function feedXml(data, now = new Date().toUTCString()) {
+  const base = String(data.site?.baseUrl || "").replace(/\/+$/, "");
+  const photosById = new Map((data.photos || []).map((p) => [p.id, p]));
+  const rssDate = (s) => {
+    const raw = xmlMachineDate(s?.isoDate) || xmlMachineDate(s?.date);
+    return raw ? new Date(`${raw}T00:00:00Z`).toUTCString() : "";
+  };
+  const heroUrl = (s) => {
+    const hero = photosById.get(s.heroPhotoId);
+    const rel = hero?.variants?.full?.jpeg || hero?.src;
+    return rel ? `${base}/${String(rel).replace(/^\/+/, "")}` : "";
+  };
+  const items = (data.stories || [])
+    .filter((s) => s.title && s.slug)
+    .map((s) => {
+      const pubDate = rssDate(s);
+      const media = heroUrl(s);
+      return `  <item>
+    <title>${escX(s.title)}</title>
+    <link>${base}/stories/${encodeURIComponent(s.slug)}/</link>
+    <guid isPermaLink="true">${base}/stories/${encodeURIComponent(s.slug)}/</guid>
+    <description>${escX(s.summary || "")}</description>
+${pubDate ? `    <pubDate>${escX(pubDate)}</pubDate>\n` : ""}    <category>${escX(s.category || s.theme || "Travel Notes")}</category>
+${media ? `    <media:content url="${escX(media)}" medium="image" type="image/jpeg"/>\n` : ""}  </item>`;
+    })
+    .join("\n");
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/">
+  <channel>
+    <title>${escX(data.site?.siteTitle || data.site?.ownerName || "Photo Blog")}</title>
+    <link>${base}/</link>
+    <description>${escX(data.site?.description || "")}</description>
+    <language>en</language>
+    <lastBuildDate>${now}</lastBuildDate>
+    <atom:link href="${base}/feed.xml" rel="self" type="application/rss+xml"/>
+${items}
+  </channel>
+</rss>
+`;
+}
+export function sitemapXml(data, buildDay = new Date().toISOString().slice(0, 10)) {
+  const base = String(data.site?.baseUrl || "").replace(/\/+$/, "");
+  const list = data.photos || [];
+  const photosById = new Map(list.map((p) => [p.id, p]));
+  const imageLoc = (p) => {
+    const rel = p?.variants?.full?.jpeg || p?.variants?.medium?.jpeg || p?.src;
+    return rel ? `${base}/${String(rel).replace(/^\/+/, "")}` : "";
+  };
+  const imageTags = (arr) => [...new Set(arr.filter(Boolean).map(imageLoc).filter(Boolean))]
+    .map((loc) => `    <image:image><image:loc>${escX(loc)}</image:loc></image:image>`)
+    .join("\n");
+  const storyImgs = (s) => {
+    const ids = [s.heroPhotoId, ...(s.body || []).flatMap(blockPhotoIds)];
+    return [...new Set(ids)].map((id) => photosById.get(id)).filter(Boolean);
+  };
+  const urlEntry = ({ loc, lastmod, images }) => {
+    const parts = [`  <url>`, `    <loc>${escX(loc)}</loc>`];
+    if (lastmod) parts.push(`    <lastmod>${lastmod}</lastmod>`);
+    if (images) parts.push(images);
+    parts.push(`  </url>`);
+    return parts.join("\n");
+  };
+  const latestStory = (data.stories || [])
+    .map((s) => xmlMachineDate(s.isoDate) || xmlMachineDate(s.date))
+    .filter(Boolean)
+    .sort()
+    .at(-1) || buildDay;
+  const entries = [];
+  entries.push(urlEntry({ loc: `${base}/`, lastmod: latestStory }));
+  entries.push(urlEntry({ loc: `${base}/gallery/`, lastmod: buildDay, images: imageTags(list) }));
+  entries.push(urlEntry({ loc: `${base}/stories/`, lastmod: latestStory }));
+  entries.push(urlEntry({ loc: `${base}/about/`, lastmod: buildDay }));
+  entries.push(urlEntry({ loc: `${base}/atlas/`, lastmod: buildDay }));
+  for (const s of (data.stories || []).filter((s) => s.title && s.slug)) {
+    entries.push(urlEntry({
+      loc: `${base}/stories/${encodeURIComponent(s.slug)}/`,
+      lastmod: xmlMachineDate(s.isoDate) || xmlMachineDate(s.date) || buildDay,
+      images: imageTags(storyImgs(s)),
+    }));
+  }
+  for (const p of list.filter((p) => p.id && p.title)) {
+    entries.push(urlEntry({
+      loc: `${base}/photos/${encodeURIComponent(p.id)}/`,
+      lastmod: xmlMachineDate(p.date) || buildDay,
+      images: imageTags([p]),
+    }));
+  }
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+${entries.join("\n")}
+</urlset>
+`;
 }

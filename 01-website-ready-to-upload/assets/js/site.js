@@ -1,9 +1,9 @@
 import {
   setContext, esc, photos, photo, imgPath, metaText, variant, srcset, responsiveImage,
-  sortPhotos, storyPhotos, storyHref, absoluteUrl, root, header, footer,
-  homeMain, galleryMain, storiesMain, aboutMain, atlasMain, storyMain, legacyStoryMain,
-  websiteLdObject, imageGalleryLdObject, personLdObject, articleLdObject,
-} from "./templates.mjs?v=0b2bb86fc0";
+  sortPhotos, storyPhotos, storyHref, photoHref, absoluteUrl, root, header, footer,
+  homeMain, galleryMain, storiesMain, aboutMain, atlasMain, storyMain, legacyStoryMain, photoMain,
+  websiteLdObject, imageGalleryLdObject, personLdObject, articleLdObject, photoLdObject, fullVariantDims,
+} from "./templates.mjs?v=3491915bcb";
 
 // Cache-bust the runtime content fetches. /assets/data/*.json is served with a long
 // edge cache (the host ignores _headers), so without a content-versioned URL a freshly
@@ -83,6 +83,17 @@ function updateMeta(data, {title, description, path="", imagePhoto=null, robots=
     const imageUrl = absoluteUrl(data, (variant(imagePhoto, "full", "jpeg") || imgPath(imagePhoto)).replace(/^(?:\.\.\/)+/,""));
     ogImage.setAttribute("content", imageUrl);
     twitterImage.setAttribute("content", imageUrl);
+    // Width/height/alt let scrapers reserve the correct card aspect ratio before
+    // fetching the image — mirrors what the build writes into the static head.
+    const dims = fullVariantDims(imagePhoto);
+    if(dims){
+      ensureMeta('meta[property="og:image:width"]', "meta", {property:"og:image:width"}).setAttribute("content", String(dims.width));
+      ensureMeta('meta[property="og:image:height"]', "meta", {property:"og:image:height"}).setAttribute("content", String(dims.height));
+    }
+    if(imagePhoto.alt){
+      ensureMeta('meta[property="og:image:alt"]', "meta", {property:"og:image:alt"}).setAttribute("content", imagePhoto.alt);
+      ensureMeta('meta[name="twitter:image:alt"]', "meta", {name:"twitter:image:alt"}).setAttribute("content", imagePhoto.alt);
+    }
   }
 }
 function setUrlParam(key, value, mode="replace"){
@@ -150,6 +161,12 @@ function isLegacyStoryShell(){
   const parent = parts.at(-2);
   return last === "story" || (last === "index.html" && parent === "story");
 }
+function currentPhotoId(){
+  const parts = location.pathname.replace(/\/$/, "").split("/").filter(Boolean);
+  const last = parts.at(-1);
+  const slug = last === "index.html" ? parts.at(-2) : last;
+  return slug && slug !== "photos" ? decodeURIComponent(slug) : null;
+}
 async function hydrate(page){
   // Content is already pre-rendered into the HTML; only bind interactivity.
   if(page === "gallery"){
@@ -167,6 +184,8 @@ async function hydrate(page){
     bindStoryFilters();
   }else if(page === "atlas"){
     initMap("atlasMap", "atlas-map-data");
+  }else if(page === "photo"){
+    bindShareControls();
   }
 }
 function loadLeaflet(){
@@ -352,7 +371,8 @@ async function boot(){
       stories: storyPhotos(data, [...(data.stories || [])].sort((a,b)=>Number(Boolean(b.featured))-Number(Boolean(a.featured)))[0] || {})[0],
       about: photo(data, data.about?.portraitPhotoId),
       atlas: null,
-      story: photo(data, ((data.stories || []).find(x => x.slug===currentStorySlug()) || data.stories?.[0])?.heroPhotoId)
+      story: photo(data, ((data.stories || []).find(x => x.slug===currentStorySlug()) || data.stories?.[0])?.heroPhotoId),
+      photo: photos(data).find(x => x.id === currentPhotoId()) || null
     };
     injectPreload(preloadMap[page], "(max-width: 850px) calc(100vw - 28px), 1180px", "medium");
     if(page === "home") renderHome(data);
@@ -361,6 +381,7 @@ async function boot(){
     if(page === "about") renderAbout(data);
     if(page === "atlas") renderAtlas(data);
     if(page === "story") renderStory(data);
+    if(page === "photo") renderPhoto(data);
     bindScrollReveal();
     bindImageLoadFade();
     initGalleryMasonry();
@@ -403,6 +424,18 @@ function renderAtlas(data){
   updateMeta(data, {title: ap.headline || "Atlas", description: ap.intro || data.site?.description, path:"atlas/", imagePhoto:hp});
   $("#app").innerHTML = atlasMain(data);
   initMap("atlasMap", "atlas-map-data");
+}
+function renderPhoto(data){
+  const p = photos(data).find(x => x.id === currentPhotoId());
+  if(!p){
+    updateMeta(data, {title:"Photograph not found", description:"The requested photograph is not available.", path:"gallery/", robots:"noindex,follow"});
+    $("#app").innerHTML = `<main class="container section"><p class="eyebrow">Photograph not found</p><h1 class="headline">This photograph is not available.</h1><p class="intro">The link may be outdated or the photograph may have been removed.</p><p><a class="text-link" href="${root()}gallery/index.html">Return to the gallery</a></p></main>`;
+    return;
+  }
+  updateMeta(data, {title:p.title, description:p.caption || p.alt || data.site?.description, path:`photos/${encodeURIComponent(p.id)}/`, imagePhoto:p});
+  injectJsonLd(photoLdObject(data, p));
+  $("#app").innerHTML = photoMain(data, p);
+  bindShareControls();
 }
 function renderStory(data){
   if(isLegacyStoryShell()){
@@ -579,13 +612,14 @@ function bindGalleryControls(data, list){
 function bindLightbox(data, getVisiblePhotos){
   const rootEl = $("#lightboxRoot");
   if(!rootEl) return;
-  rootEl.innerHTML = `<div class="lightbox" role="dialog" aria-modal="true" aria-labelledby="lightboxTitle" hidden><button class="lightbox-close" type="button" aria-label="Close photo">×</button><button class="lightbox-nav lightbox-prev" type="button" aria-label="Previous photo">‹</button><button class="lightbox-nav lightbox-next" type="button" aria-label="Next photo">›</button><div class="lightbox-media"></div><div class="lightbox-copy"><p class="eyebrow lightbox-meta"></p><h2 id="lightboxTitle"></h2><p class="muted lightbox-caption"></p><a class="lightbox-story-link" hidden></a><p class="lightbox-position" aria-live="polite"></p><div class="share-actions lightbox-actions"><button class="share-action" type="button" data-lightbox-share>Share</button><button class="share-action" type="button" data-lightbox-copy data-default-label="Copy link">Copy link</button></div><p class="share-status" aria-live="polite"></p></div></div>`;
+  rootEl.innerHTML = `<div class="lightbox" role="dialog" aria-modal="true" aria-labelledby="lightboxTitle" hidden><button class="lightbox-close" type="button" aria-label="Close photo">×</button><button class="lightbox-nav lightbox-prev" type="button" aria-label="Previous photo">‹</button><button class="lightbox-nav lightbox-next" type="button" aria-label="Next photo">›</button><div class="lightbox-media"></div><div class="lightbox-copy"><p class="eyebrow lightbox-meta"></p><h2 id="lightboxTitle"></h2><p class="muted lightbox-caption"></p><a class="lightbox-story-link" hidden></a><a class="lightbox-page-link" hidden></a><p class="lightbox-position" aria-live="polite"></p><div class="share-actions lightbox-actions"><button class="share-action" type="button" data-lightbox-share>Share</button><button class="share-action" type="button" data-lightbox-copy data-default-label="Copy link">Copy link</button></div><p class="share-status" aria-live="polite"></p></div></div>`;
   const box = $(".lightbox", rootEl);
   const media = $(".lightbox-media", rootEl);
   const title = $("#lightboxTitle", rootEl);
   const meta = $(".lightbox-meta", rootEl);
   const caption = $(".lightbox-caption", rootEl);
   const storyLink = $(".lightbox-story-link", rootEl);
+  const pageLink = $(".lightbox-page-link", rootEl);
   const status = $(".share-status", rootEl);
   const share = $("[data-lightbox-share]", rootEl);
   const copy = $("[data-lightbox-copy]", rootEl);
@@ -655,6 +689,11 @@ function bindLightbox(data, getVisiblePhotos){
         storyLink.hidden = true;
         storyLink.removeAttribute("href");
       }
+    }
+    if(pageLink){
+      pageLink.href = photoHref(p.id);
+      pageLink.innerHTML = `Open photo page <span aria-hidden="true">→</span>`;
+      pageLink.hidden = false;
     }
     const visible = currentList();
     const currentIndex = visible.findIndex(item => item.id === p.id);

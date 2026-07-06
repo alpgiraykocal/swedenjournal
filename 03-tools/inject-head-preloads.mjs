@@ -63,6 +63,18 @@ const heroFor = {
 for (const s of data.stories || []) {
   if (s.slug) heroFor[`stories/${s.slug}/index.html`] = s.heroPhotoId || null;
 }
+// Photo permalink pages: the page IS the photo — preload it as the LCP.
+for (const p of photos) {
+  if (p.id && p.title) heroFor[`photos/${p.id}/index.html`] = p.id;
+}
+
+// Optional privacy-friendly analytics: set site.cloudflareAnalyticsToken in
+// site-content.json (Cloudflare dashboard → Web Analytics → JS snippet token)
+// and every page gets the beacon. Empty/absent token → no script, no tracking.
+const cfToken = String(data.site?.cloudflareAnalyticsToken || "").trim();
+const analyticsLine = /^[A-Za-z0-9]+$/.test(cfToken)
+  ? `  <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "${cfToken}"}'></script>`
+  : null;
 
 function heroPreloadLine(prefix, heroId, sizes) {
   const p = photoById(heroId);
@@ -94,6 +106,7 @@ function buildBlock(prefix, heroId, sizes) {
   ];
   const hero = heroPreloadLine(prefix, heroId, sizes);
   if (hero) lines.push(hero);
+  if (analyticsLine) lines.push(analyticsLine);
   lines.push(`  ${END}`);
   return lines.join("\n");
 }

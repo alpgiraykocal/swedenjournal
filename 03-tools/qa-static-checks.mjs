@@ -3,6 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
+import { feedXml, sitemapXml } from "../01-website-ready-to-upload/assets/js/templates.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const websiteDir = path.join(root, "01-website-ready-to-upload");
@@ -82,6 +83,8 @@ function checkHtmlMetadata(baseDir) {
       'property="og:title"',
       'property="og:url"',
       'property="og:image"',
+      'property="og:image:width"',
+      'property="og:image:alt"',
       'name="twitter:card"',
     ]) {
       if (!html.includes(required)) fail(`${label} missing ${required}`);
@@ -119,8 +122,10 @@ function checkContent(baseDir, { requireSourcePhotos }) {
   for (const story of stories) {
     if (story.heroPhotoId && !photoIds.has(story.heroPhotoId)) fail(`Story ${story.slug} references missing hero photo: ${story.heroPhotoId}`);
     for (const block of story.body || []) {
-      if (block.type === "image" && block.photoId && !photoIds.has(block.photoId)) {
-        fail(`Story ${story.slug} image block references missing photo: ${block.photoId}`);
+      const ids = block.type === "image" || block.type === "panorama" ? [block.photoId]
+        : block.type === "image-pair" ? (block.photoIds || []) : [];
+      for (const id of ids.filter(Boolean)) {
+        if (!photoIds.has(id)) fail(`Story ${story.slug} ${block.type} block references missing photo: ${id}`);
       }
     }
   }
@@ -200,21 +205,60 @@ function checkStoryShells(baseDir) {
   }
 }
 
+// The live host is GitHub Pages (.github/workflows/deploy.yml) behind the
+// Cloudflare proxy. GH Pages serves 404.html natively at any depth and ignores
+// platform files like _headers/_redirects/.htaccess — those are dead configs
+// and must NOT come back (they mislead future maintenance).
 function checkFallbackFiles(baseDir) {
   checkFile(path.join(baseDir, "404.html"));
-  checkFile(path.join(baseDir, "_redirects"));
-  checkFile(path.join(baseDir, ".htaccess"));
-  if (exists(path.join(baseDir, "_redirects")) && !read(path.join(baseDir, "_redirects")).includes("/* /404.html 404")) {
-    fail(`${path.relative(root, path.join(baseDir, "_redirects"))} has unexpected 404 redirect rule`);
+  for (const dead of ["_redirects", "_headers", ".htaccess"]) {
+    if (exists(path.join(baseDir, dead))) {
+      fail(`${path.relative(root, path.join(baseDir, dead))} is a dead host config (site deploys to GitHub Pages) — remove it`);
+    }
   }
-  if (baseDir === websiteDir && exists(path.join(baseDir, "_redirects")) && !read(path.join(baseDir, "_redirects")).includes("/assets/images/photos/* /404.html 404")) {
-    fail(`${path.relative(root, path.join(baseDir, "_redirects"))} does not block raw source photos`);
+}
+
+function checkPhotoShells(baseDir) {
+  const dataPath = path.join(baseDir, "assets", "data", "site-content.json");
+  const content = exists(dataPath) ? readJson(dataPath) : null;
+  if (!content) return;
+  for (const photo of content.photos || []) {
+    if (!photo.id || !photo.title) continue;
+    const pagePath = path.join(baseDir, "photos", photo.id, "index.html");
+    checkFile(pagePath, `photos/${photo.id}/index.html`);
+    if (!exists(pagePath)) continue;
+    const html = read(pagePath);
+    const label = path.relative(root, pagePath);
+    if (!html.includes('href="../../assets/css/site.css')) fail(`${label} has wrong stylesheet path`);
+    if (!html.includes('window.__DATA_PATH__="../../assets/data/site-content.json"')) fail(`${label} has wrong data path`);
+    if (!html.includes('data-page="photo"')) fail(`${label} missing data-page="photo"`);
+    if (!html.includes(`rel="canonical" href="https://sweden-journal.com/photos/${encodeURIComponent(photo.id)}/"`)) fail(`${label} has wrong canonical`);
+    if (!html.includes('"@type":"ImageObject"')) fail(`${label} missing ImageObject JSON-LD`);
   }
-  if (exists(path.join(baseDir, ".htaccess")) && !read(path.join(baseDir, ".htaccess")).includes("ErrorDocument 404 /404.html")) {
-    fail(`${path.relative(root, path.join(baseDir, ".htaccess"))} has unexpected ErrorDocument rule`);
+}
+
+// Byte-level parity: the sitemap/feed on disk must be exactly what the canonical
+// builders in templates.mjs produce for the current content. The editor mirrors
+// those builders by hand — this check is what makes that mirror trustworthy.
+// The volatile inputs (sitemap buildDay, feed lastBuildDate) are read back from
+// the file on disk so a same-content regeneration compares byte-for-byte.
+function checkGeneratedXmlParity(baseDir) {
+  const dataPath = path.join(baseDir, "assets", "data", "site-content.json");
+  const content = exists(dataPath) ? readJson(dataPath) : null;
+  if (!content) return;
+  const sitemapPath = path.join(baseDir, "sitemap.xml");
+  if (exists(sitemapPath)) {
+    const disk = read(sitemapPath);
+    const day = disk.match(/<loc>[^<]*\/gallery\/<\/loc>\n\s*<lastmod>(\d{4}-\d{2}-\d{2})<\/lastmod>/)?.[1];
+    const expected = sitemapXml(content, day || undefined);
+    if (disk !== expected) fail(`${path.relative(root, sitemapPath)} does not match the canonical templates.mjs sitemapXml() output — regenerate (npm run build) or fix the writer that produced it`);
   }
-  if (baseDir === websiteDir && exists(path.join(baseDir, ".htaccess")) && !read(path.join(baseDir, ".htaccess")).includes("RedirectMatch 404 ^/assets/images/photos/")) {
-    fail(`${path.relative(root, path.join(baseDir, ".htaccess"))} does not block raw source photos`);
+  const rssPath = path.join(baseDir, "feed.xml");
+  if (exists(rssPath)) {
+    const disk = read(rssPath);
+    const now = disk.match(/<lastBuildDate>([^<]*)<\/lastBuildDate>/)?.[1];
+    const expected = feedXml(content, now || undefined);
+    if (disk !== expected) fail(`${path.relative(root, rssPath)} does not match the canonical templates.mjs feedXml() output — regenerate (npm run build) or fix the writer that produced it`);
   }
 }
 
@@ -361,6 +405,8 @@ checkHtmlMetadata(websiteDir);
 checkSitemap(websiteDir);
 checkRss(websiteDir);
 checkStoryShells(websiteDir);
+checkPhotoShells(websiteDir);
+checkGeneratedXmlParity(websiteDir);
 checkFallbackFiles(websiteDir);
 checkLegacyStoryShell(websiteDir);
 checkSourcePhotoGuard();
@@ -379,6 +425,8 @@ if (fs.existsSync(packageDir)) {
   checkSitemap(packageDir);
   checkRss(packageDir);
   checkStoryShells(packageDir);
+  checkPhotoShells(packageDir);
+  checkGeneratedXmlParity(packageDir);
   checkFallbackFiles(packageDir);
   checkLegacyStoryShell(packageDir);
   checkUploadPackagePrivacy();

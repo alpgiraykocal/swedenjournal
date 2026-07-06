@@ -8,9 +8,9 @@
 import fs from "node:fs";
 import path from "node:path";
 import {
-  setContext, photos, photo, storyPhotos, sortPhotos, photoStoryMap,
-  header, footer, homeMain, galleryMain, storiesMain, aboutMain, atlasMain, storyMain, legacyStoryMain, notFoundMain,
-  websiteLdObject, imageGalleryLdObject, personLdObject, articleLdObject,
+  setContext, photos, photo, storyPhotos, sortPhotos, photoStoryMap, fullVariantDims,
+  header, footer, homeMain, galleryMain, storiesMain, aboutMain, atlasMain, storyMain, legacyStoryMain, notFoundMain, photoMain,
+  websiteLdObject, imageGalleryLdObject, personLdObject, articleLdObject, photoLdObject,
   breadcrumbLdObject, storiesLdObject, atlasLdObject,
 } from "../01-website-ready-to-upload/assets/js/templates.mjs";
 
@@ -48,6 +48,31 @@ function clampDescription(html) {
     return `<meta name="description" content="${encAttr(cut)}">`;
   });
 }
+// SEO: og:image:width/height/alt (+ twitter:image:alt) so scrapers can reserve the
+// correct card aspect ratio before fetching the image. Idempotent: replaces the tag
+// when present, otherwise inserts it right after the matching og:image line.
+function injectOgImageMeta(html, p) {
+  if (!p) return html;
+  const dims = fullVariantDims(p);
+  const upsert = (h, pattern, tag, anchorRe) => {
+    if (pattern.test(h)) return h.replace(pattern, tag);
+    return h.replace(anchorRe, (m) => `${m}\n  ${tag}`);
+  };
+  const ogImageRe = /<meta property="og:image" content="[^"]*">/;
+  const twImageRe = /<meta name="twitter:image" content="[^"]*">/;
+  if (!ogImageRe.test(html)) return html;
+  if (dims) {
+    html = upsert(html, /<meta property="og:image:width" content="[^"]*">/, `<meta property="og:image:width" content="${dims.width}">`, ogImageRe);
+    html = upsert(html, /<meta property="og:image:height" content="[^"]*">/, `<meta property="og:image:height" content="${dims.height}">`, /<meta property="og:image:width" content="[^"]*">/);
+  }
+  if (p.alt) {
+    html = upsert(html, /<meta property="og:image:alt" content="[^"]*">/, `<meta property="og:image:alt" content="${encAttr(p.alt)}">`, dims ? /<meta property="og:image:height" content="[^"]*">/ : ogImageRe);
+    if (twImageRe.test(html)) {
+      html = upsert(html, /<meta name="twitter:image:alt" content="[^"]*">/, `<meta name="twitter:image:alt" content="${encAttr(p.alt)}">`, twImageRe);
+    }
+  }
+  return html;
+}
 // SEO: lead the homepage <title> (and social titles) with the brand name.
 function brandHomeTitle(html, d) {
   const st = String(d.site?.siteTitle || "").trim();
@@ -58,6 +83,21 @@ function brandHomeTitle(html, d) {
     .replace(/<title>[^<]*<\/title>/, `<title>${branded}</title>`)
     .replace(/(<meta property="og:title" content=")[^"]*(">)/, `$1${branded}$2`)
     .replace(/(<meta name="twitter:title" content=")[^"]*(">)/, `$1${branded}$2`);
+}
+
+// Resolve the photo behind a page's current og:image URL, so the injected
+// width/height/alt always describe the image the page actually advertises —
+// no matter whether the build or the editor wrote the og:image tag.
+function resolvePhotoByOgImage(html) {
+  const m = html.match(/<meta property="og:image" content="([^"]*)">/);
+  if (!m || !m[1]) return null;
+  const rel = decAttr(m[1]).replace(/^https?:\/\/[^/]+\//, "").replace(/^\/+/, "");
+  for (const p of photos(data)) {
+    for (const candidate of [p.variants?.full?.jpeg, p.variants?.medium?.jpeg, p.src]) {
+      if (candidate && String(candidate).replace(/^\/+/, "") === rel) return p;
+    }
+  }
+  return null;
 }
 
 function renderInto(rel, { pfx, active, main, headLd = "", hydrate = null }) {
@@ -79,6 +119,7 @@ function renderInto(rel, { pfx, active, main, headLd = "", hydrate = null }) {
   html = headRe.test(html) ? html.replace(headRe, `\n  ${headBlock}`) : html.replace(/<\/head>/, `  ${headBlock}\n</head>`);
 
   html = clampDescription(html);
+  html = injectOgImageMeta(html, resolvePhotoByOgImage(html));
   if (rel === "index.html") html = brandHomeTitle(html, data);
 
   fs.writeFileSync(file, html);
@@ -125,6 +166,60 @@ for (const s of data.stories || []) {
   });
 }
 
+// Photo permalink pages (photos/<id>/) — one indexable page per photograph so
+// Google Images has a real landing page instead of gallery/?photo=… fragments.
+// The shell (head metadata) is rewritten from content on every build, so a photo
+// title/caption/alt edit is always reflected; renderInto then injects the body.
+const base = String(data.site?.baseUrl || "").replace(/\/+$/, "");
+function photoShell(p) {
+  const siteTitle = encAttr(data.site?.siteTitle || "Photography & Travel Notes");
+  const title = encAttr(`${p.title} — ${data.site?.siteTitle || data.site?.ownerName || "Photo Blog"}`);
+  const desc = encAttr(p.caption || p.alt || data.site?.description || "");
+  const url = encAttr(`${base}/photos/${encodeURIComponent(p.id)}/`);
+  const image = encAttr(`${base}/${String(p.variants?.full?.jpeg || p.src || "").replace(/^\/+/, "")}`);
+  return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>${title}</title>
+  <meta name="description" content="${desc}">
+  <link rel="canonical" href="${url}">
+  <meta property="og:title" content="${title}">
+  <meta property="og:description" content="${desc}">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="${url}">
+  <meta property="og:image" content="${image}">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="${title}">
+  <meta name="twitter:description" content="${desc}">
+  <meta name="twitter:image" content="${image}">
+  <link rel="stylesheet" href="../../assets/css/site.css?v=20260601">
+  <link rel="alternate" type="application/rss+xml" title="${siteTitle} — Stories" href="/feed.xml">
+</head>
+<body data-page="photo">
+  <div id="app" tabindex="-1"></div>
+  <div id="footer"></div>
+  <script>window.__DATA_PATH__="../../assets/data/site-content.json";window.__ROOT__="../../";window.__ASSET_PREFIX__="../../";</script>
+  <script type="module" src="../../assets/js/site.js?v=20260601"></script>
+</body>
+</html>
+`;
+}
+const livePhotoIds = new Set();
+for (const p of photos(data)) {
+  if (!p.id || !p.title) continue;
+  livePhotoIds.add(p.id);
+  const rel = `photos/${p.id}/index.html`;
+  const file = path.join(websiteDir, rel);
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  fs.writeFileSync(file, photoShell(p));
+  n += page(rel, {
+    pfx: "../../", active: "photo",
+    mainHtml: () => photoMain(data, p),
+    headLd: ld(photoLdObject(data, p)) + ld(crumbs({ name: "Home", path: "" }, { name: "Gallery", path: "gallery/" }, { name: p.title || p.id, path: `photos/${encodeURIComponent(p.id)}/` })),
+  });
+}
+
 // Prune orphaned story pages: a story deleted in the editor leaves its
 // stories/<slug>/ folder behind. Remove any story folder no longer in the
 // content so deleted stories disappear from the published site.
@@ -138,4 +233,14 @@ if (fs.existsSync(storiesDir)) {
     }
   }
 }
-console.log(`Pre-rendered ${n} page(s)${pruned ? `, pruned ${pruned} orphaned story folder(s)` : ""}.`);
+// Same pruning for photo pages: a photo removed from the content loses its page.
+const photosPagesDir = path.join(websiteDir, "photos");
+if (fs.existsSync(photosPagesDir)) {
+  for (const entry of fs.readdirSync(photosPagesDir, { withFileTypes: true })) {
+    if (entry.isDirectory() && !livePhotoIds.has(entry.name)) {
+      fs.rmSync(path.join(photosPagesDir, entry.name), { recursive: true, force: true });
+      pruned += 1;
+    }
+  }
+}
+console.log(`Pre-rendered ${n} page(s)${pruned ? `, pruned ${pruned} orphaned folder(s)` : ""}.`);

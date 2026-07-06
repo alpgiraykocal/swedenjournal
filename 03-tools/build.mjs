@@ -1,7 +1,9 @@
-// Cloudflare-friendly build (pure Node — no bash/rsync). Run by Cloudflare Pages
-// on every push: it pre-renders 01-website-ready-to-upload in place so the editor
-// only has to update content; everything SSG (markup, JSON-LD, sitemap, RSS, head
-// preloads, gallery data, cache-busting) is regenerated here and serves from 01.
+// SSG build (pure Node — no bash/rsync). Run by GitHub Actions
+// (.github/workflows/deploy.yml) on every push: it pre-renders
+// 01-website-ready-to-upload in place so the editor only has to update content;
+// everything SSG (markup, JSON-LD, sitemap, RSS, head preloads, gallery data,
+// cache-busting) is regenerated here and the result deploys to GitHub Pages
+// (served behind the Cloudflare proxy for sweden-journal.com).
 //
 // It is robust to whatever the browser editor writes: the asset-normalization pass
 // forces the correct <script type="module"> + content-hashed ?v= on every page,
