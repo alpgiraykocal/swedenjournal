@@ -279,6 +279,10 @@ export function storyMain(data, s) {
   const mapLink = hasGeo ? `<a class="story-map-link" href="${root()}atlas/index.html?place=${encodeURIComponent(s.slug)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true" focusable="false"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.6"/></svg>View on the map</a>` : "";
   return `<main><section class="story-hero container"><div class="story-meta" role="group" aria-label="Story details">${storyMetaChips(s)}</div><h1 class="headline">${esc(s.title)}</h1><p class="intro">${esc(s.summary)}</p>${mapLink}${responsiveImage(photo(data, s.heroPhotoId), { priority: true, sizes: "(max-width: 1220px) calc(100vw - 40px), 1180px", fallbackSize: "full", viewTransitionName: s.slug ? `story-${s.slug}` : "hero-photo" })}</section><article class="story-body">${(s.body || []).map((b) => blockHtmlInteractive(data, b)).join("")}</article>${relatedPanel(data, s)}${sharePanel(data, s)}${storyNav(data, s)}</main><div id="lightboxRoot"></div>`;
 }
+// Photo permalink pages share a name with the story whose hero they are, so their
+// <title>/og:title get a "· Photograph" qualifier to stay distinct in search results
+// (avoids GSC duplicate-title tags). Single source used by build, runtime and editor.
+export const photoTitleCore = (p) => `${p?.title || "Photograph"} · Photograph`;
 export function photoMain(data, p) {
   const st = photoStory(data, p.id);
   const list = sortPhotos(photos(data));

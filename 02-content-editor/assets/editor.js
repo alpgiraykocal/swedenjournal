@@ -179,7 +179,9 @@
     }
     for(const p of c.photos||[]){
       if(!p.id||!p.title)continue;
-      pages[`photos/${p.id}/index.html`]={title:p.title,description:p.caption||p.alt||c.site.description||"",image:p.variants?.full?.jpeg||p.src||"",photo:p,photoPage:p,canonicalPath:`photos/${encodeURIComponent(p.id)}/`};
+      // Same "· Photograph" qualifier as templates.mjs photoTitleCore() so the
+      // photo page title stays distinct from the same-named story (GSC duplicate titles).
+      pages[`photos/${p.id}/index.html`]={title:`${p.title} · Photograph`,description:p.caption||p.alt||c.site.description||"",image:p.variants?.full?.jpeg||p.src||"",photo:p,photoPage:p,canonicalPath:`photos/${encodeURIComponent(p.id)}/`};
     }
     return pages;
   }

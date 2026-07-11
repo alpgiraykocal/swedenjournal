@@ -9,7 +9,7 @@ import fs from "node:fs";
 import path from "node:path";
 import {
   setContext, photos, photo, storyPhotos, sortPhotos, photoStoryMap, fullVariantDims,
-  header, footer, homeMain, galleryMain, storiesMain, aboutMain, atlasMain, storyMain, legacyStoryMain, notFoundMain, photoMain,
+  header, footer, homeMain, galleryMain, storiesMain, aboutMain, atlasMain, storyMain, legacyStoryMain, notFoundMain, photoMain, photoTitleCore,
   websiteLdObject, imageGalleryLdObject, personLdObject, articleLdObject, photoLdObject,
   breadcrumbLdObject, storiesLdObject, atlasLdObject,
 } from "../01-website-ready-to-upload/assets/js/templates.mjs";
@@ -173,7 +173,7 @@ for (const s of data.stories || []) {
 const base = String(data.site?.baseUrl || "").replace(/\/+$/, "");
 function photoShell(p) {
   const siteTitle = encAttr(data.site?.siteTitle || "Photography & Travel Notes");
-  const title = encAttr(`${p.title} — ${data.site?.siteTitle || data.site?.ownerName || "Photo Blog"}`);
+  const title = encAttr(`${photoTitleCore(p)} — ${data.site?.siteTitle || data.site?.ownerName || "Photo Blog"}`);
   const desc = encAttr(p.caption || p.alt || data.site?.description || "");
   const url = encAttr(`${base}/photos/${encodeURIComponent(p.id)}/`);
   const image = encAttr(`${base}/${String(p.variants?.full?.jpeg || p.src || "").replace(/^\/+/, "")}`);

@@ -234,6 +234,9 @@ function checkPhotoShells(baseDir) {
     if (!html.includes('data-page="photo"')) fail(`${label} missing data-page="photo"`);
     if (!html.includes(`rel="canonical" href="https://sweden-journal.com/photos/${encodeURIComponent(photo.id)}/"`)) fail(`${label} has wrong canonical`);
     if (!html.includes('"@type":"ImageObject"')) fail(`${label} missing ImageObject JSON-LD`);
+    // Photo page <title> must carry the "· Photograph" qualifier so it never collides
+    // with the same-named story's title (GSC duplicate title tags).
+    if (!/<title>[^<]*· Photograph[^<]*<\/title>/.test(html)) fail(`${label} <title> missing "· Photograph" qualifier`);
     // Google "Image Metadata" recommended fields (GSC flags these when missing).
     for (const field of ['"creditText"', '"license"', '"acquireLicensePage"']) {
       if (!html.includes(field)) fail(`${label} ImageObject JSON-LD missing ${field}`);

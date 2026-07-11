@@ -1,9 +1,9 @@
 import {
   setContext, esc, photos, photo, imgPath, metaText, variant, srcset, responsiveImage,
   sortPhotos, storyPhotos, storyHref, photoHref, absoluteUrl, root, header, footer,
-  homeMain, galleryMain, storiesMain, aboutMain, atlasMain, storyMain, legacyStoryMain, photoMain,
+  homeMain, galleryMain, storiesMain, aboutMain, atlasMain, storyMain, legacyStoryMain, photoMain, photoTitleCore,
   websiteLdObject, imageGalleryLdObject, personLdObject, articleLdObject, photoLdObject, fullVariantDims,
-} from "./templates.mjs?v=889f7019c7";
+} from "./templates.mjs?v=5df0f76369";
 
 // Cache-bust the runtime content fetches. /assets/data/*.json is served with a long
 // edge cache (the host ignores _headers), so without a content-versioned URL a freshly
@@ -432,7 +432,7 @@ function renderPhoto(data){
     $("#app").innerHTML = `<main class="container section"><p class="eyebrow">Photograph not found</p><h1 class="headline">This photograph is not available.</h1><p class="intro">The link may be outdated or the photograph may have been removed.</p><p><a class="text-link" href="${root()}gallery/index.html">Return to the gallery</a></p></main>`;
     return;
   }
-  updateMeta(data, {title:p.title, description:p.caption || p.alt || data.site?.description, path:`photos/${encodeURIComponent(p.id)}/`, imagePhoto:p});
+  updateMeta(data, {title:photoTitleCore(p), description:p.caption || p.alt || data.site?.description, path:`photos/${encodeURIComponent(p.id)}/`, imagePhoto:p});
   injectJsonLd(photoLdObject(data, p));
   $("#app").innerHTML = photoMain(data, p);
   bindShareControls();
