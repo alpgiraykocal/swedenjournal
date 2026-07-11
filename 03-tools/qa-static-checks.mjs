@@ -234,6 +234,18 @@ function checkPhotoShells(baseDir) {
     if (!html.includes('data-page="photo"')) fail(`${label} missing data-page="photo"`);
     if (!html.includes(`rel="canonical" href="https://sweden-journal.com/photos/${encodeURIComponent(photo.id)}/"`)) fail(`${label} has wrong canonical`);
     if (!html.includes('"@type":"ImageObject"')) fail(`${label} missing ImageObject JSON-LD`);
+    // Google "Image Metadata" recommended fields (GSC flags these when missing).
+    for (const field of ['"creditText"', '"license"', '"acquireLicensePage"']) {
+      if (!html.includes(field)) fail(`${label} ImageObject JSON-LD missing ${field}`);
+    }
+  }
+  // Gallery ImageGallery JSON-LD carries the same rights fields on its ImageObject items.
+  const galleryPage = path.join(baseDir, "gallery", "index.html");
+  if (exists(galleryPage) && (content.photos || []).length) {
+    const gh = read(galleryPage);
+    for (const field of ['"creditText"', '"license"', '"acquireLicensePage"']) {
+      if (!gh.includes(field)) fail(`gallery/index.html ImageGallery JSON-LD missing ${field}`);
+    }
   }
 }
 

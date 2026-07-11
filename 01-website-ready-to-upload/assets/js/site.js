@@ -3,7 +3,7 @@ import {
   sortPhotos, storyPhotos, storyHref, photoHref, absoluteUrl, root, header, footer,
   homeMain, galleryMain, storiesMain, aboutMain, atlasMain, storyMain, legacyStoryMain, photoMain,
   websiteLdObject, imageGalleryLdObject, personLdObject, articleLdObject, photoLdObject, fullVariantDims,
-} from "./templates.mjs?v=3491915bcb";
+} from "./templates.mjs?v=889f7019c7";
 
 // Cache-bust the runtime content fetches. /assets/data/*.json is served with a long
 // edge cache (the host ignores _headers), so without a content-versioned URL a freshly

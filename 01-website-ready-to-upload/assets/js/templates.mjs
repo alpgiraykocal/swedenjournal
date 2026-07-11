@@ -266,7 +266,13 @@ export function atlasMain(data) {
 }
 export function aboutMain(data) {
   const a = data.about || {}, p = photo(data, a.portraitPhotoId);
-  return `<main><section class="hero container about-grid">${responsiveImage(p, { className: "about-img", priority: true, sizes: "(max-width: 850px) calc(100vw - 28px), 520px" })}<div><p class="eyebrow">${esc(a.eyebrow)}</p><h1 class="headline">${esc(a.headline)}</h1><div class="prose">${(a.paragraphs || []).map((x) => `<p>${esc(x)}</p>`).join("")}</div>${data.site.ownerName ? `<p class="about-signature">${esc(data.site.ownerName)}</p>` : ""}${a.contactEmail ? `<div class="about-contact"><span class="eyebrow">Get in touch</span><a href="mailto:${esc(a.contactEmail)}">${esc(a.contactEmail)}</a></div>` : ""}</div></section></main>`;
+  // Licensing statement: gives the ImageObject `license`/`acquireLicensePage` URL
+  // (which default to this page) a real description of usage terms. Owner can
+  // override the wording with about.licenseNote.
+  const licenseNote = data.site.ownerName
+    ? (a.licenseNote || `All photographs are © ${data.site.ownerName}, all rights reserved. Please get in touch before reusing or licensing any image.`)
+    : "";
+  return `<main><section class="hero container about-grid">${responsiveImage(p, { className: "about-img", priority: true, sizes: "(max-width: 850px) calc(100vw - 28px), 520px" })}<div><p class="eyebrow">${esc(a.eyebrow)}</p><h1 class="headline">${esc(a.headline)}</h1><div class="prose">${(a.paragraphs || []).map((x) => `<p>${esc(x)}</p>`).join("")}</div>${data.site.ownerName ? `<p class="about-signature">${esc(data.site.ownerName)}</p>` : ""}${a.contactEmail ? `<div class="about-contact"><span class="eyebrow">Get in touch</span><a href="mailto:${esc(a.contactEmail)}">${esc(a.contactEmail)}</a></div>` : ""}${licenseNote ? `<div class="about-contact about-license" id="image-licensing"><span class="eyebrow">Image use &amp; licensing</span><p class="muted">${esc(licenseNote)}</p></div>` : ""}</div></section></main>`;
 }
 export function storyMain(data, s) {
   const hasGeo = s.coordinates && Number.isFinite(Number(s.coordinates.lat)) && Number.isFinite(Number(s.coordinates.lng));
@@ -306,9 +312,27 @@ export function websiteLdObject(data) {
   if (!base) return null;
   return { "@context": "https://schema.org", "@type": "WebSite", name: data.site?.siteTitle || data.site?.ownerName || "", url: base + "/", author: { "@type": "Person", name: data.site?.ownerName || "" } };
 }
+// Shared image-metadata rights block for every ImageObject (Google "Image Metadata"
+// structured data: creator, creditText, copyrightNotice, license, acquireLicensePage).
+// license/acquireLicensePage default to the About page (which states the usage terms);
+// override with site.imageLicenseUrl / site.imageLicensePage for a dedicated page.
+export function imageRightsFields(data) {
+  const owner = data.site?.ownerName || "";
+  const aboutUrl = absoluteUrl(data, "about/");
+  const license = String(data.site?.imageLicenseUrl || "").trim() || aboutUrl;
+  const acquire = String(data.site?.imageLicensePage || "").trim() || aboutUrl;
+  return {
+    creator: owner ? { "@type": "Person", name: owner } : undefined,
+    creditText: owner || undefined,
+    copyrightNotice: owner ? `© ${owner}` : undefined,
+    license,
+    acquireLicensePage: acquire,
+  };
+}
 export function imageGalleryLdObject(data, list) {
   list = list || sortPhotos(photos(data));
-  return { "@context": "https://schema.org", "@type": "ImageGallery", name: data.gallery?.headline || "Gallery", description: data.gallery?.intro || data.site?.description || "", url: absoluteUrl(data, "gallery/"), image: (list || []).slice(0, 24).map((p) => ({ "@type": "ImageObject", name: p.title || "", caption: p.caption || "", contentUrl: jsonLdImageUrl(data, p), thumbnailUrl: variant(p, "thumb", "jpeg") ? absoluteUrl(data, variant(p, "thumb", "jpeg").replace(/^(?:\.\.\/)+/, "")) : undefined })) };
+  const rights = imageRightsFields(data);
+  return { "@context": "https://schema.org", "@type": "ImageGallery", name: data.gallery?.headline || "Gallery", description: data.gallery?.intro || data.site?.description || "", url: absoluteUrl(data, "gallery/"), image: (list || []).slice(0, 24).map((p) => ({ "@type": "ImageObject", name: p.title || "", caption: p.caption || "", contentUrl: jsonLdImageUrl(data, p), thumbnailUrl: variant(p, "thumb", "jpeg") ? absoluteUrl(data, variant(p, "thumb", "jpeg").replace(/^(?:\.\.\/)+/, "")) : undefined, ...rights })) };
 }
 export function personLdObject(data) {
   const base = String(data.site?.baseUrl || "").replace(/\/+$/, "");
@@ -336,8 +360,7 @@ export function photoLdObject(data, p) {
     height: dims ? dims.height : undefined,
     representativeOfPage: true,
     contentLocation: p.location ? { "@type": "Place", name: p.location } : undefined,
-    creator: { "@type": "Person", name: data.site?.ownerName || "" },
-    copyrightNotice: data.site?.ownerName ? `© ${data.site.ownerName}` : undefined,
+    ...imageRightsFields(data),
     isPartOf: st ? { "@type": "Article", headline: st.title || "", url: absoluteUrl(data, "stories/" + encodeURIComponent(st.slug) + "/") } : undefined,
     url: absoluteUrl(data, "photos/" + encodeURIComponent(p.id) + "/"),
   };
