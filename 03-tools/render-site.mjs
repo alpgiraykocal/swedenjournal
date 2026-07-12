@@ -7,6 +7,7 @@
 // so the pre-rendered DOM matches exactly what the runtime would build.
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import {
   setContext, photos, photo, storyPhotos, sortPhotos, photoStoryMap, fullVariantDims,
   header, footer, homeMain, galleryMain, storiesMain, aboutMain, atlasMain, storyMain, legacyStoryMain, notFoundMain, photoMain, photoTitleCore,
@@ -16,7 +17,7 @@ import {
 
 const crumbs = (...trail) => breadcrumbLdObject(data, trail);
 
-const root = path.resolve(new URL("..", import.meta.url).pathname);
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const websiteDir = path.join(root, "01-website-ready-to-upload");
 const data = JSON.parse(fs.readFileSync(path.join(websiteDir, "assets/data/site-content.json"), "utf8"));
 

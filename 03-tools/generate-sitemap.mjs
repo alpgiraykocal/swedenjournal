@@ -3,9 +3,10 @@
 // qa-static-checks all produce/verify the exact same bytes.
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { sitemapXml } from "../01-website-ready-to-upload/assets/js/templates.mjs";
 
-const root = path.resolve(new URL("..", import.meta.url).pathname);
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const websiteDir = path.join(root, "01-website-ready-to-upload");
 const data = JSON.parse(fs.readFileSync(path.join(websiteDir, "assets/data/site-content.json"), "utf8"));
 
