@@ -883,6 +883,12 @@ body[data-page="gallery"] .photo-card[hidden]{display:none!important}
   navigation: auto;
 }
 
+/* Opt the multi-page app into cross-document view transitions. Chromium morphs the
+   shared story hero (view-transition-name: story-<slug>) from card → story page and
+   cross-fades everything else; other browsers ignore this and navigate normally.
+   The prefers-reduced-motion block below neutralises all of it. */
+@view-transition { navigation: auto; }
+
 @keyframes vt-fade-slide {
   from { opacity: 0; transform: translateY(12px); }
   to   { opacity: 1; transform: none; }

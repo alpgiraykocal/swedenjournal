@@ -17,6 +17,23 @@ const END = "<!-- perf-head:end -->";
 const THEME_LIGHT = "#f3efe7";
 const THEME_DARK = "#1a1815";
 
+// Speculation Rules: prerender same-origin document links on hover / pointer-down
+// ("moderate" eagerness — not on page load, so no wasted prerenders). Excludes query
+// strings (gallery ?photo=, ?filter=… client state) and .xml (feed/sitemap). Chromium
+// makes these navigations instant; other browsers ignore the block. Origin-relative
+// patterns → identical on every page regardless of asset prefix.
+const SPECULATION_RULES = JSON.stringify({
+  prerender: [{
+    eagerness: "moderate",
+    where: { and: [
+      { href_matches: "/*" },
+      { not: { href_matches: "/*\\?*" } },
+      { not: { href_matches: "/*.xml" } },
+    ] },
+  }],
+});
+const speculationLine = `  <script type="speculationrules">${SPECULATION_RULES}</script>`;
+
 // Per-page hero `sizes`, matching exactly what the runtime <picture> renders so the
 // preload scanner selects the same candidate (no wasted / duplicate download).
 const SIZES_STORY = "(max-width: 1220px) calc(100vw - 40px), 1180px";
@@ -106,6 +123,7 @@ function buildBlock(prefix, heroId, sizes) {
   ];
   const hero = heroPreloadLine(prefix, heroId, sizes);
   if (hero) lines.push(hero);
+  lines.push(speculationLine);
   if (analyticsLine) lines.push(analyticsLine);
   lines.push(`  ${END}`);
   return lines.join("\n");

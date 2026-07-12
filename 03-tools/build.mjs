@@ -19,14 +19,18 @@ const root = path.resolve(toolsDir, "..");
 const websiteDir = path.join(root, "01-website-ready-to-upload");
 
 // 1. Generators + pre-render — each writes into 01-website-ready-to-upload in place.
+// render-site MUST run before inject-head-preloads: render-site regenerates the
+// photo permalink pages from scratch (photoShell), so the perf-head block (theme
+// colour, font/hero preload, speculation rules) has to be injected afterwards or it
+// would be wiped on every build. Static pages keep their perf-head either way.
 for (const step of [
   "backfill-avif.mjs",
   "sync-image-variants.mjs",
   "generate-rss.mjs",
   "generate-sitemap.mjs",
   "generate-llms.mjs",
-  "inject-head-preloads.mjs",
   "render-site.mjs",
+  "inject-head-preloads.mjs",
 ]) {
   execSync(`node ${JSON.stringify(path.join(toolsDir, step))}`, { stdio: "inherit" });
 }
