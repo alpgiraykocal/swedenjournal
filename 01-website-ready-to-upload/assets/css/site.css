@@ -84,6 +84,9 @@ button{font:inherit}
 ::selection{background:var(--accent);color:var(--accent-ink)}
 .headline,h2,h3,.featured-story h3,.story-card h3,.story-body blockquote{font-optical-sizing:auto}
 .intro,.prose p,.story-body p,.card p,.featured-story p,.story-card p,.about-contact a{text-wrap:pretty}
+/* Balance display headings so a lone word never orphans onto the last line
+   (browsers cap balancing to a few lines, so body copy is unaffected). */
+.headline,h2,h3,.featured-story h3,.story-card h3{text-wrap:balance}
 button:disabled{opacity:.48;cursor:not-allowed;transform:none}
 .skip-link{position:fixed;left:18px;top:14px;z-index:50;transform:translateY(-140%);background:var(--text);color:var(--paper);padding:10px 14px;border-radius:999px}
 .skip-link:focus{transform:translateY(0)}
@@ -375,6 +378,9 @@ body[data-page="gallery"] .photo-card[hidden]{display:none!important}
 .story-body{width:min(880px,100%);max-width:100%;margin:0 auto;padding:0 20px 54px;overflow:hidden}
 .story-body p{max-width:100%;margin:38px 0;color:var(--text);font-family:var(--serif);font-size:2.1rem;line-height:1.26;letter-spacing:0;overflow-wrap:break-word}
 .story-body > p:first-child{margin-top:0}
+/* Editorial drop cap on the opening paragraph — only when the story starts with
+   text (first child is a paragraph), so it never lands on a leading image/heading. */
+.story-body > p:first-child::first-letter{float:left;font-family:var(--serif);font-weight:500;font-size:4.1em;line-height:.78;margin:.02em .09em 0 0;color:var(--accent)}
 .story-body p + figure{margin-top:48px}
 .story-body figure{margin:50px 0}
 .story-inline-photo{
