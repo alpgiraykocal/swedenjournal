@@ -4,7 +4,7 @@ import {
   homeMain, galleryMain, storiesMain, aboutMain, atlasMain, storyMain, legacyStoryMain, photoMain, photoTitleCore,
   collections, collectionPhotos, collectionsMain, collectionMain, collectionHref, photoExifChips,
   websiteLdObject, imageGalleryLdObject, personLdObject, articleLdObject, photoLdObject, collectionsLdObject, collectionLdObject, fullVariantDims,
-} from "./templates.mjs?v=0d33a4ca55";
+} from "./templates.mjs?v=d0c3307737";
 
 // Cache-bust the runtime content fetches. /assets/data/*.json is served with a long
 // edge cache (the host ignores _headers), so without a content-versioned URL a freshly
@@ -498,36 +498,36 @@ function renderStory(data){
 }
 function bindScrollReveal(){const els=[...document.querySelectorAll(".photo-card,.story-card,.related-photos .photo-card,.story-inline-photo,.story-body > p,.story-body > h2,.story-body > blockquote")];if(typeof IntersectionObserver==="undefined"){els.forEach(el=>el.classList.add("revealed"));return;}const io=new IntersectionObserver((entries)=>{let i=0;entries.forEach(e=>{if(!e.isIntersecting)return;const el=e.target;const delay=Math.min(i,6)*55;i++;if(delay){el.style.transitionDelay=delay+"ms";setTimeout(()=>{el.style.transitionDelay="";},delay+650);}el.classList.add("revealed");io.unobserve(el);});},{threshold:0.08,rootMargin:"0px 0px -40px 0px"});els.forEach(el=>{if(!el.classList.contains("revealed"))io.observe(el);});}
 function bindImageLoadFade(){const sel=".photo-media img,.story-card-media img,.featured-story-media img,.story-inline-img,.hero-img,.about-img,.story-hero img";document.querySelectorAll(sel).forEach(img=>{if(img.complete&&img.naturalWidth){img.classList.add("img-loaded");return;}img.classList.add("img-loading");const done=()=>{img.classList.remove("img-loading");img.classList.add("img-loaded");};img.addEventListener("load",done,{once:true});img.addEventListener("error",done,{once:true});});}
-// Gallery masonry via CSS Grid row-span. Each card is given a --masonry-span so
+// Photo masonry via CSS Grid row-span. Each card is given a --masonry-span so
 // it occupies ceil((height + gap) / rowUnit) fine grid rows; with align-items:start
 // the columns then stack independently (true masonry) without CSS multi-column,
 // which paints unreliably (blank tiles) in Chromium. Native lazy-loading and hover
-// filters work normally on a plain grid. No-op off the gallery page and on the
-// single-column mobile layout (grid-auto-rows:auto → rowUnit 0).
+// filters work normally on a plain grid. Any grid marked [data-masonry] opts in
+// (gallery + series pages); no-op when none is present and on the single-column
+// mobile layout (grid-auto-rows:auto → rowUnit 0).
 function layoutGalleryMasonry(){
-  if(document.body.dataset.page !== "gallery") return;
-  const grid = document.getElementById("galleryGrid");
-  if(!grid) return;
-  const cs = getComputedStyle(grid);
-  const rowUnit = parseFloat(cs.gridAutoRows) || 0;
-  const gap = parseFloat(cs.columnGap) || 0;
-  const cards = grid.querySelectorAll(".photo-card");
-  if(rowUnit <= 0){ cards.forEach(c => c.style.removeProperty("--masonry-span")); return; }
-  cards.forEach(card => {
-    if(card.hidden) return;
-    const span = Math.max(1, Math.ceil((card.getBoundingClientRect().height + gap) / rowUnit));
-    card.style.setProperty("--masonry-span", span);
+  document.querySelectorAll("[data-masonry]").forEach(grid => {
+    const cs = getComputedStyle(grid);
+    const rowUnit = parseFloat(cs.gridAutoRows) || 0;
+    const gap = parseFloat(cs.columnGap) || 0;
+    const cards = grid.querySelectorAll(".photo-card");
+    if(rowUnit <= 0){ cards.forEach(c => c.style.removeProperty("--masonry-span")); return; }
+    cards.forEach(card => {
+      if(card.hidden) return;
+      const span = Math.max(1, Math.ceil((card.getBoundingClientRect().height + gap) / rowUnit));
+      card.style.setProperty("--masonry-span", span);
+    });
   });
 }
 function initGalleryMasonry(){
-  if(document.body.dataset.page !== "gallery") return;
+  if(!document.querySelector("[data-masonry]")) return;
   layoutGalleryMasonry();
   let raf = 0;
   const relayout = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(layoutGalleryMasonry); };
   window.addEventListener("resize", relayout);
   // aspect-ratio reserves height up front, but a late image decode or font/caption
   // reflow can change it — recompute as each not-yet-loaded image settles.
-  document.querySelectorAll("#galleryGrid .photo-card img").forEach(img => {
+  document.querySelectorAll("[data-masonry] .photo-card img").forEach(img => {
     if(!(img.complete && img.naturalWidth)) img.addEventListener("load", relayout, {once:true});
   });
 }
