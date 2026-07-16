@@ -171,7 +171,17 @@ for (const s of data.stories || []) {
     pfx: "../../", active: "story",
     mainHtml: () => storyMain(data, s),
     headLd: ld(articleLdObject(data, s, photo(data, s.heroPhotoId))) + ld(crumbs({ name: "Home", path: "" }, { name: "Stories", path: "stories/" }, { name: s.title || s.slug, path: `stories/${encodeURIComponent(s.slug)}/` })),
-    hydrate: { stories: [s], photos: storyPhotos(data, s) },
+    // The inline payload is deliberately minimal (this story + its photos) and carries
+    // no `collections`, so the runtime cannot look up a photo's series from it — attach
+    // it here instead, the same way gallery.json is enriched. (No `story` link: on a
+    // story page that would point at the page you are already on.)
+    hydrate: {
+      stories: [s],
+      photos: storyPhotos(data, s).map((p) => {
+        const cl = photoCols.get(p.id);
+        return cl ? { ...p, series: { slug: cl.slug, title: cl.title } } : p;
+      }),
+    },
   });
 }
 

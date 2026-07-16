@@ -75,7 +75,9 @@ let pages = 0;
 for (const f of walkHtml(websiteDir)) {
   let html = fs.readFileSync(f, "utf8");
   html = html.replace(
-    /<script\s+(?:type="module"\s+)?src="((?:\.\.\/)*assets\/js\/site\.js)(?:\?v=[A-Za-z0-9]+)?"\s*>/g,
+    // Accepts a root-absolute "/" prefix as well as "../" — 404.html is served at any
+    // depth and so links its assets from the root (same shape as the site.css rule below).
+    /<script\s+(?:type="module"\s+)?src="((?:(?:\.\.\/)*|\/)assets\/js\/site\.js)(?:\?v=[A-Za-z0-9]+)?"\s*>/g,
     (_m, src) => `<script type="module" src="${src}?v=${V}">`,
   );
   html = html.replace(

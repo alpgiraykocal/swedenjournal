@@ -302,13 +302,13 @@ export function collectionCard(data, col) {
   // landscape, and grid-2 stretches every card to the tallest — a landscape cover next
   // to a portrait one left a large hole above its copy. A uniform ratio keeps the row
   // even and image-first; the img already fills the box via object-fit:cover.
-  return `<a class="card story-card" href="${collectionHref(col.slug)}" data-collection-card><div class="story-card-media collection-card-media">${responsiveImage(cover, { className: "story-card-img", sizes: "(max-width: 850px) calc(100vw - 28px), 48vw" })}</div><div class="story-card-copy"><span class="meta">${count} ${count === 1 ? "photograph" : "photographs"}</span><h3>${esc(col.title)}</h3><p class="muted">${esc(col.description || "")}</p><span class="story-link">View series</span></div></a>`;
+  return `<a class="card story-card" href="${collectionHref(col.slug)}"><div class="story-card-media collection-card-media">${responsiveImage(cover, { className: "story-card-img", sizes: "(max-width: 850px) calc(100vw - 28px), 48vw" })}</div><div class="story-card-copy"><span class="meta">${count} ${count === 1 ? "photograph" : "photographs"}</span><h3>${esc(col.title)}</h3><p class="muted">${esc(col.description || "")}</p><span class="story-link">View series</span></div></a>`;
 }
 export function collectionsMain(data) {
   const cp = data.collectionsPage || {};
   const list = liveCollections(data);
   return `<main><section class="hero container"><p class="eyebrow">${esc(cp.eyebrow || "Series")}</p><h1 class="headline">${esc(cp.headline || "Photographic series")}</h1><p class="intro">${esc(cp.intro || "Curated groups of photographs — a single thread of subject or place followed across the journal.")}</p></section>
-  <section class="section"><div class="container">${list.length ? `<div class="grid-2 collections-grid">${list.map((c) => collectionCard(data, c)).join("")}</div>` : `<p class="muted">No series yet.</p>`}</div></section></main>`;
+  <section class="section"><div class="container">${list.length ? `<div class="grid-2">${list.map((c) => collectionCard(data, c)).join("")}</div>` : `<p class="muted">No series yet.</p>`}</div></section></main>`;
 }
 export function collectionMain(data, col) {
   const list = collectionPhotos(data, col);

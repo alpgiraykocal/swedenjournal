@@ -3,8 +3,9 @@ import {
   sortPhotos, storyPhotos, storyHref, photoHref, absoluteUrl, root, header, footer,
   homeMain, galleryMain, storiesMain, aboutMain, atlasMain, storyMain, legacyStoryMain, photoMain, photoTitleCore,
   collections, collectionPhotos, collectionsMain, collectionMain, collectionHref, photoExifChips,
+  photoStory, photoCollection,
   websiteLdObject, imageGalleryLdObject, personLdObject, articleLdObject, photoLdObject, collectionsLdObject, collectionLdObject, fullVariantDims,
-} from "./templates.mjs?v=d0c3307737";
+} from "./templates.mjs?v=1261cf4c6b";
 
 // Cache-bust the runtime content fetches. /assets/data/*.json is served with a long
 // edge cache (the host ignores _headers), so without a content-versioned URL a freshly
@@ -174,6 +175,22 @@ function currentCollectionSlug(){
   const slug = last === "index.html" ? parts.at(-2) : last;
   return slug && slug !== "series" ? decodeURIComponent(slug) : null;
 }
+// The lightbox links a photo back to its story / series. gallery.json ships those
+// pre-enriched (render-site), but the story and series pages load raw site-content —
+// so attach them here, skipping a link that points at the page you are already on.
+function withContext(data, list, { currentStory = null, currentSeries = null } = {}){
+  return list.map(p => {
+    const st = photoStory(data, p.id);
+    const cl = photoCollection(data, p.id);
+    const story = st && st.slug !== currentStory ? { slug: st.slug, title: st.title } : null;
+    const series = cl && cl.slug !== currentSeries ? { slug: cl.slug, title: cl.title } : null;
+    if(!story && !series) return p;
+    const out = { ...p };
+    if(story) out.story = story;
+    if(series) out.series = series;
+    return out;
+  });
+}
 async function hydrate(page){
   // Content is already pre-rendered into the HTML; only bind interactivity.
   if(page === "gallery"){
@@ -186,7 +203,7 @@ async function hydrate(page){
     const s = (data.stories||[]).find(x => x.slug === slug) || data.stories?.[0];
     if(!s) return;
     bindShareControls();
-    bindLightbox(data, () => storyPhotos(data, s));
+    bindLightbox(data, () => withContext(data, storyPhotos(data, s), { currentStory: s.slug }));
   }else if(page === "stories"){
     bindStoryFilters();
   }else if(page === "atlas"){
@@ -196,7 +213,7 @@ async function hydrate(page){
   }else if(page === "collection"){
     const data = await loadContent();
     const col = (data.collections||[]).find(c => c.slug === currentCollectionSlug());
-    if(col) bindLightbox(data, () => collectionPhotos(data, col));
+    if(col) bindLightbox(data, () => withContext(data, collectionPhotos(data, col), { currentSeries: col.slug }));
   }
 }
 function loadLeaflet(){
@@ -459,7 +476,7 @@ function renderCollection(data){
   updateMeta(data, {title: col.title, description: col.description || data.site?.description, path:`series/${encodeURIComponent(col.slug)}/`, imagePhoto: cover});
   injectJsonLd(collectionLdObject(data, col));
   $("#app").innerHTML = collectionMain(data, col);
-  bindLightbox(data, () => collectionPhotos(data, col));
+  bindLightbox(data, () => withContext(data, collectionPhotos(data, col), { currentSeries: col.slug }));
 }
 function renderPhoto(data){
   const p = photos(data).find(x => x.id === currentPhotoId());
@@ -494,7 +511,7 @@ function renderStory(data){
   jsonLdArticle(data, s, p);
   $("#app").innerHTML = storyMain(data, s);
   bindShareControls();
-  bindLightbox(data, () => storyPhotos(data, s));
+  bindLightbox(data, () => withContext(data, storyPhotos(data, s), { currentStory: s.slug }));
 }
 function bindScrollReveal(){const els=[...document.querySelectorAll(".photo-card,.story-card,.related-photos .photo-card,.story-inline-photo,.story-body > p,.story-body > h2,.story-body > blockquote")];if(typeof IntersectionObserver==="undefined"){els.forEach(el=>el.classList.add("revealed"));return;}const io=new IntersectionObserver((entries)=>{let i=0;entries.forEach(e=>{if(!e.isIntersecting)return;const el=e.target;const delay=Math.min(i,6)*55;i++;if(delay){el.style.transitionDelay=delay+"ms";setTimeout(()=>{el.style.transitionDelay="";},delay+650);}el.classList.add("revealed");io.unobserve(el);});},{threshold:0.08,rootMargin:"0px 0px -40px 0px"});els.forEach(el=>{if(!el.classList.contains("revealed"))io.observe(el);});}
 function bindImageLoadFade(){const sel=".photo-media img,.story-card-media img,.featured-story-media img,.story-inline-img,.hero-img,.about-img,.story-hero img";document.querySelectorAll(sel).forEach(img=>{if(img.complete&&img.naturalWidth){img.classList.add("img-loaded");return;}img.classList.add("img-loading");const done=()=>{img.classList.remove("img-loading");img.classList.add("img-loaded");};img.addEventListener("load",done,{once:true});img.addEventListener("error",done,{once:true});});}
@@ -689,6 +706,10 @@ function bindLightbox(data, getVisiblePhotos){
     });
     hiddenBackground = [];
   };
+  // Always resolve a photo through getVisiblePhotos() first: that list is the enriched
+  // one (story/series attached), while photos(data) is raw on the story and series pages.
+  // Falling back to photos(data) covers a deep-link to a photo the current filter hides.
+  const findPhoto = id => (getVisiblePhotos?.() || []).find(item => item.id === id) || photos(data).find(item => item.id === id);
   const urlFor = p => {
     const url = new URL(location.href);
     url.searchParams.set("photo", p.id);
@@ -775,7 +796,7 @@ function bindLightbox(data, getVisiblePhotos){
     open(visible[nextIndex], "replace");
   };
   document.querySelectorAll("[data-open-photo]").forEach(btn => btn.addEventListener("click", () => {
-    const p = photos(data).find(item => item.id === btn.dataset.openPhoto);
+    const p = findPhoto(btn.dataset.openPhoto);
     if(p) open(p);
   }));
   document.querySelectorAll(".photo-media").forEach(m => m.addEventListener("click", e => {
@@ -837,7 +858,7 @@ function bindLightbox(data, getVisiblePhotos){
     }
   });
   const initialPhoto = new URLSearchParams(location.search).get("photo");
-  const p = photos(data).find(item => item.id === initialPhoto);
+  const p = initialPhoto ? findPhoto(initialPhoto) : null;
   if(p) open(p, "replace");
   window.addEventListener("popstate", () => {
     if(box.hidden) return;
