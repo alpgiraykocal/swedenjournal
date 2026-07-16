@@ -70,7 +70,7 @@ function checkFile(filePath, label = path.relative(root, filePath)) {
 }
 
 function checkHtmlMetadata(baseDir) {
-  const pages = ["index.html", "gallery/index.html", "stories/index.html", "story/index.html", "about/index.html", "404.html"];
+  const pages = ["index.html", "gallery/index.html", "stories/index.html", "story/index.html", "about/index.html", "atlas/index.html", "series/index.html", "404.html"];
   for (const page of pages) {
     const filePath = path.join(baseDir, page);
     checkFile(filePath);
@@ -260,6 +260,13 @@ function checkCollections(baseDir) {
   const content = exists(dataPath) ? readJson(dataPath) : null;
   if (!content) return;
   const photoIds = new Set((content.photos || []).map((p) => p.id));
+  // Stale photo references are silently dropped by the strict lookups everywhere, so
+  // they only ever rot in the content — flag them the way story blocks are flagged.
+  for (const col of content.collections || []) {
+    for (const id of (col.photoIds || []).filter(Boolean)) {
+      if (!photoIds.has(id)) fail(`Collection ${col.slug || col.title || "unknown"} references missing photo: ${id}`);
+    }
+  }
   const cols = (content.collections || []).filter((c) => c.slug && c.title && (c.photoIds || []).some((id) => photoIds.has(id)));
   unique(cols.map((c) => c.slug), "collection slug");
 
