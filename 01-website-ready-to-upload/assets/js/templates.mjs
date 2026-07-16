@@ -298,7 +298,11 @@ export function atlasMain(data) {
 export function collectionCard(data, col) {
   const cover = collectionPhotos(data, col)[0];
   const count = collectionPhotos(data, col).length;
-  return `<a class="card story-card" href="${collectionHref(col.slug)}" data-collection-card><div class="story-card-media"${mediaRatioStyle(cover)}>${responsiveImage(cover, { className: "story-card-img", sizes: "(max-width: 850px) calc(100vw - 28px), 48vw" })}</div><div class="story-card-copy"><span class="meta">${count} ${count === 1 ? "photograph" : "photographs"}</span><h3>${esc(col.title)}</h3><p class="muted">${esc(col.description || "")}</p><span class="story-link">View series</span></div></a>`;
+  // Fixed 3:2 cover (NOT the photo's natural ratio): series covers mix portrait and
+  // landscape, and grid-2 stretches every card to the tallest — a landscape cover next
+  // to a portrait one left a large hole above its copy. A uniform ratio keeps the row
+  // even and image-first; the img already fills the box via object-fit:cover.
+  return `<a class="card story-card" href="${collectionHref(col.slug)}" data-collection-card><div class="story-card-media collection-card-media">${responsiveImage(cover, { className: "story-card-img", sizes: "(max-width: 850px) calc(100vw - 28px), 48vw" })}</div><div class="story-card-copy"><span class="meta">${count} ${count === 1 ? "photograph" : "photographs"}</span><h3>${esc(col.title)}</h3><p class="muted">${esc(col.description || "")}</p><span class="story-link">View series</span></div></a>`;
 }
 export function collectionsMain(data) {
   const cp = data.collectionsPage || {};
