@@ -47,12 +47,17 @@ for (const photo of data.photos || []) {
     medium: { width: 1200 },
     full:   { width: 2200 },
   };
+  // Declared srcset width = the target cap, but never wider than the source itself.
+  // generate-image-variants.sh resizes with no enlargement, so a small/portrait source
+  // yields a variant narrower than the cap; advertising the cap as its `w` descriptor
+  // would make the browser overrate the candidate. Clamp to the real pixel width.
+  const sourceWidth = Number(photo.width);
   photo.variants = {};
   for (const [size, meta] of Object.entries(sizes)) {
     photo.variants[size] = {
       jpeg: variantPath(photo.src, size, "jpeg"),
       webp: variantPath(photo.src, size, "webp"),
-      width: meta.width,
+      width: Number.isFinite(sourceWidth) && sourceWidth > 0 ? Math.min(meta.width, sourceWidth) : meta.width,
     };
     if (efficientAvifExists(photo.src, size)) {
       photo.variants[size].avif = variantPath(photo.src, size, "avif");

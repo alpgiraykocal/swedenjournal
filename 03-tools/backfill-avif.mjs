@@ -27,11 +27,39 @@ const baseName = (src) => path.basename(src, path.extname(src));
 
 let made = 0;
 let skipped = 0;
+let dimsFilled = 0;
 const failures = [];
 
+// Backfill missing intrinsic width/height from the on-disk full JPEG. fullVariantDims()
+// (templates.mjs) returns null without them, which would drop the og:image:width/height
+// /alt tags that qa-static-checks requires on every static page — a build-breaking gap
+// for any photo added via raw JSON without dims. The editor sets dims on upload; this
+// closes the hand-edited path. Ratio is preserved, so the value the meta needs is exact.
+async function backfillDims(photo) {
+  const w = Number(photo.width), h = Number(photo.height);
+  if (Number.isFinite(w) && w > 0 && Number.isFinite(h) && h > 0) return false;
+  const fullJpeg = path.join(generatedDir("full"), `${baseName(photo.src)}.jpeg`);
+  if (!fs.existsSync(fullJpeg)) return false;
+  try {
+    const meta = await sharp(fullJpeg).metadata();
+    if (meta.width && meta.height) {
+      photo.width = meta.width;
+      photo.height = meta.height;
+      dimsFilled += 1;
+      return true;
+    }
+  } catch (e) {
+    failures.push(`${baseName(photo.src)}/dims: ${e.message || e}`);
+  }
+  return false;
+}
+
+let dimsChanged = false;
 for (const photo of data.photos || []) {
   if (!photo.src) continue;
   const base = baseName(photo.src);
+  // eslint-disable-next-line no-await-in-loop
+  if (await backfillDims(photo)) dimsChanged = true;
   for (const [size, quality] of Object.entries(SIZES)) {
     const jpegPath = path.join(generatedDir(size), `${base}.jpeg`);
     const avifPath = path.join(generatedDir(size), `${base}.avif`);
@@ -47,5 +75,12 @@ for (const photo of data.photos || []) {
   }
 }
 
+// Persist backfilled dims so the downstream steps (sync-image-variants, render-site)
+// see them. Same 2-space + trailing-newline shape the editor and sync-image-variants
+// write, so the on-disk diff stays minimal when nothing changed.
+if (dimsChanged) {
+  fs.writeFileSync(path.join(websiteDir, "assets/data/site-content.json"), `${JSON.stringify(data, null, 2)}\n`);
+}
+
 if (failures.length) for (const f of failures) console.warn(`! AVIF backfill failed: ${f}`);
-console.log(`AVIF backfill: ${made} generated, ${skipped} already present${failures.length ? `, ${failures.length} failed` : ""}.`);
+console.log(`AVIF backfill: ${made} generated, ${skipped} already present${dimsFilled ? `, ${dimsFilled} dims backfilled` : ""}${failures.length ? `, ${failures.length} failed` : ""}.`);

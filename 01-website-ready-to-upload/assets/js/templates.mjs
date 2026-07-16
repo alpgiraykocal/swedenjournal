@@ -313,7 +313,15 @@ export function notFoundMain(data) {
 }
 
 // ---- JSON-LD object builders (pure) ----
-export const machineDate = (v) => (/^\d{4}-\d{2}-\d{2}$/.test(String(v || "").trim()) ? String(v).trim() : undefined);
+// Accept only a real calendar date: correct ISO shape AND a date the engine does not
+// reject outright (month 0/13, etc.). Mirrors editor.js machineDate() so the editor's
+// sitemap/feed writer and this build-time builder agree byte-for-byte. (JS rolls
+// over-long days like 2026-02-31 rather than rejecting them; both sides keep those.)
+export const machineDate = (v) => {
+  const raw = String(v || "").trim();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(raw)) return undefined;
+  return Number.isNaN(new Date(`${raw}T00:00:00Z`).getTime()) ? undefined : raw;
+};
 export const jsonLdImageUrl = (data, p) => (p ? absoluteUrl(data, (variant(p, "full", "jpeg") || imgPath(p)).replace(/^(?:\.\.\/)+/, "")) : undefined);
 export function websiteLdObject(data) {
   const base = String(data.site?.baseUrl || "").replace(/\/+$/, "");
@@ -391,7 +399,11 @@ export function atlasLdObject(data) {
 // line, and qa-static-checks.mjs regenerates both from here and byte-compares
 // against what is on disk — so an editor save can never silently degrade either file.
 const escX = (s) => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-export const xmlMachineDate = (v) => (/^\d{4}-\d{2}-\d{2}$/.test(String(v || "").trim()) ? String(v).trim() : "");
+export const xmlMachineDate = (v) => {
+  const raw = String(v || "").trim();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(raw)) return "";
+  return Number.isNaN(new Date(`${raw}T00:00:00Z`).getTime()) ? "" : raw;
+};
 export function feedXml(data, now = new Date().toUTCString()) {
   const base = String(data.site?.baseUrl || "").replace(/\/+$/, "");
   const photosById = new Map((data.photos || []).map((p) => [p.id, p]));
