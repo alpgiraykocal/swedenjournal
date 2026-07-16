@@ -4,7 +4,7 @@ import {
   homeMain, galleryMain, storiesMain, aboutMain, atlasMain, storyMain, legacyStoryMain, photoMain, photoTitleCore,
   collections, collectionPhotos, collectionsMain, collectionMain, collectionHref, photoExifChips,
   websiteLdObject, imageGalleryLdObject, personLdObject, articleLdObject, photoLdObject, collectionsLdObject, collectionLdObject, fullVariantDims,
-} from "./templates.mjs?v=039e96b0f6";
+} from "./templates.mjs?v=991a9ed951";
 
 // Cache-bust the runtime content fetches. /assets/data/*.json is served with a long
 // edge cache (the host ignores _headers), so without a content-versioned URL a freshly
@@ -648,7 +648,7 @@ function bindGalleryControls(data, list){
 function bindLightbox(data, getVisiblePhotos){
   const rootEl = $("#lightboxRoot");
   if(!rootEl) return;
-  rootEl.innerHTML = `<div class="lightbox" role="dialog" aria-modal="true" aria-labelledby="lightboxTitle" hidden><button class="lightbox-close" type="button" aria-label="Close photo">×</button><button class="lightbox-nav lightbox-prev" type="button" aria-label="Previous photo">‹</button><button class="lightbox-nav lightbox-next" type="button" aria-label="Next photo">›</button><div class="lightbox-media"></div><div class="lightbox-copy"><p class="eyebrow lightbox-meta"></p><h2 id="lightboxTitle"></h2><p class="muted lightbox-caption"></p><p class="lightbox-exif photo-exif" hidden></p><a class="lightbox-story-link" hidden></a><a class="lightbox-series-link" hidden></a><a class="lightbox-page-link" hidden></a><p class="lightbox-position" aria-live="polite"></p><div class="share-actions lightbox-actions"><button class="share-action" type="button" data-lightbox-share>Share</button><button class="share-action" type="button" data-lightbox-copy data-default-label="Copy link">Copy link</button></div><p class="share-status" aria-live="polite"></p></div></div>`;
+  rootEl.innerHTML = `<div class="lightbox" role="dialog" aria-modal="true" aria-labelledby="lightboxTitle" hidden><button class="lightbox-close" type="button" aria-label="Close photo">×</button><button class="lightbox-nav lightbox-prev" type="button" aria-label="Previous photo">‹</button><button class="lightbox-nav lightbox-next" type="button" aria-label="Next photo">›</button><div class="lightbox-media"></div><div class="lightbox-copy"><p class="eyebrow lightbox-meta"></p><h2 id="lightboxTitle"></h2><p class="muted lightbox-caption"></p><p class="lightbox-exif photo-page-tags photo-exif" hidden></p><a class="lightbox-story-link" hidden></a><a class="lightbox-series-link" hidden></a><a class="lightbox-page-link" hidden></a><p class="lightbox-position" aria-live="polite"></p><div class="share-actions lightbox-actions"><button class="share-action" type="button" data-lightbox-share>Share</button><button class="share-action" type="button" data-lightbox-copy data-default-label="Copy link">Copy link</button></div><p class="share-status" aria-live="polite"></p></div></div>`;
   const box = $(".lightbox", rootEl);
   const media = $(".lightbox-media", rootEl);
   const title = $("#lightboxTitle", rootEl);

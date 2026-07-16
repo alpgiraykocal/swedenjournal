@@ -530,9 +530,14 @@ body[data-page="gallery"] .photo-card[hidden]{display:none!important}
 .lightbox-story-link:hover,.lightbox-series-link:hover{text-decoration:underline}
 .lightbox-story-link:hover span,.lightbox-series-link:hover span{transform:translateX(3px)}
 .lightbox-series-link{margin-top:2px}
-.lightbox-exif{margin-top:12px}
-.lightbox-exif[hidden]{display:none}
-.lightbox-exif span{border-color:rgba(255,255,255,.16);color:rgba(255,255,255,.72)}
+/* The lightbox EXIF row reuses the .photo-page-tags pill geometry, but that block is
+   defined later in this file — so these overrides are scoped under .lightbox to win on
+   specificity rather than source order. The panel is always dark: the light --surface
+   fill and muted text would otherwise render the chips unreadable. The [hidden] rule
+   needs the same weight because .photo-page-tags sets display:flex. */
+.lightbox .lightbox-exif{margin:12px 0 0}
+.lightbox .lightbox-exif[hidden]{display:none}
+.lightbox .lightbox-exif span{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.24);color:rgba(255,255,255,.9)}
 .lightbox-position{margin:12px 0 0;color:rgba(255,248,239,.62);font-size:13px;font-variant-numeric:tabular-nums}
 .lightbox .share-action{background:rgba(255,253,248,.1);border-color:rgba(255,253,248,.22);color:var(--paper)}
 .lightbox .share-action:hover{background:rgba(255,253,248,.18);color:var(--paper)}
