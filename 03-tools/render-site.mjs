@@ -11,8 +11,9 @@ import { fileURLToPath } from "node:url";
 import {
   setContext, photos, photo, storyPhotos, sortPhotos, photoStoryMap, fullVariantDims,
   header, footer, homeMain, galleryMain, storiesMain, aboutMain, atlasMain, storyMain, legacyStoryMain, notFoundMain, photoMain, photoTitleCore,
+  collections, collectionPhotos, collectionsMain, collectionMain,
   websiteLdObject, imageGalleryLdObject, personLdObject, articleLdObject, photoLdObject,
-  breadcrumbLdObject, storiesLdObject, atlasLdObject,
+  breadcrumbLdObject, storiesLdObject, atlasLdObject, collectionsLdObject, collectionLdObject,
 } from "../01-website-ready-to-upload/assets/js/templates.mjs";
 
 const crumbs = (...trail) => breadcrumbLdObject(data, trail);
@@ -221,6 +222,64 @@ for (const p of photos(data)) {
   });
 }
 
+// Series (photo collections): an index at /series/ plus one page per collection.
+// The detail shells are written from content on every build (like photoShell) so a
+// title/description edit is always reflected; renderInto then injects the body.
+n += page("series/index.html", {
+  pfx: "../", active: "series",
+  mainHtml: () => collectionsMain(data),
+  headLd: ld(collectionsLdObject(data)) + ld(crumbs({ name: "Home", path: "" }, { name: "Series", path: "series/" })),
+});
+function collectionShell(col) {
+  const cover = collectionPhotos(data, col)[0];
+  const title = encAttr(`${col.title || "Series"} — ${data.site?.siteTitle || data.site?.ownerName || "Photo Blog"}`);
+  const desc = encAttr(col.description || data.site?.description || "");
+  const url = encAttr(`${base}/series/${encodeURIComponent(col.slug)}/`);
+  const siteTitle = encAttr(data.site?.siteTitle || "Photography & Travel Notes");
+  const image = encAttr(`${base}/${String(cover?.variants?.full?.jpeg || cover?.src || "").replace(/^\/+/, "")}`);
+  return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>${title}</title>
+  <meta name="description" content="${desc}">
+  <link rel="canonical" href="${url}">
+  <meta property="og:title" content="${title}">
+  <meta property="og:description" content="${desc}">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="${url}">
+  <meta property="og:image" content="${image}">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="${title}">
+  <meta name="twitter:description" content="${desc}">
+  <meta name="twitter:image" content="${image}">
+  <link rel="stylesheet" href="../../assets/css/site.css?v=20260601">
+  <link rel="alternate" type="application/rss+xml" title="${siteTitle} — Stories" href="/feed.xml">
+</head>
+<body data-page="collection">
+  <div id="app" tabindex="-1"></div>
+  <div id="footer"></div>
+  <script>window.__DATA_PATH__="../../assets/data/site-content.json";window.__ROOT__="../../";window.__ASSET_PREFIX__="../../";</script>
+  <script type="module" src="../../assets/js/site.js?v=20260601"></script>
+</body>
+</html>
+`;
+}
+const liveCollectionSlugs = new Set();
+for (const col of collections(data)) {
+  if (!col.slug || !col.title || !collectionPhotos(data, col).length) continue;
+  liveCollectionSlugs.add(col.slug);
+  const rel = `series/${col.slug}/index.html`;
+  const file = path.join(websiteDir, rel);
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  fs.writeFileSync(file, collectionShell(col));
+  n += page(rel, {
+    pfx: "../../", active: "collection",
+    mainHtml: () => collectionMain(data, col),
+    headLd: ld(collectionLdObject(data, col)) + ld(crumbs({ name: "Home", path: "" }, { name: "Series", path: "series/" }, { name: col.title || col.slug, path: `series/${encodeURIComponent(col.slug)}/` })),
+  });
+}
+
 // Prune orphaned story pages: a story deleted in the editor leaves its
 // stories/<slug>/ folder behind. Remove any story folder no longer in the
 // content so deleted stories disappear from the published site.
@@ -240,6 +299,16 @@ if (fs.existsSync(photosPagesDir)) {
   for (const entry of fs.readdirSync(photosPagesDir, { withFileTypes: true })) {
     if (entry.isDirectory() && !livePhotoIds.has(entry.name)) {
       fs.rmSync(path.join(photosPagesDir, entry.name), { recursive: true, force: true });
+      pruned += 1;
+    }
+  }
+}
+// Same pruning for series pages: a collection removed (or emptied) loses its page.
+const seriesDir = path.join(websiteDir, "series");
+if (fs.existsSync(seriesDir)) {
+  for (const entry of fs.readdirSync(seriesDir, { withFileTypes: true })) {
+    if (entry.isDirectory() && !liveCollectionSlugs.has(entry.name)) {
+      fs.rmSync(path.join(seriesDir, entry.name), { recursive: true, force: true });
       pruned += 1;
     }
   }

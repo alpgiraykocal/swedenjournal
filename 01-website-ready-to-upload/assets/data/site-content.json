@@ -2955,5 +2955,44 @@
       },
       "isoDate": "2026-04-04"
     }
+  ],
+  "collectionsPage": {
+    "eyebrow": "Series",
+    "headline": "Photographic series",
+    "intro": "Curated groups of photographs — a single thread of subject or place followed across the journal, apart from the stories."
+  },
+  "collections": [
+    {
+      "slug": "runestones-and-carvings",
+      "title": "Runestones & Carvings",
+      "description": "Sweden’s memory cut into stone — rune inscriptions and the Sigurd carving at Ramsund, gathered from across the journal’s ancient sites.",
+      "photoIds": [
+        "anundshog-runestone-vs-13",
+        "saltangsbron-runestone-vs9",
+        "runestone-u978-old-uppsala-church",
+        "runestone-vs10-vasteras",
+        "sigurd-carving-ramsund",
+        "sigurd-carving-ramsund-detail",
+        "sigurd-carving-ramsund-figures",
+        "sigurd-carving-ramsund-grani"
+      ]
+    },
+    {
+      "slug": "castles-and-fortresses",
+      "title": "Castles & Fortresses",
+      "description": "Walls, moats, and towers — Landskrona Slott, Glimmingehus, and Kärnan across Sweden’s fortified past.",
+      "photoIds": [
+        "round-bastion-at-landskrona-slott",
+        "landskrona-slott-across-the-moat",
+        "courtyard-of-landskrona-slott",
+        "passage-through-landskrona-slott",
+        "rooflines-of-landskrona-slott",
+        "glimmingehus-across-the-moat",
+        "cobbled-courtyard-at-glimmingehus",
+        "karnan-tower-helsingborg",
+        "at-the-foot-of-karnan-helsingborg",
+        "terrace-steps-to-karnan-helsingborg"
+      ]
+    }
   ]
 }

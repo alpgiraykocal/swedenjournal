@@ -93,6 +93,17 @@ export function photoStoryMap(data) {
   return map;
 }
 export const photoStory = (data, id) => photoStoryMap(data).get(id) || null;
+// ---- Series (photo collections): curated photo groups, independent of stories ----
+export const collections = (data) => (Array.isArray(data.collections) ? data.collections : []);
+export const collection = (data, slug) => collections(data).find((c) => c.slug === slug) || null;
+export const collectionHref = (slug) => `${root()}series/${encodeURIComponent(slug)}/`;
+// Strict lookup (no first-photo fallback) so a stale id drops out instead of pulling
+// an unrelated photo into the series.
+export function collectionPhotos(data, col) {
+  const byId = new Map(photos(data).map((p) => [p.id, p]));
+  return (col?.photoIds || []).map((id) => byId.get(id)).filter(Boolean);
+}
+export const liveCollections = (data) => collections(data).filter((c) => c.slug && c.title && collectionPhotos(data, c).length);
 export function storyShareUrl(data, story) {
   const base = String(data.site?.baseUrl || "").replace(/\/+$/, "");
   if (base) return `${base}/stories/${encodeURIComponent(story.slug)}/`;
@@ -111,10 +122,10 @@ export function sortPhotos(list) {
 export const mediaRatioStyle = (p) => (p?.width && p?.height ? ` style="aspect-ratio:${esc(p.width)} / ${esc(p.height)}"` : "");
 export function header(data) {
   const page = CTX.page;
-  const activePage = page === "story" ? "stories" : page === "photo" ? "gallery" : page;
+  const activePage = page === "story" ? "stories" : page === "photo" ? "gallery" : page === "collection" ? "series" : page;
   const item = (id, href, label) => `<a href="${href}" ${activePage === id ? `aria-current="page"` : ""}>${label}</a>`;
   return `<a class="skip-link" href="#app">Skip to content</a><header class="site-header"><div class="container nav"><a class="brand" href="${root()}index.html" aria-label="${esc(data.site.ownerName)} — home"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" focusable="false"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="3.4" fill="currentColor"/></svg></span><span class="brand-text">${esc(data.site.ownerName)}<span class="brand-tagline">${esc(data.site.siteTitle || "")}</span></span></a><nav class="nav-links" aria-label="Primary navigation">
-  ${item("home", `${root()}index.html`, "Home")}${item("stories", `${root()}stories/index.html`, "Stories")}${item("atlas", `${root()}atlas/index.html`, "Atlas")}${item("gallery", `${root()}gallery/index.html`, "Gallery")}${item("about", `${root()}about/index.html`, "About")}<button type="button" class="theme-toggle" data-theme-toggle aria-label="Toggle dark and light theme" title="Toggle dark / light theme"><svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.1"/><path d="M12 2.4v2.2M12 19.4v2.2M4.6 4.6l1.6 1.6M17.8 17.8l1.6 1.6M2.4 12h2.2M19.4 12h2.2M4.6 19.4l1.6-1.6M17.8 6.2l1.6-1.6"/></svg><svg class="icon-moon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M20.5 14.8A8.3 8.3 0 0 1 9.2 3.5a8.3 8.3 0 1 0 11.3 11.3z"/></svg></button><a href="${esc(data.site.instagramUrl)}" target="_blank" rel="noopener" aria-label="Instagram: ${esc(data.site.instagramLabel || "@sweden_journal")}" class="ig-nav-link"><svg class="ig-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98C.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></a></nav></div></header>`;
+  ${item("home", `${root()}index.html`, "Home")}${item("stories", `${root()}stories/index.html`, "Stories")}${item("series", `${root()}series/index.html`, "Series")}${item("atlas", `${root()}atlas/index.html`, "Atlas")}${item("gallery", `${root()}gallery/index.html`, "Gallery")}${item("about", `${root()}about/index.html`, "About")}<button type="button" class="theme-toggle" data-theme-toggle aria-label="Toggle dark and light theme" title="Toggle dark / light theme"><svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.1"/><path d="M12 2.4v2.2M12 19.4v2.2M4.6 4.6l1.6 1.6M17.8 17.8l1.6 1.6M2.4 12h2.2M19.4 12h2.2M4.6 19.4l1.6-1.6M17.8 6.2l1.6-1.6"/></svg><svg class="icon-moon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M20.5 14.8A8.3 8.3 0 0 1 9.2 3.5a8.3 8.3 0 1 0 11.3 11.3z"/></svg></button><a href="${esc(data.site.instagramUrl)}" target="_blank" rel="noopener" aria-label="Instagram: ${esc(data.site.instagramLabel || "@sweden_journal")}" class="ig-nav-link"><svg class="ig-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98C.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></a></nav></div></header>`;
 }
 export const footer = (data) => `<footer class="site-footer"><div class="container footer-row"><span>${esc(data.site.ownerName)} — ${esc(data.site.footerText)}</span><span class="footer-follow"><span class="footer-follow-label">Follow the journal</span><a class="footer-rss" href="${root()}feed.xml"><svg class="rss-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M4 4.44V7a13 13 0 0 1 13 13h2.56A15.56 15.56 0 0 0 4 4.44zm0 5.66v2.56A6.34 6.34 0 0 1 10.34 19H12.9A8.9 8.9 0 0 0 4 10.1zM5.92 16.1a1.92 1.92 0 1 0 0 3.84 1.92 1.92 0 0 0 0-3.84z"/></svg>RSS</a>${data.site.instagramUrl ? `<a class="footer-ig ig-footer-link" href="${esc(data.site.instagramUrl)}" target="_blank" rel="noopener" aria-label="Instagram: ${esc(data.site.instagramLabel || "@sweden_journal")}"><svg class="ig-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98C.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>Instagram</a>` : ""}</span></div></footer>`;
 // `transition` opts the card's hero into the shared-element view transition. Pass
@@ -267,6 +278,22 @@ export function atlasMain(data) {
   const mapData = JSON.stringify(mapStories).replace(/</g, "\\u003c");
   return `<main><section class="hero container atlas-hero"><p class="eyebrow">${esc(ap.eyebrow || "Explore by place")}</p><h1 class="headline">${esc(ap.headline || "An atlas of quiet places")}</h1><p class="intro">${esc(ap.intro || "Every story mapped to where it happened. Wander the journal geographically — or browse the places below.")}</p></section>
   <section class="section atlas-section"><div class="container atlas-layout"><div class="atlas-map-wrap"><div id="atlasMap" class="stories-map atlas-map" role="region" aria-label="Map of story locations"></div><script type="application/json" id="atlas-map-data">${mapData}</script></div><nav class="atlas-places" aria-label="Places in the journal"><p class="eyebrow">${mapStories.length} ${mapStories.length === 1 ? "place" : "places"}</p><ul>${places}</ul></nav></div></section></main>`;
+}
+export function collectionCard(data, col) {
+  const cover = collectionPhotos(data, col)[0];
+  const count = collectionPhotos(data, col).length;
+  return `<a class="card story-card" href="${collectionHref(col.slug)}" data-collection-card><div class="story-card-media"${mediaRatioStyle(cover)}>${responsiveImage(cover, { className: "story-card-img", sizes: "(max-width: 850px) calc(100vw - 28px), 48vw" })}</div><div class="story-card-copy"><span class="meta">${count} ${count === 1 ? "photograph" : "photographs"}</span><h3>${esc(col.title)}</h3><p class="muted">${esc(col.description || "")}</p><span class="story-link">View series</span></div></a>`;
+}
+export function collectionsMain(data) {
+  const cp = data.collectionsPage || {};
+  const list = liveCollections(data);
+  return `<main><section class="hero container"><p class="eyebrow">${esc(cp.eyebrow || "Series")}</p><h1 class="headline">${esc(cp.headline || "Photographic series")}</h1><p class="intro">${esc(cp.intro || "Curated groups of photographs — a single thread of subject or place followed across the journal.")}</p></section>
+  <section class="section"><div class="container">${list.length ? `<div class="grid-2 collections-grid">${list.map((c) => collectionCard(data, c)).join("")}</div>` : `<p class="muted">No series yet.</p>`}</div></section></main>`;
+}
+export function collectionMain(data, col) {
+  const list = collectionPhotos(data, col);
+  return `<main><section class="hero container"><p class="eyebrow"><a class="text-link" href="${root()}series/index.html">Series</a></p><h1 class="headline">${esc(col.title)}</h1>${col.description ? `<p class="intro">${esc(col.description)}</p>` : ""}<p class="gallery-count">${list.length} ${list.length === 1 ? "photograph" : "photographs"}</p></section>
+  <section class="section selected-section" aria-labelledby="seriesHeading"><div class="container"><h2 id="seriesHeading" class="visually-hidden">Photographs in ${esc(col.title)}</h2><div class="gallery-grid selected-grid">${list.map((p, i) => photoFigure(p, { priority: i < 2, eager: i < 12, interactive: true, story: photoStory(data, p.id) })).join("")}</div></div></section><div id="lightboxRoot"></div></main>`;
 }
 export function aboutMain(data) {
   const a = data.about || {}, p = photo(data, a.portraitPhotoId);
@@ -424,6 +451,15 @@ export function atlasLdObject(data) {
   return { "@context": "https://schema.org", "@type": "CollectionPage", name: data.atlasPage?.headline || "Atlas", description: data.atlasPage?.intro || data.site?.description || "", url: absoluteUrl(data, "atlas/"), mainEntity: { "@type": "ItemList", itemListElement: placed.map((s, i) => ({ "@type": "ListItem", position: i + 1, item: { "@type": "Place", name: s.title, url: absoluteUrl(data, "stories/" + encodeURIComponent(s.slug) + "/"), geo: { "@type": "GeoCoordinates", latitude: Number(s.coordinates.lat), longitude: Number(s.coordinates.lng) } } })) } };
 }
 
+export function collectionsLdObject(data) {
+  const list = liveCollections(data);
+  return { "@context": "https://schema.org", "@type": "CollectionPage", name: data.collectionsPage?.headline || "Series", description: data.collectionsPage?.intro || data.site?.description || "", url: absoluteUrl(data, "series/"), mainEntity: { "@type": "ItemList", itemListElement: list.map((c, i) => ({ "@type": "ListItem", position: i + 1, name: c.title, url: absoluteUrl(data, "series/" + encodeURIComponent(c.slug) + "/") })) } };
+}
+export function collectionLdObject(data, col) {
+  const rights = imageRightsFields(data);
+  return { "@context": "https://schema.org", "@type": "ImageGallery", name: col.title || "", description: col.description || "", url: absoluteUrl(data, "series/" + encodeURIComponent(col.slug) + "/"), image: collectionPhotos(data, col).slice(0, 24).map((p) => ({ "@type": "ImageObject", name: p.title || "", caption: p.caption || "", contentUrl: jsonLdImageUrl(data, p), thumbnailUrl: variant(p, "thumb", "jpeg") ? absoluteUrl(data, variant(p, "thumb", "jpeg").replace(/^(?:\.\.\/)+/, "")) : undefined, ...rights })) };
+}
+
 // ---- Canonical feed.xml / sitemap.xml builders ----
 // SINGLE source of truth for both files. The node generators (03-tools) call these
 // directly; the editor (02-content-editor/assets/editor.js) mirrors them line for
@@ -551,6 +587,12 @@ export function sitemapXml(data, buildDay = new Date().toISOString().slice(0, 10
       lastmod: xmlMachineDate(p.date) || buildDay,
       images: imageTags([p]),
     }));
+  }
+  entries.push(urlEntry({ loc: `${base}/series/`, lastmod: buildDay }));
+  for (const col of (data.collections || []).filter((c) => c.slug && c.title)) {
+    const pics = (col.photoIds || []).map((id) => photosById.get(id)).filter(Boolean);
+    if (!pics.length) continue;
+    entries.push(urlEntry({ loc: `${base}/series/${encodeURIComponent(col.slug)}/`, lastmod: buildDay, images: imageTags(pics) }));
   }
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">

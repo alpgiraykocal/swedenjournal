@@ -5,6 +5,7 @@
 ## Main pages
 - [Home](https://sweden-journal.com/): Featured stories and a curated edit of photographs.
 - [Stories](https://sweden-journal.com/stories/): Long-form visual essays built around place, light, and movement.
+- [Series](https://sweden-journal.com/series/): Curated groups of photographs — a subject or place followed across the journal.
 - [Atlas](https://sweden-journal.com/atlas/): Every story mapped to where it happened — explore the journal geographically.
 - [Gallery](https://sweden-journal.com/gallery/): A curated, image-first archive of photographs.
 - [About](https://sweden-journal.com/about/): About the photographer and the project.
@@ -18,6 +19,10 @@
 - [The Stronghold at Glimmingehus](https://sweden-journal.com/stories/glimmingehus/): Standing alone among the fields of southeastern Skåne, Glimmingehus is the best-preserved medieval stronghold in…
 - [The Sigurd Carving at Ramsund](https://sweden-journal.com/stories/sigurd-carving-ramsund-story/): On a low rock at Sundbyholm outside Eskilstuna, an eleventh-century carving spells out the saga of Sigurd the…
 - [Kärnan: Helsingborg's Medieval Keep](https://sweden-journal.com/stories/karnan-helsingborg/): Helsingborg's brick keep, Kärnan, has watched over the Sound for some seven centuries — all that remains of a great…
+
+## Series
+- [Runestones & Carvings](https://sweden-journal.com/series/runestones-and-carvings/): Sweden’s memory cut into stone — rune inscriptions and the Sigurd carving at Ramsund, gathered from across the journal’s…
+- [Castles & Fortresses](https://sweden-journal.com/series/castles-and-fortresses/): Walls, moats, and towers — Landskrona Slott, Glimmingehus, and Kärnan across Sweden’s fortified past.
 
 ## More
 - [RSS feed](https://sweden-journal.com/feed.xml)

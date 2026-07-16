@@ -80,6 +80,13 @@ const heroFor = {
 for (const s of data.stories || []) {
   if (s.slug) heroFor[`stories/${s.slug}/index.html`] = s.heroPhotoId || null;
 }
+// Series pages are card / gallery grids with no single dominant LCP (same reasoning as
+// the gallery) — no hero preload, but they still need the perf-head block (theme, fonts,
+// speculation rules), so register them with a null hero.
+heroFor["series/index.html"] = null;
+for (const col of data.collections || []) {
+  if (col.slug) heroFor[`series/${col.slug}/index.html`] = null;
+}
 // Photo permalink pages: the page IS the photo — preload it as the LCP.
 for (const p of photos) {
   if (p.id && p.title) heroFor[`photos/${p.id}/index.html`] = p.id;
