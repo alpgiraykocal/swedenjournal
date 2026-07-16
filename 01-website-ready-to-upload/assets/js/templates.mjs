@@ -287,6 +287,35 @@ export function storyMain(data, s) {
 // <title>/og:title get a "· Photograph" qualifier to stay distinct in search results
 // (avoids GSC duplicate-title tags). Single source used by build, runtime and editor.
 export const photoTitleCore = (p) => `${p?.title || "Photograph"} · Photograph`;
+// Camera EXIF as display chips (camera · lens · focal · aperture · shutter · ISO).
+// Data is populated locally by 03-tools/backfill-exif.mjs (sources are gitignored, so
+// it can only be read on the author's machine and is carried in site-content.json).
+export function photoExifChips(p) {
+  const e = p && p.exif;
+  if (!e) return "";
+  const parts = [];
+  if (e.camera) parts.push(e.camera);
+  if (e.lens) parts.push(e.lens);
+  if (e.focalLength) parts.push(`${e.focalLength}mm`);
+  if (e.aperture) parts.push(`f/${e.aperture}`);
+  if (e.shutter) parts.push(`${e.shutter}s`);
+  if (e.iso) parts.push(`ISO ${e.iso}`);
+  return parts.map((x) => `<span>${esc(x)}</span>`).join("");
+}
+// Same EXIF as schema.org PropertyValue rows for the photo page ImageObject.
+export function exifDataLd(p) {
+  const e = p && p.exif;
+  if (!e) return undefined;
+  const rows = [
+    ["Camera", e.camera],
+    ["Lens", e.lens],
+    ["Focal length", e.focalLength ? `${e.focalLength} mm` : ""],
+    ["Aperture", e.aperture ? `f/${e.aperture}` : ""],
+    ["Shutter speed", e.shutter ? `${e.shutter} s` : ""],
+    ["ISO", e.iso ? String(e.iso) : ""],
+  ].filter(([, v]) => v);
+  return rows.length ? rows.map(([name, value]) => ({ "@type": "PropertyValue", name, value })) : undefined;
+}
 export function photoMain(data, p) {
   const st = photoStory(data, p.id);
   const list = sortPhotos(photos(data));
@@ -302,7 +331,7 @@ export function photoMain(data, p) {
   const walk = (prev || next)
     ? `<nav class="story-walk container" aria-label="More photographs"><p class="eyebrow story-walk-eyebrow">More from the gallery</p><div class="story-walk-row">${walkLink(prev, "prev", "Previous")}${walkLink(next, "next", "Next")}</div></nav>`
     : "";
-  return `<main><section class="story-hero container photo-page-hero"><div class="story-meta" role="group" aria-label="Photograph details">${chips}</div><h1 class="headline">${esc(p.title)}</h1>${p.caption ? `<p class="intro">${esc(p.caption)}</p>` : ""}${storyLink}${responsiveImage(p, { priority: true, sizes: "(max-width: 1220px) calc(100vw - 40px), 1180px", fallbackSize: "full", viewTransitionName: p.id ? `photo-${p.id}` : undefined })}${(p.tags || []).length ? `<p class="photo-page-tags">${(p.tags || []).slice(0, 6).map((t) => `<span>${esc(t)}</span>`).join("")}</p>` : ""}<p class="photo-page-back"><a class="text-link" href="${root()}gallery/index.html">Back to the gallery</a></p></section>${related.length ? `<section class="section related-section"><div class="container related-container"><div class="section-head"><div><p class="eyebrow">Same collection</p><h2>Related photographs</h2></div></div><div class="gallery-grid selected-grid related-photos">${related.map((rp) => `<a class="photo-page-related" href="${photoHref(rp.id)}">${photoFigure(rp, { sizes: "(max-width: 560px) calc(100vw - 24px), 280px" })}</a>`).join("")}</div></div></section>` : ""}${photoSharePanel(data, p)}${walk}</main>`;
+  return `<main><section class="story-hero container photo-page-hero"><div class="story-meta" role="group" aria-label="Photograph details">${chips}</div><h1 class="headline">${esc(p.title)}</h1>${p.caption ? `<p class="intro">${esc(p.caption)}</p>` : ""}${storyLink}${responsiveImage(p, { priority: true, sizes: "(max-width: 1220px) calc(100vw - 40px), 1180px", fallbackSize: "full", viewTransitionName: p.id ? `photo-${p.id}` : undefined })}${photoExifChips(p) ? `<p class="photo-page-tags photo-exif" aria-label="Camera and exposure settings">${photoExifChips(p)}</p>` : ""}${(p.tags || []).length ? `<p class="photo-page-tags">${(p.tags || []).slice(0, 6).map((t) => `<span>${esc(t)}</span>`).join("")}</p>` : ""}<p class="photo-page-back"><a class="text-link" href="${root()}gallery/index.html">Back to the gallery</a></p></section>${related.length ? `<section class="section related-section"><div class="container related-container"><div class="section-head"><div><p class="eyebrow">Same collection</p><h2>Related photographs</h2></div></div><div class="gallery-grid selected-grid related-photos">${related.map((rp) => `<a class="photo-page-related" href="${photoHref(rp.id)}">${photoFigure(rp, { sizes: "(max-width: 560px) calc(100vw - 24px), 280px" })}</a>`).join("")}</div></div></section>` : ""}${photoSharePanel(data, p)}${walk}</main>`;
 }
 export function legacyStoryMain(data) {
   return `<main class="container section"><p class="eyebrow">Stories</p><h1 class="headline">${esc(data.storiesPage?.headline || "Stories")}</h1><p class="intro">${esc(data.storiesPage?.intro || data.site?.description || "")}</p><p><a class="text-link" href="${root()}stories/index.html">Return to stories</a></p></main>`;
@@ -375,6 +404,8 @@ export function photoLdObject(data, p) {
     width: dims ? dims.width : undefined,
     height: dims ? dims.height : undefined,
     representativeOfPage: true,
+    dateCreated: machineDate(p.exif?.shotAt),
+    exifData: exifDataLd(p),
     contentLocation: p.location ? { "@type": "Place", name: p.location } : undefined,
     ...imageRightsFields(data),
     isPartOf: st ? { "@type": "Article", headline: st.title || "", url: absoluteUrl(data, "stories/" + encodeURIComponent(st.slug) + "/") } : undefined,

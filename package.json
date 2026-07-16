@@ -4,11 +4,13 @@
   "private": true,
   "scripts": {
     "generate-variants": "bash 03-tools/generate-image-variants.sh",
+    "exif": "node 03-tools/backfill-exif.mjs",
     "build": "node 03-tools/build.mjs",
     "build:package": "bash 03-tools/build-upload-package.sh",
     "qa": "node 03-tools/qa-static-checks.mjs"
   },
   "devDependencies": {
+    "exif-reader": "^2.0.3",
     "sharp": "^0.30.6",
     "sharp-cli": "^2.1.0"
   }
