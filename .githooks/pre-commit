@@ -1,0 +1,36 @@
+#!/bin/sh
+# Auto-fill camera EXIF for newly added photos before each commit, then stage the
+# enriched site-content.json so it lands in the SAME commit.
+#
+# Why a hook: the full-res sources are gitignored, so EXIF can only be read locally
+# (see 03-tools/backfill-exif.mjs). This runs that step for you on every commit —
+# including commits made from GitHub Desktop — so you never ship a photo without its
+# camera data. It is idempotent: backfill skips photos that already carry EXIF, so it
+# is a fast no-op when nothing new was added.
+#
+# It NEVER blocks a commit: any failure (e.g. a GUI git client with a minimal PATH that
+# can't find node) exits 0, and you can still run `npm run exif` by hand.
+
+# Resolve a node binary even when launched from a GUI app with a stripped-down PATH.
+NODE="$(command -v node 2>/dev/null)"
+if [ -z "$NODE" ]; then
+  for c in /opt/homebrew/bin/node /usr/local/bin/node "$HOME"/.nvm/versions/node/*/bin/node; do
+    if [ -x "$c" ]; then NODE="$c"; break; fi
+  done
+fi
+[ -z "$NODE" ] && exit 0
+
+ROOT="$(git rev-parse --show-toplevel)"
+DATA="$ROOT/01-website-ready-to-upload/assets/data/site-content.json"
+
+before="$("$NODE" -e 'const fs=require("fs");process.stdout.write(fs.existsSync(process.argv[1])?require("crypto").createHash("sha1").update(fs.readFileSync(process.argv[1])).digest("hex"):"")' "$DATA" 2>/dev/null)"
+"$NODE" "$ROOT/03-tools/backfill-exif.mjs" || exit 0
+after="$("$NODE" -e 'const fs=require("fs");process.stdout.write(fs.existsSync(process.argv[1])?require("crypto").createHash("sha1").update(fs.readFileSync(process.argv[1])).digest("hex"):"")' "$DATA" 2>/dev/null)"
+
+# Only stage the content file when backfill actually changed it, so an unrelated commit
+# never sweeps in unstaged edits.
+if [ -n "$after" ] && [ "$before" != "$after" ]; then
+  git add "$DATA" 2>/dev/null || true
+  echo "pre-commit: camera EXIF backfilled into site-content.json (staged)."
+fi
+exit 0
