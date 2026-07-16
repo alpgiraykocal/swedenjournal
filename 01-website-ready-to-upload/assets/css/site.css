@@ -148,6 +148,10 @@ h2{margin:0;font-family:var(--serif);font-size:3.4rem;font-weight:500;line-heigh
   padding:18px 0 0;
 }
 .story-card:hover{transform:none}
+/* Author display:grid above beats the UA's [hidden]{display:none}, so without this the
+   category/search filter sets the attribute but the card keeps rendering (the photo grid
+   has the same guard via [data-masonry] .photo-card[hidden]). */
+.story-card[hidden]{display:none!important}
 .story-card:hover .story-card-media img,
 .featured-story:hover .featured-story-media img{transform:scale(1.04)}
 .story-card:hover .story-link::after,
