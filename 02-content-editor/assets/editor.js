@@ -221,11 +221,23 @@
     const base=publicBaseUrl(c), now=new Date().toUTCString();
     const photosById=new Map((c.photos||[]).map(p=>[p.id,p]));
     const heroUrl=s=>{const hero=photosById.get(s.heroPhotoId);const rel=hero?.variants?.full?.jpeg||hero?.src;return rel?`${base}/${String(rel).replace(/^\/+/,"")}`:"";};
+    // Full story body for <content:encoded>. MIRRORS templates.mjs feedXml() contentEncoded() byte-for-byte.
+    const contentEncoded=s=>{
+      const imgTag=id=>{const p=photosById.get(id);if(!p)return"";const rel=p.variants?.medium?.jpeg||p.variants?.full?.jpeg||p.src;return rel?`<img src="${base}/${String(rel).replace(/^\/+/,"")}" alt="${esc(p.alt||"")}"/>`:"";};
+      const html=(s.body||[]).map(b=>{
+        if(b.type==="image"||b.type==="panorama"){const img=imgTag(b.photoId);if(!img)return"";const cap=b.caption||photosById.get(b.photoId)?.caption||"";return `<figure>${img}${cap?`<figcaption>${esc(cap)}</figcaption>`:""}</figure>`;}
+        if(b.type==="image-pair"){const imgs=(b.photoIds||[]).map(imgTag).filter(Boolean).join("");if(!imgs)return"";return `<figure>${imgs}${b.caption?`<figcaption>${esc(b.caption)}</figcaption>`:""}</figure>`;}
+        if(b.type==="heading")return `<h2>${esc(b.text||"")}</h2>`;
+        if(b.type==="quote")return `<blockquote><p>${esc(b.text||"")}</p></blockquote>`;
+        return `<p>${esc(b.text||"")}</p>`;
+      }).join("");
+      return html.replace(/]]>/g,"]]]]><![CDATA[>");
+    };
     const items=(c.stories||[]).filter(s=>s.title&&s.slug).map(s=>{
-      const pubDate=rssDate(s);const media=heroUrl(s);
-      return `  <item>\n    <title>${escXml(s.title)}</title>\n    <link>${base}/stories/${encodeURIComponent(s.slug)}/</link>\n    <guid isPermaLink="true">${base}/stories/${encodeURIComponent(s.slug)}/</guid>\n    <description>${escXml(s.summary||"")}</description>\n${pubDate?`    <pubDate>${escXml(pubDate)}</pubDate>\n`:""}    <category>${escXml(s.category||s.theme||"Travel Notes")}</category>\n${media?`    <media:content url="${escXml(media)}" medium="image" type="image/jpeg"/>\n`:""}  </item>`;
+      const pubDate=rssDate(s);const media=heroUrl(s);const body=contentEncoded(s);
+      return `  <item>\n    <title>${escXml(s.title)}</title>\n    <link>${base}/stories/${encodeURIComponent(s.slug)}/</link>\n    <guid isPermaLink="true">${base}/stories/${encodeURIComponent(s.slug)}/</guid>\n    <description>${escXml(s.summary||"")}</description>\n${pubDate?`    <pubDate>${escXml(pubDate)}</pubDate>\n`:""}    <category>${escXml(s.category||s.theme||"Travel Notes")}</category>\n${media?`    <media:content url="${escXml(media)}" medium="image" type="image/jpeg"/>\n`:""}${body?`    <content:encoded><![CDATA[${body}]]></content:encoded>\n`:""}  </item>`;
     }).join("\n");
-    return `<?xml version="1.0" encoding="UTF-8"?>\n<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/">\n  <channel>\n    <title>${escXml(c.site?.siteTitle||c.site?.ownerName||"Photo Blog")}</title>\n    <link>${base}/</link>\n    <description>${escXml(c.site?.description||"")}</description>\n    <language>en</language>\n    <lastBuildDate>${now}</lastBuildDate>\n    <atom:link href="${base}/feed.xml" rel="self" type="application/rss+xml"/>\n${items}\n  </channel>\n</rss>\n`;
+    return `<?xml version="1.0" encoding="UTF-8"?>\n<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/" xmlns:content="http://purl.org/rss/1.0/modules/content/">\n  <channel>\n    <title>${escXml(c.site?.siteTitle||c.site?.ownerName||"Photo Blog")}</title>\n    <link>${base}/</link>\n    <description>${escXml(c.site?.description||"")}</description>\n    <language>en</language>\n    <lastBuildDate>${now}</lastBuildDate>\n    <atom:link href="${base}/feed.xml" rel="self" type="application/rss+xml"/>\n${items}\n  </channel>\n</rss>\n`;
   }
   function escXml(value){return String(value??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
   function escapeAttr(value){return String(value||"").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;");}

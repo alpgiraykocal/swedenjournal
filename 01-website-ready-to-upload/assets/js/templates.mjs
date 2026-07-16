@@ -447,22 +447,52 @@ export function feedXml(data, now = new Date().toUTCString()) {
     const rel = hero?.variants?.full?.jpeg || hero?.src;
     return rel ? `${base}/${String(rel).replace(/^\/+/, "")}` : "";
   };
+  // Full story body as self-contained HTML for <content:encoded> (full-text RSS). Images
+  // use absolute URLs (the feed renders off-site) and a medium variant to stay light.
+  // Wrapped in CDATA by the caller, so the "]]>" sequence is escaped defensively.
+  // MIRRORED byte-for-byte in editor.js rssXml() — keep the two in lockstep.
+  const contentEncoded = (s) => {
+    const imgTag = (id) => {
+      const p = photosById.get(id);
+      if (!p) return "";
+      const rel = p.variants?.medium?.jpeg || p.variants?.full?.jpeg || p.src;
+      return rel ? `<img src="${base}/${String(rel).replace(/^\/+/, "")}" alt="${esc(p.alt || "")}"/>` : "";
+    };
+    const html = (s.body || []).map((b) => {
+      if (b.type === "image" || b.type === "panorama") {
+        const img = imgTag(b.photoId);
+        if (!img) return "";
+        const cap = b.caption || photosById.get(b.photoId)?.caption || "";
+        return `<figure>${img}${cap ? `<figcaption>${esc(cap)}</figcaption>` : ""}</figure>`;
+      }
+      if (b.type === "image-pair") {
+        const imgs = (b.photoIds || []).map(imgTag).filter(Boolean).join("");
+        if (!imgs) return "";
+        return `<figure>${imgs}${b.caption ? `<figcaption>${esc(b.caption)}</figcaption>` : ""}</figure>`;
+      }
+      if (b.type === "heading") return `<h2>${esc(b.text || "")}</h2>`;
+      if (b.type === "quote") return `<blockquote><p>${esc(b.text || "")}</p></blockquote>`;
+      return `<p>${esc(b.text || "")}</p>`;
+    }).join("");
+    return html.replace(/]]>/g, "]]]]><![CDATA[>");
+  };
   const items = (data.stories || [])
     .filter((s) => s.title && s.slug)
     .map((s) => {
       const pubDate = rssDate(s);
       const media = heroUrl(s);
+      const body = contentEncoded(s);
       return `  <item>
     <title>${escX(s.title)}</title>
     <link>${base}/stories/${encodeURIComponent(s.slug)}/</link>
     <guid isPermaLink="true">${base}/stories/${encodeURIComponent(s.slug)}/</guid>
     <description>${escX(s.summary || "")}</description>
 ${pubDate ? `    <pubDate>${escX(pubDate)}</pubDate>\n` : ""}    <category>${escX(s.category || s.theme || "Travel Notes")}</category>
-${media ? `    <media:content url="${escX(media)}" medium="image" type="image/jpeg"/>\n` : ""}  </item>`;
+${media ? `    <media:content url="${escX(media)}" medium="image" type="image/jpeg"/>\n` : ""}${body ? `    <content:encoded><![CDATA[${body}]]></content:encoded>\n` : ""}  </item>`;
     })
     .join("\n");
   return `<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>${escX(data.site?.siteTitle || data.site?.ownerName || "Photo Blog")}</title>
     <link>${base}/</link>
