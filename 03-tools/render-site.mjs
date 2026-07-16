@@ -9,9 +9,9 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
-  setContext, photos, photo, storyPhotos, sortPhotos, photoStoryMap, fullVariantDims,
+  setContext, photos, photo, storyPhotos, sortPhotos, photoStoryMap, photoCollectionMap, fullVariantDims,
   header, footer, homeMain, galleryMain, storiesMain, aboutMain, atlasMain, storyMain, legacyStoryMain, notFoundMain, photoMain, photoTitleCore,
-  collections, collectionPhotos, collectionsMain, collectionMain,
+  collections, collectionPhotos, liveCollections, collectionsMain, collectionMain,
   websiteLdObject, imageGalleryLdObject, personLdObject, articleLdObject, photoLdObject,
   breadcrumbLdObject, storiesLdObject, atlasLdObject, collectionsLdObject, collectionLdObject,
 } from "../01-website-ready-to-upload/assets/js/templates.mjs";
@@ -137,12 +137,19 @@ function page(rel, { pfx, active, mainHtml, headLd = "", hydrate = null }) {
 // Gallery hydration data is large (all photos) and only needed for the lightbox
 // (user-triggered) — write it to a separate cacheable file fetched lazily instead
 // of inlining ~40KB into the document. Story pages keep tiny inline data.
-// Enrich each gallery photo with the story it belongs to (if any) so the
-// lightbox can offer a "From the story: …" link without loading site-content.
+// Enrich each gallery photo with the story and/or series it belongs to so the
+// lightbox can offer "From the story: …" / "In series: …" links without loading
+// site-content. (EXIF already rides along — the photo objects carry p.exif.)
 const photoStories = photoStoryMap(data);
+const photoCols = photoCollectionMap(data);
 const galleryPhotos = photos(data).map((p) => {
   const st = photoStories.get(p.id);
-  return st ? { ...p, story: { slug: st.slug, title: st.title } } : p;
+  const cl = photoCols.get(p.id);
+  if (!st && !cl) return p;
+  const out = { ...p };
+  if (st) out.story = { slug: st.slug, title: st.title };
+  if (cl) out.series = { slug: cl.slug, title: cl.title };
+  return out;
 });
 fs.writeFileSync(path.join(websiteDir, "assets/data/gallery.json"), JSON.stringify({ photos: galleryPhotos }));
 
@@ -230,6 +237,21 @@ n += page("series/index.html", {
   mainHtml: () => collectionsMain(data),
   headLd: ld(collectionsLdObject(data)) + ld(crumbs({ name: "Home", path: "" }, { name: "Series", path: "series/" })),
 });
+// The series-index shell ships a generic icon og:image; point it at the first
+// collection's cover so social/search cards show a real photograph (+ width/alt).
+{
+  const cover = collectionPhotos(data, liveCollections(data)[0] || {})[0];
+  const file = path.join(websiteDir, "series/index.html");
+  if (cover && fs.existsSync(file)) {
+    const img = encAttr(`${base}/${String(cover.variants?.full?.jpeg || cover.src || "").replace(/^\/+/, "")}`);
+    let html = fs.readFileSync(file, "utf8");
+    html = html
+      .replace(/(<meta property="og:image" content=")[^"]*(">)/, `$1${img}$2`)
+      .replace(/(<meta name="twitter:image" content=")[^"]*(">)/, `$1${img}$2`);
+    html = injectOgImageMeta(html, cover);
+    fs.writeFileSync(file, html);
+  }
+}
 function collectionShell(col) {
   const cover = collectionPhotos(data, col)[0];
   const title = encAttr(`${col.title || "Series"} — ${data.site?.siteTitle || data.site?.ownerName || "Photo Blog"}`);

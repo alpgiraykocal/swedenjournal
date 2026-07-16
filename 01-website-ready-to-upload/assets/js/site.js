@@ -2,9 +2,9 @@ import {
   setContext, esc, photos, photo, imgPath, metaText, variant, srcset, responsiveImage,
   sortPhotos, storyPhotos, storyHref, photoHref, absoluteUrl, root, header, footer,
   homeMain, galleryMain, storiesMain, aboutMain, atlasMain, storyMain, legacyStoryMain, photoMain, photoTitleCore,
-  collections, collectionPhotos, collectionsMain, collectionMain,
+  collections, collectionPhotos, collectionsMain, collectionMain, collectionHref, photoExifChips,
   websiteLdObject, imageGalleryLdObject, personLdObject, articleLdObject, photoLdObject, collectionsLdObject, collectionLdObject, fullVariantDims,
-} from "./templates.mjs?v=10982b2194";
+} from "./templates.mjs?v=039e96b0f6";
 
 // Cache-bust the runtime content fetches. /assets/data/*.json is served with a long
 // edge cache (the host ignores _headers), so without a content-versioned URL a freshly
@@ -648,13 +648,15 @@ function bindGalleryControls(data, list){
 function bindLightbox(data, getVisiblePhotos){
   const rootEl = $("#lightboxRoot");
   if(!rootEl) return;
-  rootEl.innerHTML = `<div class="lightbox" role="dialog" aria-modal="true" aria-labelledby="lightboxTitle" hidden><button class="lightbox-close" type="button" aria-label="Close photo">×</button><button class="lightbox-nav lightbox-prev" type="button" aria-label="Previous photo">‹</button><button class="lightbox-nav lightbox-next" type="button" aria-label="Next photo">›</button><div class="lightbox-media"></div><div class="lightbox-copy"><p class="eyebrow lightbox-meta"></p><h2 id="lightboxTitle"></h2><p class="muted lightbox-caption"></p><a class="lightbox-story-link" hidden></a><a class="lightbox-page-link" hidden></a><p class="lightbox-position" aria-live="polite"></p><div class="share-actions lightbox-actions"><button class="share-action" type="button" data-lightbox-share>Share</button><button class="share-action" type="button" data-lightbox-copy data-default-label="Copy link">Copy link</button></div><p class="share-status" aria-live="polite"></p></div></div>`;
+  rootEl.innerHTML = `<div class="lightbox" role="dialog" aria-modal="true" aria-labelledby="lightboxTitle" hidden><button class="lightbox-close" type="button" aria-label="Close photo">×</button><button class="lightbox-nav lightbox-prev" type="button" aria-label="Previous photo">‹</button><button class="lightbox-nav lightbox-next" type="button" aria-label="Next photo">›</button><div class="lightbox-media"></div><div class="lightbox-copy"><p class="eyebrow lightbox-meta"></p><h2 id="lightboxTitle"></h2><p class="muted lightbox-caption"></p><p class="lightbox-exif photo-exif" hidden></p><a class="lightbox-story-link" hidden></a><a class="lightbox-series-link" hidden></a><a class="lightbox-page-link" hidden></a><p class="lightbox-position" aria-live="polite"></p><div class="share-actions lightbox-actions"><button class="share-action" type="button" data-lightbox-share>Share</button><button class="share-action" type="button" data-lightbox-copy data-default-label="Copy link">Copy link</button></div><p class="share-status" aria-live="polite"></p></div></div>`;
   const box = $(".lightbox", rootEl);
   const media = $(".lightbox-media", rootEl);
   const title = $("#lightboxTitle", rootEl);
   const meta = $(".lightbox-meta", rootEl);
   const caption = $(".lightbox-caption", rootEl);
   const storyLink = $(".lightbox-story-link", rootEl);
+  const seriesLink = $(".lightbox-series-link", rootEl);
+  const exifEl = $(".lightbox-exif", rootEl);
   const pageLink = $(".lightbox-page-link", rootEl);
   const status = $(".share-status", rootEl);
   const share = $("[data-lightbox-share]", rootEl);
@@ -716,6 +718,11 @@ function bindLightbox(data, getVisiblePhotos){
     title.textContent = p.title || "";
     meta.textContent = metaText([p.location,p.date,p.theme]);
     caption.textContent = p.caption || "";
+    if(exifEl){
+      const chips = photoExifChips(p);
+      exifEl.innerHTML = chips;
+      exifEl.hidden = !chips;
+    }
     if(storyLink){
       if(p.story && p.story.slug){
         storyLink.href = storyHref(p.story.slug);
@@ -724,6 +731,16 @@ function bindLightbox(data, getVisiblePhotos){
       }else{
         storyLink.hidden = true;
         storyLink.removeAttribute("href");
+      }
+    }
+    if(seriesLink){
+      if(p.series && p.series.slug){
+        seriesLink.href = collectionHref(p.series.slug);
+        seriesLink.innerHTML = `In series: ${esc(p.series.title)} <span aria-hidden="true">→</span>`;
+        seriesLink.hidden = false;
+      }else{
+        seriesLink.hidden = true;
+        seriesLink.removeAttribute("href");
       }
     }
     if(pageLink){

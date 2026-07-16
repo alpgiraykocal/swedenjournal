@@ -252,6 +252,49 @@ function checkPhotoShells(baseDir) {
   }
 }
 
+// Series (photo collections): the index and one page per non-empty collection must
+// exist with the right shell paths, canonical, JSON-LD, and sitemap entries — mirrors
+// the guards on story/photo pages so the collections feature can't silently degrade.
+function checkCollections(baseDir) {
+  const dataPath = path.join(baseDir, "assets", "data", "site-content.json");
+  const content = exists(dataPath) ? readJson(dataPath) : null;
+  if (!content) return;
+  const photoIds = new Set((content.photos || []).map((p) => p.id));
+  const cols = (content.collections || []).filter((c) => c.slug && c.title && (c.photoIds || []).some((id) => photoIds.has(id)));
+  unique(cols.map((c) => c.slug), "collection slug");
+
+  const indexPath = path.join(baseDir, "series", "index.html");
+  checkFile(indexPath, "series/index.html");
+  if (exists(indexPath)) {
+    const html = read(indexPath);
+    if (!html.includes('rel="canonical" href="https://sweden-journal.com/series/"')) fail("series/index.html has wrong canonical");
+    if (!html.includes('data-page="series"')) fail('series/index.html missing data-page="series"');
+    if (cols.length && !html.includes('"@type":"CollectionPage"')) fail("series/index.html missing CollectionPage JSON-LD");
+  }
+
+  for (const col of cols) {
+    const pagePath = path.join(baseDir, "series", col.slug, "index.html");
+    checkFile(pagePath, `series/${col.slug}/index.html`);
+    if (!exists(pagePath)) continue;
+    const html = read(pagePath);
+    const label = path.relative(root, pagePath);
+    if (!html.includes('href="../../assets/css/site.css')) fail(`${label} has wrong stylesheet path`);
+    if (!html.includes('window.__DATA_PATH__="../../assets/data/site-content.json"')) fail(`${label} has wrong data path`);
+    if (!html.includes('data-page="collection"')) fail(`${label} missing data-page="collection"`);
+    if (!html.includes(`rel="canonical" href="https://sweden-journal.com/series/${encodeURIComponent(col.slug)}/"`)) fail(`${label} has wrong canonical`);
+    if (!html.includes('"@type":"ImageGallery"')) fail(`${label} missing ImageGallery JSON-LD`);
+  }
+
+  const sitemapPath = path.join(baseDir, "sitemap.xml");
+  if (exists(sitemapPath)) {
+    const sm = read(sitemapPath);
+    if (cols.length && !/<loc>https:\/\/[^<]+\/series\/<\/loc>/.test(sm)) fail("sitemap.xml missing /series/ index URL");
+    for (const col of cols) {
+      if (!sm.includes(`<loc>https://sweden-journal.com/series/${encodeURIComponent(col.slug)}/</loc>`)) fail(`sitemap.xml missing series URL: ${col.slug}`);
+    }
+  }
+}
+
 // Byte-level parity: the sitemap/feed on disk must be exactly what the canonical
 // builders in templates.mjs produce for the current content. The editor mirrors
 // those builders by hand — this check is what makes that mirror trustworthy.
@@ -421,6 +464,7 @@ checkSitemap(websiteDir);
 checkRss(websiteDir);
 checkStoryShells(websiteDir);
 checkPhotoShells(websiteDir);
+checkCollections(websiteDir);
 checkGeneratedXmlParity(websiteDir);
 checkFallbackFiles(websiteDir);
 checkLegacyStoryShell(websiteDir);
@@ -441,6 +485,7 @@ if (fs.existsSync(packageDir)) {
   checkRss(packageDir);
   checkStoryShells(packageDir);
   checkPhotoShells(packageDir);
+  checkCollections(packageDir);
   checkGeneratedXmlParity(packageDir);
   checkFallbackFiles(packageDir);
   checkLegacyStoryShell(packageDir);

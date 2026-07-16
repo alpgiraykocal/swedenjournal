@@ -524,11 +524,15 @@ body[data-page="gallery"] .photo-card[hidden]{display:none!important}
 }
 .lightbox-prev{left:18px}
 .lightbox-next{right:18px}
-.lightbox-story-link{display:inline-flex;align-items:center;gap:6px;min-height:44px;margin-top:10px;color:#9ec4cf;font-size:14px;font-weight:650}
-.lightbox-story-link[hidden]{display:none}
-.lightbox-story-link span{transition:transform .28s var(--ease)}
-.lightbox-story-link:hover{text-decoration:underline}
-.lightbox-story-link:hover span{transform:translateX(3px)}
+.lightbox-story-link,.lightbox-series-link{display:inline-flex;align-items:center;gap:6px;min-height:44px;margin-top:10px;color:#9ec4cf;font-size:14px;font-weight:650}
+.lightbox-story-link[hidden],.lightbox-series-link[hidden]{display:none}
+.lightbox-story-link span,.lightbox-series-link span{transition:transform .28s var(--ease)}
+.lightbox-story-link:hover,.lightbox-series-link:hover{text-decoration:underline}
+.lightbox-story-link:hover span,.lightbox-series-link:hover span{transform:translateX(3px)}
+.lightbox-series-link{margin-top:2px}
+.lightbox-exif{margin-top:12px}
+.lightbox-exif[hidden]{display:none}
+.lightbox-exif span{border-color:rgba(255,255,255,.16);color:rgba(255,255,255,.72)}
 .lightbox-position{margin:12px 0 0;color:rgba(255,248,239,.62);font-size:13px;font-variant-numeric:tabular-nums}
 .lightbox .share-action{background:rgba(255,253,248,.1);border-color:rgba(255,253,248,.22);color:var(--paper)}
 .lightbox .share-action:hover{background:rgba(255,253,248,.18);color:var(--paper)}
@@ -947,6 +951,11 @@ body[data-page="gallery"] .photo-card[hidden]{display:none!important}
 .photo-page-hero .intro{font-style:normal}
 .photo-page-tags{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0 0}
 .photo-page-tags span{border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:12px;color:var(--muted)}
+.series-strip{padding-top:0}
+.series-chip-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:4px}
+.series-chip{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border:1px solid var(--line);border-radius:999px;font-size:14px;font-weight:600;transition:border-color .2s var(--ease),background .2s var(--ease)}
+.series-chip span{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.series-chip:hover{border-color:currentColor;background:var(--surface,rgba(127,127,127,.06))}
 .photo-exif{margin-top:12px}
 .photo-exif span{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11px;letter-spacing:.02em;background:var(--surface,rgba(127,127,127,.06))}
 .photo-page-back{margin:20px 0 0}

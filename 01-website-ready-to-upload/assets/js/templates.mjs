@@ -104,6 +104,20 @@ export function collectionPhotos(data, col) {
   return (col?.photoIds || []).map((id) => byId.get(id)).filter(Boolean);
 }
 export const liveCollections = (data) => collections(data).filter((c) => c.slug && c.title && collectionPhotos(data, c).length);
+// Reverse index photoId -> {slug,title} of the collection using it (first wins if a
+// photo is in several). Lets a photo / lightbox link back to its series. Memoized.
+const _photoCollectionCache = new WeakMap();
+export function photoCollectionMap(data) {
+  if (_photoCollectionCache.has(data)) return _photoCollectionCache.get(data);
+  const map = new Map();
+  for (const c of collections(data)) {
+    if (!c.slug || !c.title) continue;
+    for (const id of (c.photoIds || [])) { if (id && !map.has(id)) map.set(id, { slug: c.slug, title: c.title }); }
+  }
+  _photoCollectionCache.set(data, map);
+  return map;
+}
+export const photoCollection = (data, id) => photoCollectionMap(data).get(id) || null;
 export function storyShareUrl(data, story) {
   const base = String(data.site?.baseUrl || "").replace(/\/+$/, "");
   if (base) return `${base}/stories/${encodeURIComponent(story.slug)}/`;
@@ -248,7 +262,9 @@ export function homeMain(data) {
 export function galleryMain(data) {
   const g = data.gallery || {};
   const list = sortPhotos(photos(data));
+  const series = liveCollections(data);
   return `<main><section class="hero container"><p class="eyebrow">${esc(g.eyebrow)}</p><h1 class="headline">${esc(g.headline)}</h1><p class="intro">${esc(g.intro)}</p></section>
+  ${series.length ? `<section class="section series-strip"><div class="container"><div class="section-head"><div><p class="eyebrow">Browse by series</p><h2>Follow a thread</h2></div><a class="text-link" href="${root()}series/index.html">All series</a></div><div class="series-chip-row">${series.map((c) => `<a class="series-chip" href="${collectionHref(c.slug)}">${esc(c.title)}<span>${collectionPhotos(data, c).length}</span></a>`).join("")}</div></div></section>` : ""}
   <section class="section" aria-labelledby="galleryHeading"><div class="container"><h2 id="galleryHeading" class="visually-hidden">Photographs</h2><div class="gallery-toolbar"><div><div class="filters" role="group" aria-label="Gallery filters">${(g.filters || ["All"]).map((f, i) => `<button class="filter ${i === 0 ? "active" : ""}" data-filter="${esc(f)}" aria-pressed="${i === 0 ? "true" : "false"}">${esc(f)}</button>`).join("")}</div><p class="gallery-count" id="galleryCount" aria-live="polite">${list.length} photographs</p></div><button class="filter-reset" type="button">Reset</button></div><div class="gallery-empty" id="galleryEmpty" hidden><h2>No photographs found.</h2><p class="muted">Reset the filters to return to the full edit.</p></div><div class="gallery-grid" id="galleryGrid">${list.map((p, i) => photoFigure(p, { priority: i < 2, eager: i < 12, interactive: true, story: photoStory(data, p.id) })).join("")}</div></div></section><div id="lightboxRoot"></div></main>`;
 }
 export function storiesMain(data) {
@@ -351,6 +367,8 @@ export function photoMain(data, p) {
   const next = idx >= 0 && idx < list.length - 1 ? list[idx + 1] : null;
   const chips = [p.location, p.date, p.season, p.category].filter(Boolean).map((x) => `<span>${esc(x)}</span>`).join("");
   const storyLink = st ? `<a class="story-map-link" href="${storyHref(st.slug)}">From the story: ${esc(st.title)} <span aria-hidden="true">→</span></a>` : "";
+  const col = photoCollection(data, p.id);
+  const collectionLink = col ? `<a class="story-map-link" href="${collectionHref(col.slug)}">In series: ${esc(col.title)} <span aria-hidden="true">→</span></a>` : "";
   const related = list.filter((x) => x.id !== p.id && x.category && x.category === p.category).slice(0, 3);
   const walkLink = (ph, dir, label) => ph
     ? `<a class="story-walk-link story-walk-${dir}" href="${photoHref(ph.id)}"><span class="story-walk-dir">${label}</span><span class="story-walk-title">${esc(ph.title)}</span></a>`
@@ -358,7 +376,7 @@ export function photoMain(data, p) {
   const walk = (prev || next)
     ? `<nav class="story-walk container" aria-label="More photographs"><p class="eyebrow story-walk-eyebrow">More from the gallery</p><div class="story-walk-row">${walkLink(prev, "prev", "Previous")}${walkLink(next, "next", "Next")}</div></nav>`
     : "";
-  return `<main><section class="story-hero container photo-page-hero"><div class="story-meta" role="group" aria-label="Photograph details">${chips}</div><h1 class="headline">${esc(p.title)}</h1>${p.caption ? `<p class="intro">${esc(p.caption)}</p>` : ""}${storyLink}${responsiveImage(p, { priority: true, sizes: "(max-width: 1220px) calc(100vw - 40px), 1180px", fallbackSize: "full", viewTransitionName: p.id ? `photo-${p.id}` : undefined })}${photoExifChips(p) ? `<p class="photo-page-tags photo-exif" aria-label="Camera and exposure settings">${photoExifChips(p)}</p>` : ""}${(p.tags || []).length ? `<p class="photo-page-tags">${(p.tags || []).slice(0, 6).map((t) => `<span>${esc(t)}</span>`).join("")}</p>` : ""}<p class="photo-page-back"><a class="text-link" href="${root()}gallery/index.html">Back to the gallery</a></p></section>${related.length ? `<section class="section related-section"><div class="container related-container"><div class="section-head"><div><p class="eyebrow">Same collection</p><h2>Related photographs</h2></div></div><div class="gallery-grid selected-grid related-photos">${related.map((rp) => `<a class="photo-page-related" href="${photoHref(rp.id)}">${photoFigure(rp, { sizes: "(max-width: 560px) calc(100vw - 24px), 280px" })}</a>`).join("")}</div></div></section>` : ""}${photoSharePanel(data, p)}${walk}</main>`;
+  return `<main><section class="story-hero container photo-page-hero"><div class="story-meta" role="group" aria-label="Photograph details">${chips}</div><h1 class="headline">${esc(p.title)}</h1>${p.caption ? `<p class="intro">${esc(p.caption)}</p>` : ""}${storyLink}${collectionLink}${responsiveImage(p, { priority: true, sizes: "(max-width: 1220px) calc(100vw - 40px), 1180px", fallbackSize: "full", viewTransitionName: p.id ? `photo-${p.id}` : undefined })}${photoExifChips(p) ? `<p class="photo-page-tags photo-exif" aria-label="Camera and exposure settings">${photoExifChips(p)}</p>` : ""}${(p.tags || []).length ? `<p class="photo-page-tags">${(p.tags || []).slice(0, 6).map((t) => `<span>${esc(t)}</span>`).join("")}</p>` : ""}<p class="photo-page-back"><a class="text-link" href="${root()}gallery/index.html">Back to the gallery</a></p></section>${related.length ? `<section class="section related-section"><div class="container related-container"><div class="section-head"><div><p class="eyebrow">Same collection</p><h2>Related photographs</h2></div></div><div class="gallery-grid selected-grid related-photos">${related.map((rp) => `<a class="photo-page-related" href="${photoHref(rp.id)}">${photoFigure(rp, { sizes: "(max-width: 560px) calc(100vw - 24px), 280px" })}</a>`).join("")}</div></div></section>` : ""}${photoSharePanel(data, p)}${walk}</main>`;
 }
 export function legacyStoryMain(data) {
   return `<main class="container section"><p class="eyebrow">Stories</p><h1 class="headline">${esc(data.storiesPage?.headline || "Stories")}</h1><p class="intro">${esc(data.storiesPage?.intro || data.site?.description || "")}</p><p><a class="text-link" href="${root()}stories/index.html">Return to stories</a></p></main>`;
@@ -419,6 +437,10 @@ export function articleLdObject(data, story, heroPhoto) {
 }
 export function photoLdObject(data, p) {
   const st = photoStory(data, p.id);
+  const col = photoCollection(data, p.id);
+  const partOf = [];
+  if (st) partOf.push({ "@type": "Article", headline: st.title || "", url: absoluteUrl(data, "stories/" + encodeURIComponent(st.slug) + "/") });
+  if (col) partOf.push({ "@type": "CollectionPage", name: col.title || "", url: absoluteUrl(data, "series/" + encodeURIComponent(col.slug) + "/") });
   const dims = fullVariantDims(p);
   return {
     "@context": "https://schema.org",
@@ -435,7 +457,7 @@ export function photoLdObject(data, p) {
     exifData: exifDataLd(p),
     contentLocation: p.location ? { "@type": "Place", name: p.location } : undefined,
     ...imageRightsFields(data),
-    isPartOf: st ? { "@type": "Article", headline: st.title || "", url: absoluteUrl(data, "stories/" + encodeURIComponent(st.slug) + "/") } : undefined,
+    isPartOf: partOf.length ? (partOf.length === 1 ? partOf[0] : partOf) : undefined,
     url: absoluteUrl(data, "photos/" + encodeURIComponent(p.id) + "/"),
   };
 }
