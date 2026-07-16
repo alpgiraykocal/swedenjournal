@@ -5,7 +5,7 @@ import {
   collections, collectionPhotos, collectionsMain, collectionMain, collectionHref, photoExifChips,
   photoStory, photoCollection,
   websiteLdObject, imageGalleryLdObject, personLdObject, articleLdObject, photoLdObject, collectionsLdObject, collectionLdObject, fullVariantDims,
-} from "./templates.mjs?v=1261cf4c6b";
+} from "./templates.mjs?v=d141dcbf25";
 
 // Cache-bust the runtime content fetches. /assets/data/*.json is served with a long
 // edge cache (the host ignores _headers), so without a content-versioned URL a freshly
@@ -236,12 +236,13 @@ function loadLeaflet(){
 }
 function placePopupHtml(s){
   const meta = metaText([s.location, s.date]);
+  const cta = s.kind === "photo" ? "View photograph" : "Read story";
   return `<a class="map-popup" href="${esc(s.href)}">`
     + (s.thumb ? `<img src="${esc(s.thumb)}" alt="" loading="lazy">` : "")
     + `<span class="map-popup-body"><strong>${esc(s.title)}</strong>`
     + (meta ? `<span class="map-popup-meta">${esc(meta)}</span>` : "")
     + (s.summary ? `<span class="map-popup-snippet">${esc(s.summary)}</span>` : "")
-    + `<span class="map-popup-cta">Read story &rarr;</span></span></a>`;
+    + `<span class="map-popup-cta">${cta} &rarr;</span></span></a>`;
 }
 function initMap(elId, dataId){
   const el = document.getElementById(elId);
@@ -266,10 +267,15 @@ function initMap(elId, dataId){
     window.addEventListener("themechange", () => tiles.setUrl(tileUrl(themeDark())));
     const bySlug = new Map();
     const markers = stories.map(s => {
-      const icon = L.divIcon({ className:"map-pin", html:`<img src="${esc(s.thumb)}" alt="${esc(s.alt||s.title)}">`, iconSize:[52,52], iconAnchor:[26,26] });
-      const m = L.marker([s.lat, s.lng], { icon, title:s.title, alt:s.title, riseOnHover:true, keyboard:true }).addTo(map);
+      // Photograph pins (kind:"photo") render smaller and sit under story pins, so the
+      // essays stay the map's visual anchors even where shots cluster around them.
+      const isPhoto = s.kind === "photo";
+      const size = isPhoto ? 34 : 52;
+      const icon = L.divIcon({ className:`map-pin${isPhoto ? " map-pin--photo" : ""}`, html:`<img src="${esc(s.thumb)}" alt="${esc(s.alt||s.title)}">`, iconSize:[size,size], iconAnchor:[size/2,size/2] });
+      const m = L.marker([s.lat, s.lng], { icon, title:s.title, alt:s.title, riseOnHover:true, keyboard:true, zIndexOffset:isPhoto ? 0 : 200 }).addTo(map);
       m._slug = s.slug;
-      m.bindTooltip(s.title, { direction:"top", offset:[0,-28] });
+      m._baseZ = isPhoto ? 0 : 200;
+      m.bindTooltip(s.title, { direction:"top", offset:[0,-(size/2 + 2)] });
       m.bindPopup(placePopupHtml(s), { className:"map-popup-wrap", minWidth:230, maxWidth:260, autoPanPadding:[28,28] });
       if(s.slug) bySlug.set(s.slug, m);
       return m;
@@ -321,9 +327,9 @@ function initMap(elId, dataId){
     const setActive = (slug) => {
       cards.forEach(c => c.classList.toggle("is-active", !!slug && c.dataset.placeSlug === slug));
       markers.forEach(m => {
-        const ic = m.getElement && m.getElement(), on = m._slug === slug;
+        const ic = m.getElement && m.getElement(), on = !!slug && m._slug === slug;
         if(ic) ic.classList.toggle("map-pin--active", on);
-        if(m.setZIndexOffset) m.setZIndexOffset(on ? 1000 : 0); // lift the active pin above any it overlaps
+        if(m.setZIndexOffset) m.setZIndexOffset(on ? 1000 : (m._baseZ || 0)); // lift the active pin; restore the story-over-photo stacking after
       });
     };
     cards.forEach(card => {
@@ -548,6 +554,23 @@ function initGalleryMasonry(){
     if(!(img.complete && img.naturalWidth)) img.addEventListener("load", relayout, {once:true});
   });
 }
+// Public search: word-AND match against a card's visible text plus its data attributes
+// (tags/category live there, not in the text). Empty query matches everything.
+function cardMatchesQuery(card, queryText){
+  if(!queryText) return true;
+  const hay = (card.textContent + " " + (card.dataset.tags || "") + " " + (card.dataset.category || "")).toLowerCase();
+  return queryText.split(/\s+/).filter(Boolean).every(word => hay.includes(word));
+}
+function bindSearchInput(input, onQuery){
+  if(!input) return;
+  let t = 0;
+  input.addEventListener("input", () => {
+    clearTimeout(t);
+    t = setTimeout(() => onQuery(input.value), 120);
+  });
+  // The native clear (x) fires "search" without a trailing input event in some engines.
+  input.addEventListener("search", () => onQuery(input.value));
+}
 function bindStoryFilters(){
   const scope = $(".stories-section") || document;
   const cards = [...scope.querySelectorAll("[data-story-card]")];
@@ -556,26 +579,30 @@ function bindStoryFilters(){
   const normalize = value => String(value || "").trim().toLowerCase();
   const reset = $(".story-reset");
   const featuredSection = $(".featured-story-section");
+  const searchInput = $("#storySearch");
+  let activeCategory = "All";
+  let activeQuery = "";
   const apply = (category, syncUrl=true) => {
-    const active = normalize(category || "All");
+    activeCategory = category || "All";
+    const active = normalize(activeCategory);
     let visible = 0;
     cards.forEach(card => {
-      const show = active === "all" || normalize(card.dataset.category) === active;
+      const show = (active === "all" || normalize(card.dataset.category) === active) && cardMatchesQuery(card, activeQuery);
       card.hidden = !show;
       if(show) visible += 1;
     });
     if(count) count.textContent = `${visible} of ${cards.length} stories`;
     if(empty) empty.hidden = visible !== 0;
-    if(reset) reset.disabled = active === "all";
+    if(reset) reset.disabled = active === "all" && !activeQuery;
     // The "Featured story" highlight only makes sense in the browse-all view —
-    // hide it when a specific category is active so the filter result is clean.
-    if(featuredSection) featuredSection.hidden = active !== "all";
+    // hide it when a category or a search query is active so the result is clean.
+    if(featuredSection) featuredSection.hidden = active !== "all" || !!activeQuery;
     document.querySelectorAll("[data-story-filter]").forEach(btn => {
       const selected = normalize(btn.dataset.storyFilter) === active;
       btn.classList.toggle("active", selected);
       btn.setAttribute("aria-pressed", selected ? "true" : "false");
     });
-    if(syncUrl) setUrlParam("category", category || "All");
+    if(syncUrl){ setUrlParam("category", activeCategory); setUrlParam("q", activeQuery || null); }
   };
   // Filtering shows/hides the tall featured block ABOVE the toolbar, which would
   // yank the results up (or down) and out of view. Keep the toolbar visually
@@ -588,7 +615,10 @@ function bindStoryFilters(){
   };
   document.querySelectorAll("[data-story-filter]").forEach(btn => btn.addEventListener("click", () => withToolbarAnchor(() => apply(btn.dataset.storyFilter))));
   bindFilterKeyboard(scope.querySelector(".filters"));
+  bindSearchInput(searchInput, value => { activeQuery = normalize(value); withToolbarAnchor(() => apply(activeCategory)); });
   reset?.addEventListener("click", () => {
+    activeQuery = "";
+    if(searchInput) searchInput.value = "";
     withToolbarAnchor(() => apply("All"));
     $("[data-story-filter]")?.focus();
   });
@@ -616,6 +646,8 @@ function bindStoryFilters(){
   document.querySelectorAll("[data-story-sort]").forEach(btn => btn.addEventListener("click", () => applySort(btn.dataset.storySort)));
   bindFilterKeyboard(scope.querySelector(".story-sort"));
   applySort(query().get("sort") === "oldest" ? "oldest" : "newest", false);
+  const initialQuery = query().get("q") || "";
+  if(initialQuery && searchInput){ searchInput.value = initialQuery; activeQuery = normalize(initialQuery); }
   const initialCategory = query().get("category") || "All";
   const hasInitialCategory = [...document.querySelectorAll("[data-story-filter]")].some(btn => normalize(btn.dataset.storyFilter) === normalize(initialCategory));
   apply(hasInitialCategory ? initialCategory : "All", !hasInitialCategory);
@@ -626,38 +658,45 @@ function bindGalleryControls(data, list){
   const reset = $(".filter-reset");
   const cards = [...document.querySelectorAll(".photo-card")];
   const normalize = value => String(value || "").trim().toLowerCase();
+  const searchInput = $("#gallerySearch");
   let activeFilter = "All";
+  let activeQuery = "";
   const visiblePhotos = () => cards.filter(card => !card.hidden).map(card => photos(data).find(item => item.id === card.dataset.photoId)).filter(Boolean);
   const update = (active, syncUrl=true) => {
     activeFilter = active || "All";
     const filter = normalize(active);
     let visible = 0;
     cards.forEach(card => {
-      const show = filter === "all" || normalize(card.dataset.category) === filter;
+      const show = (filter === "all" || normalize(card.dataset.category) === filter) && cardMatchesQuery(card, activeQuery);
       card.hidden = !show;
       if(show) visible += 1;
     });
-    if(count) count.textContent = filter === "all" ? `${visible} photographs` : `${visible} of ${list.length} photographs`;
+    if(count) count.textContent = filter === "all" && !activeQuery ? `${visible} photographs` : `${visible} of ${list.length} photographs`;
     if(empty) empty.hidden = visible !== 0;
-    if(reset) reset.disabled = filter === "all";
+    if(reset) reset.disabled = filter === "all" && !activeQuery;
     document.querySelectorAll(".filter").forEach(btn => {
       const selected = normalize(btn.dataset.filter) === filter;
       btn.classList.toggle("active", selected);
       btn.setAttribute("aria-pressed", selected ? "true" : "false");
     });
-    if(syncUrl) setUrlParam("filter", activeFilter);
+    if(syncUrl){ setUrlParam("filter", activeFilter); setUrlParam("q", activeQuery || null); }
     layoutGalleryMasonry();
   };
   document.querySelectorAll(".filter").forEach(btn => btn.addEventListener("click", () => {
     update(btn.dataset.filter || "All");
   }));
   bindFilterKeyboard(document.querySelector(".gallery-toolbar .filters"));
+  bindSearchInput(searchInput, value => { activeQuery = normalize(value); update(activeFilter); });
   reset?.addEventListener("click", () => {
     const first = $(".filter");
+    activeQuery = "";
+    if(searchInput) searchInput.value = "";
     update("All");
     first?.focus();
   });
   bindLightbox(data, visiblePhotos);
+  const initialQuery = query().get("q") || "";
+  if(initialQuery && searchInput){ searchInput.value = initialQuery; activeQuery = normalize(initialQuery); }
   const initialFilter = query().get("filter") || "All";
   const hasInitialFilter = [...document.querySelectorAll(".filter")].some(btn => normalize(btn.dataset.filter) === normalize(initialFilter));
   update(hasInitialFilter ? initialFilter : "All", !hasInitialFilter);

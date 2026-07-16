@@ -55,6 +55,18 @@ const clean = (obj) => {
   return out;
 };
 
+// GPS [deg, min, sec] + hemisphere ref -> signed decimal degrees (6 dp, matching the
+// editor's readExif rounding). Null when the triplet is absent or out of range.
+function gpsDecimal(arr, ref, negRef, max) {
+  if (!Array.isArray(arr) || !arr.length) return null;
+  const [d = 0, m = 0, s = 0] = arr.map(Number);
+  if (![d, m, s].every(Number.isFinite)) return null;
+  let val = d + m / 60 + s / 3600;
+  if (String(ref).toUpperCase() === negRef) val = -val;
+  if (!Number.isFinite(val) || Math.abs(val) > max) return null;
+  return Math.round(val * 1e6) / 1e6;
+}
+
 function extractExif(absFile) {
   const buf = fs.statSync(absFile) && fs.readFileSync(absFile);
   // sharp exposes the raw EXIF APP1 payload; exif-reader parses it into typed fields.
@@ -64,6 +76,9 @@ function extractExif(absFile) {
     try { parsed = exifReader(meta.exif); } catch { return null; }
     const img = parsed.Image || {};
     const photo = parsed.Photo || {};
+    const gpsInfo = parsed.GPSInfo || {};
+    const lat = gpsDecimal(gpsInfo.GPSLatitude, gpsInfo.GPSLatitudeRef, "S", 90);
+    const lng = gpsDecimal(gpsInfo.GPSLongitude, gpsInfo.GPSLongitudeRef, "W", 180);
     const iso = photo.ISOSpeedRatings ?? photo.PhotographicSensitivity ?? photo.ISO;
     const exif = clean({
       camera: cameraName(img.Make, img.Model),
@@ -74,6 +89,9 @@ function extractExif(absFile) {
       focalLength: Number.isFinite(Number(photo.FocalLength)) ? Math.round(Number(photo.FocalLength)) : "",
       focalLength35: Number.isFinite(Number(photo.FocalLengthIn35mmFilm)) ? Math.round(Number(photo.FocalLengthIn35mmFilm)) : "",
       shotAt: isoDate(photo.DateTimeOriginal || photo.DateTimeDigitized || img.DateTime),
+      // Capture location — feeds the atlas photo pins. Photos already carrying an
+      // exif block keep their old shape until re-extracted with --force.
+      gps: lat !== null && lng !== null && (lat || lng) ? { lat, lng } : "",
     });
     return Object.keys(exif).length ? exif : null;
   });

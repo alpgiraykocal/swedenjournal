@@ -456,6 +456,9 @@ function checkPublicRuntime(baseDir) {
     fail("Public Article JSON-LD should only publish machine-readable ISO dates");
   }
   if (!js.includes("setBackgroundInert")) fail("Lightbox should inert/aria-hide background content while open");
+  if (!js.includes('id="gallerySearch"') || !js.includes('id="storySearch"') || !js.includes("function cardMatchesQuery")) {
+    fail("Public search (gallery + stories inputs and the query matcher) is missing");
+  }
   if (!js.includes('robots:"noindex,follow"')) fail("Missing story-not-found noindex,follow metadata guard");
   if (!js.includes('path:"stories/"')) fail("Missing story-not-found canonical fallback to stories/");
   if (!js.includes("twitter:title") || !js.includes("twitter:image")) {

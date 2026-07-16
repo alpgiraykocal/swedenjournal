@@ -229,7 +229,7 @@
       entries.push(urlEntry({loc:`${base}/stories/${encodeURIComponent(s.slug)}/`,lastmod:machineDate(s.isoDate)||machineDate(s.date)||buildDay,images:imageTags(storyImgs(s))}));
     }
     for(const p of list.filter(p=>p.id&&p.title)){
-      entries.push(urlEntry({loc:`${base}/photos/${encodeURIComponent(p.id)}/`,lastmod:machineDate(p.date)||buildDay,images:imageTags([p])}));
+      entries.push(urlEntry({loc:`${base}/photos/${encodeURIComponent(p.id)}/`,lastmod:machineDate(p.date)||machineDate(p.exif?.shotAt)||buildDay,images:imageTags([p])}));
     }
     entries.push(urlEntry({loc:`${base}/series/`,lastmod:buildDay}));
     for(const col of (c.collections||[]).filter(x=>x.slug&&x.title)){
