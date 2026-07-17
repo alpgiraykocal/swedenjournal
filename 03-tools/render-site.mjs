@@ -9,7 +9,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
-  setContext, photos, photo, storyPhotos, sortPhotos, photoStoryMap, photoCollectionMap, fullVariantDims,
+  setContext, photos, photo, storyPhotos, photoStoryMap, photoCollectionMap, fullVariantDims,
   header, footer, homeMain, galleryMain, storiesMain, aboutMain, atlasMain, storyMain, legacyStoryMain, notFoundMain, photoMain, photoTitleCore,
   collections, collectionPhotos, liveCollections, collectionsMain, collectionMain,
   websiteLdObject, imageGalleryLdObject, personLdObject, articleLdObject, photoLdObject,

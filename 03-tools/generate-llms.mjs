@@ -12,7 +12,10 @@ const base = String(data.site?.baseUrl || "https://sweden-journal.com").replace(
 const owner = data.site?.ownerName || "Sweden Journal";
 const desc = (data.site?.description || "").replace(/\s+/g, " ").trim();
 const stories = (data.stories || []).filter((s) => s.slug && s.title);
-const collections = (data.collections || []).filter((c) => c.slug && c.title && (c.photoIds || []).length);
+// Same "live" rule as the build (render-site liveCollectionSlugs): a collection whose
+// photoIds all point at deleted photos gets no page, so it must not be linked here.
+const photoIds = new Set((data.photos || []).map((p) => p.id));
+const collections = (data.collections || []).filter((c) => c.slug && c.title && (c.photoIds || []).some((id) => photoIds.has(id)));
 
 const line = (label, url, note) => `- [${label}](${url})${note ? `: ${note}` : ""}`;
 const clip = (s, n) => { const t = String(s || "").replace(/\s+/g, " ").trim(); return t.length > n ? t.slice(0, t.lastIndexOf(" ", n)) + "…" : t; };
