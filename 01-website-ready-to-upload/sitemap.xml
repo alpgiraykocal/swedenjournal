@@ -46,6 +46,8 @@
     <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/at-the-foot-of-karnan-helsingborg.jpeg</image:loc></image:image>
     <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/climbing-the-terrace-steps-to-karnan.jpeg</image:loc></image:image>
     <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/the-terrace-staircase-below-karnan.jpeg</image:loc></image:image>
+    <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/rune-stone-at-rytterne.jpeg</image:loc></image:image>
+    <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/viking-memorial-stone-at-rytterne.jpeg</image:loc></image:image>
   </url>
   <url>
     <loc>https://sweden-journal.com/stories/</loc>
@@ -312,6 +314,16 @@
     <loc>https://sweden-journal.com/photos/terrace-staircase-below-karnan/</loc>
     <lastmod>2026-04-04</lastmod>
     <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/the-terrace-staircase-below-karnan.jpeg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://sweden-journal.com/photos/rune-stone-at-rytterne/</loc>
+    <lastmod>2026-07-17</lastmod>
+    <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/rune-stone-at-rytterne.jpeg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://sweden-journal.com/photos/viking-memorial-stone-at-rytterne/</loc>
+    <lastmod>2026-07-17</lastmod>
+    <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/viking-memorial-stone-at-rytterne.jpeg</image:loc></image:image>
   </url>
   <url>
     <loc>https://sweden-journal.com/series/</loc>

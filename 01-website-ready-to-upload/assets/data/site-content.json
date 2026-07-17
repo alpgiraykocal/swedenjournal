@@ -2499,6 +2499,133 @@
           "lng": 12.695769
         }
       }
+    },
+    {
+      "id": "rune-stone-at-rytterne",
+      "title": "Rune Stone at Rytterne",
+      "location": "Rytterne, Västerås, Sweden",
+      "date": "Spring 2026",
+      "season": "Spring",
+      "theme": "Viking Age, Rune Stone, Nordic Heritage",
+      "tags": [
+        "Rytterne Rune Stone",
+        "Rytterne",
+        "Västerås",
+        "Västmanland",
+        "Sweden",
+        "Rune Stone",
+        "Viking Age",
+        "Ancient Site",
+        "Nordic Heritage",
+        "Travel Photography"
+      ],
+      "src": "assets/images/photos/rune-stone-at-rytterne.jpeg",
+      "width": 6240,
+      "height": 4160,
+      "alt": "A weathered gray rune stone carved with an interlaced runic cross motif, standing in a grass field near a stone wall and bare tree in Rytterne, Västerås, Sweden.",
+      "caption": "A rune stone stands in an open field in Rytterne parish near Västerås, its interlaced carving catching low spring light against a backdrop of a drystone wall and quiet farmland.",
+      "sortOrder": 50,
+      "featured": false,
+      "_exifGps": {
+        "lat": 59.512506,
+        "lng": 16.34255
+      },
+      "variants": {
+        "thumb": {
+          "jpeg": "assets/images/generated/thumb/rune-stone-at-rytterne.jpeg",
+          "webp": "assets/images/generated/thumb/rune-stone-at-rytterne.webp",
+          "width": 480
+        },
+        "medium": {
+          "jpeg": "assets/images/generated/medium/rune-stone-at-rytterne.jpeg",
+          "webp": "assets/images/generated/medium/rune-stone-at-rytterne.webp",
+          "width": 1200
+        },
+        "full": {
+          "jpeg": "assets/images/generated/full/rune-stone-at-rytterne.jpeg",
+          "webp": "assets/images/generated/full/rune-stone-at-rytterne.webp",
+          "width": 2200
+        }
+      },
+      "category": "Ancient Sites",
+      "exif": {
+        "camera": "FUJIFILM X-T30 II",
+        "lens": "XC15-45mmF3.5-5.6 OIS PZ",
+        "iso": 320,
+        "aperture": 5.6,
+        "shutter": "1/340",
+        "focalLength": 37,
+        "focalLength35": 56,
+        "shotAt": "2026-04-19",
+        "gps": {
+          "lat": 59.512506,
+          "lng": 16.34255
+        }
+      }
+    },
+    {
+      "id": "viking-memorial-stone-at-rytterne",
+      "title": "Viking Memorial Stone at Rytterne",
+      "location": "Rytterne, Västerås, Sweden",
+      "date": "Spring 2026",
+      "season": "Spring",
+      "theme": "iking Age, Rune Stone, Memorial Inscription, Nordic Heritage",
+      "tags": [
+        "Rytterne Rune Stone",
+        "Rytterne",
+        "Västerås",
+        "Västmanland",
+        "Sweden",
+        "Rune Stone",
+        "Viking Age",
+        "Memorial Inscription",
+        "Ancient Site",
+        "Nordic Heritage",
+        "Travel Photography"
+      ],
+      "src": "assets/images/photos/viking-memorial-stone-at-rytterne.jpeg",
+      "width": 6240,
+      "height": 4160,
+      "alt": "A granite rune stone carved with a curved runic inscription band, standing beside a large tree with a stone wall, iron gate, and open field behind it in Rytterne, Västerås, Sweden.",
+      "caption": "A rune stone at Rytterne carries a memorial inscription raised for a son who died in the east, its weathered arc of runes read now against the same fields and stone walls that have surrounded it for a thousand years.",
+      "sortOrder": 51,
+      "featured": false,
+      "_exifGps": {
+        "lat": 59.512497,
+        "lng": 16.342547
+      },
+      "variants": {
+        "thumb": {
+          "jpeg": "assets/images/generated/thumb/viking-memorial-stone-at-rytterne.jpeg",
+          "webp": "assets/images/generated/thumb/viking-memorial-stone-at-rytterne.webp",
+          "width": 480
+        },
+        "medium": {
+          "jpeg": "assets/images/generated/medium/viking-memorial-stone-at-rytterne.jpeg",
+          "webp": "assets/images/generated/medium/viking-memorial-stone-at-rytterne.webp",
+          "width": 1200
+        },
+        "full": {
+          "jpeg": "assets/images/generated/full/viking-memorial-stone-at-rytterne.jpeg",
+          "webp": "assets/images/generated/full/viking-memorial-stone-at-rytterne.webp",
+          "width": 2200
+        }
+      },
+      "category": "Ancient Sites",
+      "exif": {
+        "camera": "FUJIFILM X-T30 II",
+        "lens": "XC15-45mmF3.5-5.6 OIS PZ",
+        "iso": 320,
+        "aperture": 5.6,
+        "shutter": "1/280",
+        "focalLength": 37,
+        "focalLength35": 56,
+        "shotAt": "2026-04-19",
+        "gps": {
+          "lat": 59.512497,
+          "lng": 16.342547
+        }
+      }
     }
   ],
   "stories": [
