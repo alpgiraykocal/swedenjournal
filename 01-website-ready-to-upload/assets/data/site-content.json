@@ -2626,6 +2626,135 @@
           "lng": 16.342547
         }
       }
+    },
+    {
+      "id": "rune-stone-at-dingtuna",
+      "title": "Rune Stone at Dingtuna",
+      "location": "Dingtuna, Västerås, Sweden",
+      "date": "Spring 2026",
+      "season": "Spring",
+      "theme": "Viking Age, Rune Stone, Medieval Inscription, Nordic Heritage",
+      "tags": [
+        "Dingtuna Rune Stone",
+        "Dingtuna",
+        "Västerås",
+        "Västmanland",
+        "Sweden",
+        "Rune Stone",
+        "Viking Age",
+        "Medieval Inscription",
+        "Ancient Site",
+        "Nordic Heritage",
+        "Travel Photography"
+      ],
+      "src": "assets/images/photos/rune-stone-at-dingtuna.jpeg",
+      "width": 6240,
+      "height": 4160,
+      "alt": "A triangular granite rune stone fragment with red-painted runes carved along its edge, leaning against a fallen pine trunk in a grassy garden in Dingtuna, Västerås, Sweden.",
+      "caption": "A worn fragment of a memorial stone stands propped against a fallen pine at Dingtuna, its faded prayer for a lost son still traceable in red-painted runes along the broken granite edge.",
+      "sortOrder": 52,
+      "featured": false,
+      "category": "Ancient Sites",
+      "_exifGps": {
+        "lat": 59.564206,
+        "lng": 16.353706
+      },
+      "variants": {
+        "thumb": {
+          "jpeg": "assets/images/generated/thumb/rune-stone-at-dingtuna.jpeg",
+          "webp": "assets/images/generated/thumb/rune-stone-at-dingtuna.webp",
+          "width": 480
+        },
+        "medium": {
+          "jpeg": "assets/images/generated/medium/rune-stone-at-dingtuna.jpeg",
+          "webp": "assets/images/generated/medium/rune-stone-at-dingtuna.webp",
+          "width": 1200
+        },
+        "full": {
+          "jpeg": "assets/images/generated/full/rune-stone-at-dingtuna.jpeg",
+          "webp": "assets/images/generated/full/rune-stone-at-dingtuna.webp",
+          "width": 2200
+        }
+      },
+      "exif": {
+        "camera": "FUJIFILM X-T30 II",
+        "lens": "XC15-45mmF3.5-5.6 OIS PZ",
+        "iso": 320,
+        "aperture": 5.6,
+        "shutter": "1/125",
+        "focalLength": 41,
+        "focalLength35": 61,
+        "shotAt": "2026-04-19",
+        "gps": {
+          "lat": 59.564206,
+          "lng": 16.353706
+        }
+      }
+    },
+    {
+      "id": "england-rune-stone-at-dingtuna",
+      "title": "England Rune Stone at Dingtuna",
+      "location": "Dingtuna, Västerås, Sweden",
+      "date": "Spring 2026",
+      "season": "Spring",
+      "theme": "Viking Age, Rune Stone, Memorial Inscription, Nordic Heritage",
+      "tags": [
+        "Dingtuna Rune Stone",
+        "Dingtuna",
+        "Västerås",
+        "Västmanland",
+        "Sweden",
+        "Rune Stone",
+        "Viking Age",
+        "Memorial Inscription",
+        "England Voyage",
+        "Ancient Site",
+        "Nordic Heritage",
+        "Travel Photography"
+      ],
+      "src": "assets/images/photos/england-rune-stone-at-dingtuna.jpeg",
+      "width": 6240,
+      "height": 4160,
+      "alt": "A tall gray granite rune stone with a vertical band of red-painted runes carved down its right edge, standing near a tree and low granite benches on a lawn in Dingtuna, Västerås, Sweden.",
+      "caption": "Carved by the rune-master Sigge, this stone at Dingtuna once marked the memory of a man who traveled to England and did not return, its faded runic band still legible where the granite meets tree shade and open lawn.",
+      "sortOrder": 53,
+      "featured": false,
+      "category": "Ancient Sites",
+      "_exifGps": {
+        "lat": 59.562906,
+        "lng": 16.351236
+      },
+      "variants": {
+        "thumb": {
+          "jpeg": "assets/images/generated/thumb/england-rune-stone-at-dingtuna.jpeg",
+          "webp": "assets/images/generated/thumb/england-rune-stone-at-dingtuna.webp",
+          "width": 480
+        },
+        "medium": {
+          "jpeg": "assets/images/generated/medium/england-rune-stone-at-dingtuna.jpeg",
+          "webp": "assets/images/generated/medium/england-rune-stone-at-dingtuna.webp",
+          "width": 1200
+        },
+        "full": {
+          "jpeg": "assets/images/generated/full/england-rune-stone-at-dingtuna.jpeg",
+          "webp": "assets/images/generated/full/england-rune-stone-at-dingtuna.webp",
+          "width": 2200
+        }
+      },
+      "exif": {
+        "camera": "FUJIFILM X-T30 II",
+        "lens": "XC15-45mmF3.5-5.6 OIS PZ",
+        "iso": 160,
+        "aperture": 5.6,
+        "shutter": "1/420",
+        "focalLength": 41,
+        "focalLength35": 61,
+        "shotAt": "2026-04-19",
+        "gps": {
+          "lat": 59.562906,
+          "lng": 16.351236
+        }
+      }
     }
   ],
   "stories": [
@@ -3251,13 +3380,17 @@
       "description": "Sweden’s memory cut into stone — rune inscriptions and the Sigurd carving at Ramsund, gathered from across the journal’s ancient sites.",
       "photoIds": [
         "anundshog-runestone-vs-13",
-        "saltangsbron-runestone-vs9",
         "runestone-u978-old-uppsala-church",
+        "saltangsbron-runestone-vs9",
         "runestone-vs10-vasteras",
         "sigurd-carving-ramsund",
         "sigurd-carving-ramsund-detail",
         "sigurd-carving-ramsund-figures",
-        "sigurd-carving-ramsund-grani"
+        "sigurd-carving-ramsund-grani",
+        "rune-stone-at-rytterne",
+        "viking-memorial-stone-at-rytterne",
+        "rune-stone-at-dingtuna",
+        "england-rune-stone-at-dingtuna"
       ]
     },
     {

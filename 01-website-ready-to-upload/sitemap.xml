@@ -48,6 +48,8 @@
     <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/the-terrace-staircase-below-karnan.jpeg</image:loc></image:image>
     <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/rune-stone-at-rytterne.jpeg</image:loc></image:image>
     <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/viking-memorial-stone-at-rytterne.jpeg</image:loc></image:image>
+    <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/rune-stone-at-dingtuna.jpeg</image:loc></image:image>
+    <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/england-rune-stone-at-dingtuna.jpeg</image:loc></image:image>
   </url>
   <url>
     <loc>https://sweden-journal.com/stories/</loc>
@@ -317,13 +319,23 @@
   </url>
   <url>
     <loc>https://sweden-journal.com/photos/rune-stone-at-rytterne/</loc>
-    <lastmod>2026-07-17</lastmod>
+    <lastmod>2026-04-19</lastmod>
     <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/rune-stone-at-rytterne.jpeg</image:loc></image:image>
   </url>
   <url>
     <loc>https://sweden-journal.com/photos/viking-memorial-stone-at-rytterne/</loc>
-    <lastmod>2026-07-17</lastmod>
+    <lastmod>2026-04-19</lastmod>
     <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/viking-memorial-stone-at-rytterne.jpeg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://sweden-journal.com/photos/rune-stone-at-dingtuna/</loc>
+    <lastmod>2026-07-17</lastmod>
+    <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/rune-stone-at-dingtuna.jpeg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://sweden-journal.com/photos/england-rune-stone-at-dingtuna/</loc>
+    <lastmod>2026-07-17</lastmod>
+    <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/england-rune-stone-at-dingtuna.jpeg</image:loc></image:image>
   </url>
   <url>
     <loc>https://sweden-journal.com/series/</loc>
@@ -333,13 +345,17 @@
     <loc>https://sweden-journal.com/series/runestones-and-carvings/</loc>
     <lastmod>2026-07-17</lastmod>
     <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/anundshog-runestone-vs-13.jpeg</image:loc></image:image>
-    <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/saltangsbron-runestone-vs-9.jpeg</image:loc></image:image>
     <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/runestone-u-978-at-old-uppsala-church.jpeg</image:loc></image:image>
+    <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/saltangsbron-runestone-vs-9.jpeg</image:loc></image:image>
     <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/runestone-vs-10-vasteras.jpeg</image:loc></image:image>
     <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/the-sigurd-carving-at-ramsund.jpeg</image:loc></image:image>
     <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/detail-of-the-sigurd-carving-at-ramsund.jpeg</image:loc></image:image>
     <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/figures-of-the-sigurd-carving-at-ramsund.jpeg</image:loc></image:image>
     <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/grani-and-the-runic-band-sigurd-carving.jpeg</image:loc></image:image>
+    <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/rune-stone-at-rytterne.jpeg</image:loc></image:image>
+    <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/viking-memorial-stone-at-rytterne.jpeg</image:loc></image:image>
+    <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/rune-stone-at-dingtuna.jpeg</image:loc></image:image>
+    <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/england-rune-stone-at-dingtuna.jpeg</image:loc></image:image>
   </url>
   <url>
     <loc>https://sweden-journal.com/series/castles-and-fortresses/</loc>
