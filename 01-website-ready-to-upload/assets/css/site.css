@@ -861,7 +861,11 @@ body[data-page="gallery"] .container{overflow:hidden}
 .atlas-cta:hover .atlas-cta-arrow{background:var(--accent-cool);color:var(--accent-ink);border-color:var(--accent-cool)}
 @media(min-width:851px){.atlas-places{display:flex;flex-direction:column;max-height:min(70vh,600px)}.atlas-places ul{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding-right:7px;scrollbar-width:thin;scrollbar-color:var(--line-strong) transparent}.atlas-places ul::-webkit-scrollbar{width:8px}.atlas-places ul::-webkit-scrollbar-thumb{background:var(--line-strong);border-radius:999px}.atlas-places ul::-webkit-scrollbar-track{background:transparent}}
 @media(max-width:850px){.atlas-layout{grid-template-columns:1fr;gap:24px}.atlas-map{height:54vh}}
-@media(max-width:560px){.atlas-cta{flex-direction:column;align-items:flex-start;gap:16px;padding:22px}.atlas-cta h2{font-size:2rem}.atlas-map{height:60vh}}
+/* .stories-map.atlas-map (not bare .atlas-map): the atlas map element carries both
+   classes, and the later stories-page rule `.stories-map{height:320px}` (same 560px
+   media block below) ties on specificity — without the double class it wins on source
+   order and squashes the atlas map to 320px on phones. */
+@media(max-width:560px){.atlas-cta{flex-direction:column;align-items:flex-start;gap:16px;padding:22px}.atlas-cta h2{font-size:2rem}.stories-map.atlas-map{height:60vh}}
 .leaflet-container{font-family:var(--sans);background:var(--surface-strong)}
 .leaflet-container a{color:var(--accent-cool)}
 .leaflet-div-icon.map-pin{background:transparent;border:0}
@@ -874,6 +878,15 @@ body[data-page="gallery"] .container{overflow:hidden}
 .leaflet-marker-icon.map-pin--photo img,.map-pin--photo img{width:34px!important;height:34px!important;border-width:2px}
 .atlas-place.is-active{border-color:var(--line-strong);background:var(--paper);transform:translateY(-1px)}
 .map-recenter{width:34px;height:34px;display:flex;align-items:center;justify-content:center;background:var(--paper);border:1px solid var(--line-strong);border-radius:9px;cursor:pointer;font-size:17px;line-height:1;color:var(--text);box-shadow:0 2px 7px rgba(31,29,25,.2)}
+.map-chips{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.map-chip{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:999px;border:1px solid var(--line-strong);background:var(--paper);color:var(--text);font-size:12px;font-weight:650;line-height:1;cursor:pointer;box-shadow:0 2px 7px rgba(31,29,25,.2)}
+.map-chip:hover{background:var(--surface)}
+.map-chip:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.map-chip-count{color:var(--muted);font-weight:600}
+.map-chip.is-off{opacity:.55}
+.map-chip.is-off .map-chip-count{text-decoration:line-through}
+.map-chip-hint{display:none;color:var(--muted);font-weight:500}
+.map-chip.is-gated .map-chip-hint{display:inline}
 .map-recenter:hover{background:var(--surface)}
 .map-recenter:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
 /* Map controls are mouse-precision sized by default (Leaflet zoom 30px, recenter

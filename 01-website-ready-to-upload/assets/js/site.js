@@ -5,7 +5,7 @@ import {
   collections, collectionPhotos, collectionsMain, collectionMain, collectionHref, photoExifChips,
   photoStory, photoCollection,
   websiteLdObject, imageGalleryLdObject, personLdObject, articleLdObject, photoLdObject, collectionsLdObject, collectionLdObject, fullVariantDims,
-} from "./templates.mjs?v=097f13d6dc";
+} from "./templates.mjs?v=f3ec1e4f15";
 
 // Cache-bust the runtime content fetches. /assets/data/*.json is served with a long
 // edge cache (the host ignores _headers), so without a content-versioned URL a freshly
@@ -266,20 +266,71 @@ function initMap(elId, dataId){
     // Match the basemap to the active theme, and swap it live when the user toggles.
     window.addEventListener("themechange", () => tiles.setUrl(tileUrl(themeDark())));
     const bySlug = new Map();
+    // Several shots of the same monument sit only metres apart — under half a pin even
+    // at max zoom, so they'd stack unclickably. Spread each ~100m-cell group in a small
+    // deterministic circle (~18m) so the pins separate once the reader zooms in.
+    const cells = new Map();
+    stories.forEach(s => { const k = `${s.lat.toFixed(3)},${s.lng.toFixed(3)}`; if(!cells.has(k)) cells.set(k, []); cells.get(k).push(s); });
+    cells.forEach(group => {
+      if(group.length < 2) return;
+      group.forEach((s, i) => {
+        const a = (2 * Math.PI * i) / group.length;
+        s.lat += 0.00016 * Math.sin(a);
+        s.lng += (0.00016 * Math.cos(a)) / Math.cos(s.lat * Math.PI / 180);
+      });
+    });
+    const storyMarkers = [], photoMarkers = [];
     const markers = stories.map(s => {
       // Photograph pins (kind:"photo") render smaller and sit under story pins, so the
       // essays stay the map's visual anchors even where shots cluster around them.
       const isPhoto = s.kind === "photo";
       const size = isPhoto ? 34 : 52;
       const icon = L.divIcon({ className:`map-pin${isPhoto ? " map-pin--photo" : ""}`, html:`<img src="${esc(s.thumb)}" alt="${esc(s.alt||s.title)}">`, iconSize:[size,size], iconAnchor:[size/2,size/2] });
-      const m = L.marker([s.lat, s.lng], { icon, title:s.title, alt:s.title, riseOnHover:true, keyboard:true, zIndexOffset:isPhoto ? 0 : 200 }).addTo(map);
+      const m = L.marker([s.lat, s.lng], { icon, title:s.title, alt:s.title, riseOnHover:true, keyboard:true, zIndexOffset:isPhoto ? 0 : 200 });
       m._slug = s.slug;
       m._baseZ = isPhoto ? 0 : 200;
       m.bindTooltip(s.title, { direction:"top", offset:[0,-(size/2 + 2)] });
       m.bindPopup(placePopupHtml(s), { className:"map-popup-wrap", minWidth:230, maxWidth:260, autoPanPadding:[28,28] });
       if(s.slug) bySlug.set(s.slug, m);
+      (isPhoto ? photoMarkers : storyMarkers).push(m);
       return m;
     });
+    // Layered pins: story pins are always on; photo pins only join from PHOTO_MIN_ZOOM
+    // in, so the country view stays a readable index of essays (and the photo thumbs
+    // are not all fetched up front). The chips over the map let the reader toggle
+    // either layer; while the zoom gate holds the photo layer back, its chip shows a
+    // "zoom to see" hint instead of silently doing nothing.
+    const PHOTO_MIN_ZOOM = 9;
+    const storyLayer = L.layerGroup(storyMarkers).addTo(map);
+    const photoLayer = L.layerGroup(photoMarkers);
+    let storiesOn = true, photosOn = true, photoChip = null;
+    const setLayerOn = (layer, on) => { if(on && !map.hasLayer(layer)) map.addLayer(layer); if(!on && map.hasLayer(layer)) map.removeLayer(layer); };
+    const syncLayers = () => {
+      setLayerOn(storyLayer, storiesOn);
+      setLayerOn(photoLayer, photosOn && map.getZoom() >= PHOTO_MIN_ZOOM);
+      if(photoChip) photoChip.classList.toggle("is-gated", photosOn && map.getZoom() < PHOTO_MIN_ZOOM);
+    };
+    map.on("zoomend", syncLayers);
+    if(photoMarkers.length){
+      const Chips = L.Control.extend({ options:{ position:"topright" }, onAdd:function(){
+        const wrap = L.DomUtil.create("div", "map-chips");
+        L.DomEvent.disableClickPropagation(wrap);
+        L.DomEvent.disableScrollPropagation(wrap);
+        const chip = (label, count, hint) => {
+          const b = L.DomUtil.create("button", "map-chip", wrap);
+          b.type = "button";
+          b.setAttribute("aria-pressed", "true");
+          b.innerHTML = `${label}<span class="map-chip-count">${count}</span>${hint ? `<span class="map-chip-hint">zoom to see</span>` : ""}`;
+          return b;
+        };
+        const sb = chip("Stories", storyMarkers.length, false);
+        L.DomEvent.on(sb, "click", () => { storiesOn = !storiesOn; sb.setAttribute("aria-pressed", String(storiesOn)); sb.classList.toggle("is-off", !storiesOn); syncLayers(); });
+        photoChip = chip("Photographs", photoMarkers.length, true);
+        L.DomEvent.on(photoChip, "click", () => { photosOn = !photosOn; photoChip.setAttribute("aria-pressed", String(photosOn)); photoChip.classList.toggle("is-off", !photosOn); syncLayers(); });
+        return wrap;
+      }});
+      map.addControl(new Chips());
+    }
     const fitAll = () => {
       if(markers.length > 1) map.fitBounds(L.featureGroup(markers).getBounds().pad(0.25), { animate:!reduce });
       else map.setView([stories[0].lat, stories[0].lng], 9, { animate:false });
@@ -288,8 +339,10 @@ function initMap(elId, dataId){
     let focused = null;
     try{ focused = new URLSearchParams(location.search).get("place"); }catch(e){}
     const focusTarget = focused && bySlug.has(focused) ? bySlug.get(focused) : null;
+    // Zoom 10: close enough that neighbouring stories (e.g. the Skåne cluster) separate
+    // clearly, and past PHOTO_MIN_ZOOM so the photographs around the place show too.
     const applyView = () => {
-      if(focusTarget) map.setView(focusTarget.getLatLng(), 8, { animate:!reduce });
+      if(focusTarget) map.setView(focusTarget.getLatLng(), 10, { animate:!reduce });
       else fitAll();
     };
     // A lazily-initialised map inside a flex / limited-height column can start with a
@@ -298,6 +351,7 @@ function initMap(elId, dataId){
     // the size before fitting, and again after layout settles, so pins always show.
     map.invalidateSize(false);
     applyView();
+    syncLayers();
     if(focusTarget){ if(reduce) focusTarget.openPopup(); else setTimeout(() => focusTarget.openPopup(), 380); }
     const settle = () => { map.invalidateSize(false); applyView(); };
     requestAnimationFrame(settle);
