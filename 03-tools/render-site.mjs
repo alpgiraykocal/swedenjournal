@@ -108,17 +108,20 @@ function renderInto(rel, { pfx, active, main, headLd = "", hydrate = null }) {
   let html = fs.readFileSync(file, "utf8");
 
   const bodyBlock = `${BODY_START}\n  ${main.header}\n  <div id="app" tabindex="-1">${main.app}</div>\n  <div id="footer">${main.footer}</div>${hydrationScript(hydrate)}\n  ${BODY_END}`;
+  // Replacement strings go through callbacks so content containing `$&`-style
+  // sequences is inserted literally (String.replace would otherwise expand them).
+  // The editor's applySsgRender mirrors this exactly.
   const bodyRe = new RegExp(`${BODY_START}[\\s\\S]*?${BODY_END}`);
   if (bodyRe.test(html)) {
-    html = html.replace(bodyRe, bodyBlock);
+    html = html.replace(bodyRe, () => bodyBlock);
   } else {
-    html = html.replace(/<div id="app" tabindex="-1">[\s\S]*?<\/div>\s*<div id="footer">[\s\S]*?<\/div>/, bodyBlock);
+    html = html.replace(/<div id="app" tabindex="-1">[\s\S]*?<\/div>\s*<div id="footer">[\s\S]*?<\/div>/, () => bodyBlock);
   }
   html = html.replace(/<body([^>]*?)(\sdata-prerendered="1")?>/, (m, attrs) => `<body${attrs} data-prerendered="1">`);
 
   const headBlock = headLd ? `${HEAD_START}\n  ${headLd}\n  ${HEAD_END}` : `${HEAD_START}${HEAD_END}`;
   const headRe = new RegExp(`\\s*${HEAD_START}[\\s\\S]*?${HEAD_END}`);
-  html = headRe.test(html) ? html.replace(headRe, `\n  ${headBlock}`) : html.replace(/<\/head>/, `  ${headBlock}\n</head>`);
+  html = headRe.test(html) ? html.replace(headRe, () => `\n  ${headBlock}`) : html.replace(/<\/head>/, () => `  ${headBlock}\n</head>`);
 
   html = clampDescription(html);
   html = injectOgImageMeta(html, resolvePhotoByOgImage(html));

@@ -328,8 +328,76 @@
     const pattern=patterns[selector]||/<meta name="twitter:card" content="[^"]*">/;
     return pattern.test(html)?html.replace(pattern,tag):html.replace("</head>",`  ${tag}\n</head>`);
   }
+  // Canonical shared templates (assets/js/templates.mjs) imported from the CONNECTED
+  // website folder — the exact module render-site.mjs and site.js use, so the editor
+  // renders pages with the same code as the build instead of a hand mirror. Loaded via
+  // blob/data URL because the editor runs as a plain non-module page. Cached per source
+  // text. Returns null when the folder ships no importable templates.mjs; callers then
+  // skip the SSG body/JSON-LD refresh (the next npm run build covers it).
+  async function siteTemplates(){
+    let src;try{src=await readText(state.websiteHandle,"assets/js/templates.mjs");}catch(e){return null;}
+    if(state.templatesModule&&state.templatesSource===src)return state.templatesModule;
+    let mod=null;
+    const blobUrl=URL.createObjectURL(new Blob([src],{type:"text/javascript"}));
+    try{mod=await import(blobUrl);}catch(e){
+      try{mod=await import(`data:text/javascript;base64,${btoa(unescape(encodeURIComponent(src)))}`);}catch(e2){mod=null;}
+    }finally{URL.revokeObjectURL(blobUrl);}
+    state.templatesSource=src;state.templatesModule=mod;
+    return mod;
+  }
+  // MIRRORS the page map in 03-tools/render-site.mjs: same main builder, same JSON-LD
+  // objects, same hydration payload per page — so an editor save leaves every page
+  // exactly as the next build would (the build only adds perf-head + hashed ?v=).
+  function ssgPlanFor(path,item,M,c){
+    const ld=obj=>obj?`<script type="application/ld+json">${JSON.stringify(obj).replace(/</g,"\\u003c")}</script>`:"";
+    const crumbs=(...trail)=>ld(M.breadcrumbLdObject(c,trail));
+    const pfx=shellPrefix(path);
+    if(item.photoPage){const p=item.photoPage;return{pfx,active:"photo",main:()=>M.photoMain(c,p),headLd:()=>ld(M.photoLdObject(c,p))+crumbs({name:"Home",path:""},{name:"Gallery",path:"gallery/"},{name:p.title||p.id,path:`photos/${encodeURIComponent(p.id)}/`}),hydrate:null};}
+    if(item.collectionPage){const col=item.collectionPage;return{pfx,active:"collection",main:()=>M.collectionMain(c,col),headLd:()=>ld(M.collectionLdObject(c,col))+crumbs({name:"Home",path:""},{name:"Series",path:"series/"},{name:col.title||col.slug,path:`series/${encodeURIComponent(col.slug)}/`}),hydrate:null};}
+    if(item.story){const s=item.story;return{pfx,active:"story",main:()=>M.storyMain(c,s),headLd:()=>ld(M.articleLdObject(c,s,M.photo(c,s.heroPhotoId)))+crumbs({name:"Home",path:""},{name:"Stories",path:"stories/"},{name:s.title||s.slug,path:`stories/${encodeURIComponent(s.slug)}/`}),hydrate:()=>{const photoCols=M.photoCollectionMap(c);return{stories:[s],photos:M.storyPhotos(c,s).map(p=>{const cl=photoCols.get(p.id);return cl?{...p,series:{slug:cl.slug,title:cl.title}}:p;})};}};}
+    const fixed={
+      "index.html":{active:"home",main:()=>M.homeMain(c),headLd:()=>ld(M.websiteLdObject(c))},
+      "gallery/index.html":{active:"gallery",main:()=>M.galleryMain(c),headLd:()=>ld(M.imageGalleryLdObject(c))+crumbs({name:"Home",path:""},{name:"Gallery",path:"gallery/"})},
+      "stories/index.html":{active:"stories",main:()=>M.storiesMain(c),headLd:()=>ld(M.storiesLdObject(c))+crumbs({name:"Home",path:""},{name:"Stories",path:"stories/"})},
+      "story/index.html":{active:"story",main:()=>M.legacyStoryMain(c),headLd:()=>""},
+      "about/index.html":{active:"about",main:()=>M.aboutMain(c),headLd:()=>ld(M.personLdObject(c))+crumbs({name:"Home",path:""},{name:"About",path:"about/"})},
+      "atlas/index.html":{active:"atlas",main:()=>M.atlasMain(c),headLd:()=>ld(M.atlasLdObject(c))+crumbs({name:"Home",path:""},{name:"Atlas",path:"atlas/"})},
+      "series/index.html":{active:"series",main:()=>M.collectionsMain(c),headLd:()=>ld(M.collectionsLdObject(c))+crumbs({name:"Home",path:""},{name:"Series",path:"series/"})}
+    };
+    const f=fixed[path];
+    return f?{pfx,active:f.active,main:f.main,headLd:f.headLd,hydrate:null}:null;
+  }
+  // MIRRORS render-site.mjs renderInto() byte for byte (markers, indentation,
+  // data-prerendered flag, head-block placement) so a build rerun is a no-op.
+  function applySsgRender(html,plan,M,c){
+    const BODY_START="<!-- ssg:body:start -->",BODY_END="<!-- ssg:body:end -->";
+    const HEAD_START="<!-- ssg:head:start -->",HEAD_END="<!-- ssg:head:end -->";
+    M.setContext({root:plan.pfx,prefix:plan.pfx,page:plan.active});
+    const main={header:M.header(c),app:plan.main(),footer:M.footer(c)};
+    const headLd=plan.headLd();
+    const hydrate=typeof plan.hydrate==="function"?plan.hydrate():plan.hydrate;
+    const hyd=hydrate?`\n  <script type="application/json" id="hydration-data">${JSON.stringify(hydrate).replace(/</g,"\\u003c")}</script>`:"";
+    const bodyBlock=`${BODY_START}\n  ${main.header}\n  <div id="app" tabindex="-1">${main.app}</div>\n  <div id="footer">${main.footer}</div>${hyd}\n  ${BODY_END}`;
+    const bodyRe=new RegExp(`${BODY_START}[\\s\\S]*?${BODY_END}`);
+    if(bodyRe.test(html))html=html.replace(bodyRe,()=>bodyBlock);
+    else html=html.replace(/<div id="app" tabindex="-1">[\s\S]*?<\/div>\s*<div id="footer">[\s\S]*?<\/div>/,()=>bodyBlock);
+    html=html.replace(/<body([^>]*?)(\sdata-prerendered="1")?>/,(m,attrs)=>`<body${attrs} data-prerendered="1">`);
+    const headBlock=headLd?`${HEAD_START}\n  ${headLd}\n  ${HEAD_END}`:`${HEAD_START}${HEAD_END}`;
+    const headRe=new RegExp(`\\s*${HEAD_START}[\\s\\S]*?${HEAD_END}`);
+    html=headRe.test(html)?html.replace(headRe,()=>`\n  ${headBlock}`):html.replace(/<\/head>/,()=>`  ${headBlock}\n</head>`);
+    return html;
+  }
   async function refreshHtmlMetadata(){
     const meta=staticPageMeta();
+    const M=await siteTemplates();
+    if(M){
+      // MIRRORS render-site.mjs gallery.json enrichment (story/series links ride along).
+      const photoStories=M.photoStoryMap(state.content),photoCols=M.photoCollectionMap(state.content);
+      const galleryPhotos=M.photos(state.content).map(p=>{const st=photoStories.get(p.id),cl=photoCols.get(p.id);if(!st&&!cl)return p;const out={...p};if(st)out.story={slug:st.slug,title:st.title};if(cl)out.series={slug:cl.slug,title:cl.title};return out;});
+      await writeTextIfChanged(state.websiteHandle,"assets/data/gallery.json",JSON.stringify({photos:galleryPhotos}));
+    }else{
+      showToast("Uyarı: assets/js/templates.mjs yüklenemedi — sayfa gövdeleri ve JSON-LD güncellenmedi, yayından önce npm run build gerekir.");
+    }
     for(const [path,item] of Object.entries(meta)){
       let html,original=null;try{html=await readText(state.websiteHandle,path);original=html;}catch(e){if(item.photoPage)html=storyHtmlShell(path,"photo");else if(item.collectionPage)html=storyHtmlShell(path,"collection");else if(item.story)html=storyHtmlShell(path);else continue;}
       // Home gets the brand-led title, same as the build's brandHomeTitle().
@@ -354,10 +422,31 @@
       html=replaceOrInsertMeta(html,"twitter:title",`<meta name="twitter:title" content="${escapeAttr(title)}">`);
       html=replaceOrInsertMeta(html,"twitter:description",`<meta name="twitter:description" content="${escapeAttr(desc)}">`);
       html=replaceOrInsertMeta(html,"twitter:image",`<meta name="twitter:image" content="${escapeAttr(image)}">`);
+      // Same tags AND same placement as the build's injectOgImageMeta(): width/height
+      // directly after og:image, alt after height, twitter alt after twitter:image —
+      // replaced in place when already present, so built pages keep their byte layout
+      // and freshly created shells match what the next build would produce.
       {const dims=fullVariantDims(item.photo);
-        if(dims){html=replaceOrInsertMeta(html,"og:image:width",`<meta property="og:image:width" content="${dims.width}">`);html=replaceOrInsertMeta(html,"og:image:height",`<meta property="og:image:height" content="${dims.height}">`);}
-        if(item.photo?.alt){html=replaceOrInsertMeta(html,"og:image:alt",`<meta property="og:image:alt" content="${escapeAttr(item.photo.alt)}">`);html=replaceOrInsertMeta(html,"twitter:image:alt",`<meta name="twitter:image:alt" content="${escapeAttr(item.photo.alt)}">`);}}
+        // Rewritten tags are first stripped, then re-inserted at the build's anchor
+        // positions, so pages whose tags an older editor appended before </head>
+        // converge to the injectOgImageMeta() layout instead of keeping the old spot.
+        const insertAfter=(h,anchorRe,tag)=>h.replace(anchorRe,m=>`${m}\n  ${tag}`);
+        const ogImageRe=/<meta property="og:image" content="[^"]*">/;
+        const twImageRe=/<meta name="twitter:image" content="[^"]*">/;
+        if(item.photo&&ogImageRe.test(html)){
+          if(dims){
+            html=html.replace(/\n\s*<meta property="og:image:width" content="[^"]*">/g,"").replace(/\n\s*<meta property="og:image:height" content="[^"]*">/g,"");
+            html=insertAfter(html,ogImageRe,`<meta property="og:image:width" content="${dims.width}">`);
+            html=insertAfter(html,/<meta property="og:image:width" content="[^"]*">/,`<meta property="og:image:height" content="${dims.height}">`);
+          }
+          if(item.photo.alt){
+            html=html.replace(/\n\s*<meta property="og:image:alt" content="[^"]*">/g,"").replace(/\n\s*<meta name="twitter:image:alt" content="[^"]*">/g,"");
+            html=insertAfter(html,dims?/<meta property="og:image:height" content="[^"]*">/:ogImageRe,`<meta property="og:image:alt" content="${escapeAttr(item.photo.alt)}">`);
+            if(twImageRe.test(html))html=insertAfter(html,twImageRe,`<meta name="twitter:image:alt" content="${escapeAttr(item.photo.alt)}">`);
+          }
+        }}
       if(item.robots)html=replaceOrInsertMeta(html,"robots",`<meta name="robots" content="${escapeAttr(item.robots)}">`);else html=html.replace(/\n\s*<meta name="robots" content="[^"]*">/,"");
+      if(M){const plan=ssgPlanFor(path,item,M,state.content);if(plan)html=applySsgRender(html,plan,M,state.content);}
       if(html!==original)await writeText(state.websiteHandle,path,html);
     }
   }

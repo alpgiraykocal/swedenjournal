@@ -16,6 +16,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import sharp from "sharp";
 import exifReader from "exif-reader";
+import { sitemapXml } from "../01-website-ready-to-upload/assets/js/templates.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const websiteDir = path.join(root, "01-website-ready-to-upload");
@@ -114,6 +115,17 @@ for (const photo of data.photos || []) {
   }
 }
 
-if (filled) fs.writeFileSync(dataPath, `${JSON.stringify(data, null, 2)}\n`);
+if (filled) {
+  fs.writeFileSync(dataPath, `${JSON.stringify(data, null, 2)}\n`);
+  // shotAt feeds the photo-page <lastmod> entries: regenerate the sitemap so it stays
+  // byte-equal to the canonical templates.mjs output (qa checkGeneratedXmlParity)
+  // without requiring a full build after the backfill. The buildDay is read back from
+  // the file on disk — same as QA does — so unrelated entries keep their dates.
+  const sitemapPath = path.join(websiteDir, "sitemap.xml");
+  if (fs.existsSync(sitemapPath)) {
+    const day = fs.readFileSync(sitemapPath, "utf8").match(/<loc>[^<]*\/gallery\/<\/loc>\n\s*<lastmod>(\d{4}-\d{2}-\d{2})<\/lastmod>/)?.[1];
+    fs.writeFileSync(sitemapPath, sitemapXml(data, day || undefined));
+  }
+}
 if (failures.length) for (const f of failures) console.warn(`! EXIF read failed: ${f}`);
 console.log(`EXIF backfill: ${filled} enriched, ${skipped} kept${missing ? `, ${missing} source(s) absent (skipped)` : ""}${failures.length ? `, ${failures.length} failed` : ""}.`);
