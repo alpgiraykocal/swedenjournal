@@ -6,7 +6,7 @@
   </url>
   <url>
     <loc>https://sweden-journal.com/gallery/</loc>
-    <lastmod>2026-07-17</lastmod>
+    <lastmod>2026-07-20</lastmod>
     <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/quiet-street-in-gamla-stan.jpeg</image:loc></image:image>
     <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/crowded-street-in-gamla-stan.jpeg</image:loc></image:image>
     <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/stockholm-city-hall.jpeg</image:loc></image:image>
@@ -50,6 +50,7 @@
     <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/viking-memorial-stone-at-rytterne.jpeg</image:loc></image:image>
     <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/rune-stone-at-dingtuna.jpeg</image:loc></image:image>
     <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/england-rune-stone-at-dingtuna.jpeg</image:loc></image:image>
+    <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/haga-kyrka-in-gothenburg.jpeg</image:loc></image:image>
   </url>
   <url>
     <loc>https://sweden-journal.com/stories/</loc>
@@ -57,11 +58,11 @@
   </url>
   <url>
     <loc>https://sweden-journal.com/about/</loc>
-    <lastmod>2026-07-17</lastmod>
+    <lastmod>2026-07-20</lastmod>
   </url>
   <url>
     <loc>https://sweden-journal.com/atlas/</loc>
-    <lastmod>2026-07-17</lastmod>
+    <lastmod>2026-07-20</lastmod>
   </url>
   <url>
     <loc>https://sweden-journal.com/stories/anundshog/</loc>
@@ -338,12 +339,17 @@
     <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/england-rune-stone-at-dingtuna.jpeg</image:loc></image:image>
   </url>
   <url>
+    <loc>https://sweden-journal.com/photos/haga-kyrka-gothenburg/</loc>
+    <lastmod>2026-07-20</lastmod>
+    <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/haga-kyrka-in-gothenburg.jpeg</image:loc></image:image>
+  </url>
+  <url>
     <loc>https://sweden-journal.com/series/</loc>
-    <lastmod>2026-07-17</lastmod>
+    <lastmod>2026-07-20</lastmod>
   </url>
   <url>
     <loc>https://sweden-journal.com/series/runestones-and-carvings/</loc>
-    <lastmod>2026-07-17</lastmod>
+    <lastmod>2026-07-20</lastmod>
     <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/anundshog-runestone-vs-13.jpeg</image:loc></image:image>
     <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/runestone-u-978-at-old-uppsala-church.jpeg</image:loc></image:image>
     <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/saltangsbron-runestone-vs-9.jpeg</image:loc></image:image>
@@ -359,7 +365,7 @@
   </url>
   <url>
     <loc>https://sweden-journal.com/series/castles-and-fortresses/</loc>
-    <lastmod>2026-07-17</lastmod>
+    <lastmod>2026-07-20</lastmod>
     <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/round-bastion-at-landskrona-slott.jpeg</image:loc></image:image>
     <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/landskrona-slott-across-the-moat.jpeg</image:loc></image:image>
     <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/courtyard-of-landskrona-slott.jpeg</image:loc></image:image>

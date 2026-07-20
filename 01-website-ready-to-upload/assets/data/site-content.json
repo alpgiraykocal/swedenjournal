@@ -2767,6 +2767,69 @@
           "lng": 16.351236
         }
       }
+    },
+    {
+      "id": "haga-kyrka-gothenburg",
+      "title": "Haga Kyrka in Gothenburg",
+      "location": "Haga, Gothenburg, Sweden",
+      "date": "Summer 2026",
+      "season": "Summer",
+      "theme": "Church, Gothic Revival, Brick Architecture, Nordic Heritage",
+      "tags": [
+        "Haga Kyrka",
+        "Haga",
+        "Gothenburg",
+        "Sweden",
+        "Historic Church",
+        "Gothic Revival",
+        "Brick Architecture",
+        "Nordic Heritage",
+        "Architecture",
+        "Travel Photography"
+      ],
+      "src": "assets/images/photos/haga-kyrka-in-gothenburg.jpeg",
+      "width": 3583,
+      "height": 5375,
+      "alt": "The yellow brick tower and tall spire of Haga Kyrka in Gothenburg, Sweden, seen from below against an overcast sky, with Gothic arched windows and a green copper roof.",
+      "caption": "A view up the tower of Haga Kyrka in Gothenburg, where yellow brick, Gothic arches, and a heavy grey sky hold the quiet of an overcast summer morning.",
+      "sortOrder": 54,
+      "featured": false,
+      "_exifGps": {
+        "lat": 57.698997,
+        "lng": 11.961367
+      },
+      "variants": {
+        "thumb": {
+          "jpeg": "assets/images/generated/thumb/haga-kyrka-in-gothenburg.jpeg",
+          "webp": "assets/images/generated/thumb/haga-kyrka-in-gothenburg.webp",
+          "width": 480
+        },
+        "medium": {
+          "jpeg": "assets/images/generated/medium/haga-kyrka-in-gothenburg.jpeg",
+          "webp": "assets/images/generated/medium/haga-kyrka-in-gothenburg.webp",
+          "width": 1200
+        },
+        "full": {
+          "jpeg": "assets/images/generated/full/haga-kyrka-in-gothenburg.jpeg",
+          "webp": "assets/images/generated/full/haga-kyrka-in-gothenburg.webp",
+          "width": 2200
+        }
+      },
+      "category": "Churches",
+      "exif": {
+        "camera": "FUJIFILM X-T30 II",
+        "lens": "XC15-45mmF3.5-5.6 OIS PZ",
+        "iso": 640,
+        "aperture": 5.6,
+        "shutter": "1/800",
+        "focalLength": 15,
+        "focalLength35": 23,
+        "shotAt": "2026-07-18",
+        "gps": {
+          "lat": 57.698997,
+          "lng": 11.961367
+        }
+      }
     }
   ],
   "stories": [
