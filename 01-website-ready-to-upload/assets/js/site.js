@@ -5,7 +5,7 @@ import {
   collections, collectionPhotos, collectionsMain, collectionMain, collectionHref, photoExifChips,
   photoStory, photoCollection,
   websiteLdObject, imageGalleryLdObject, personLdObject, articleLdObject, photoLdObject, collectionsLdObject, collectionLdObject, fullVariantDims,
-} from "./templates.mjs?v=f3ec1e4f15";
+} from "./templates.mjs?v=d4b5eda054";
 
 // Cache-bust the runtime content fetches. /assets/data/*.json is served with a long
 // edge cache (the host ignores _headers), so without a content-versioned URL a freshly
@@ -888,12 +888,21 @@ function bindLightbox(data, getVisiblePhotos){
     const nextIndex = (index + direction + visible.length) % visible.length;
     open(visible[nextIndex], "replace");
   };
-  document.querySelectorAll("[data-open-photo]").forEach(btn => btn.addEventListener("click", () => {
-    const p = findPhoto(btn.dataset.openPhoto);
-    if(p) open(p);
+  // The trigger is a real <a href="photos/<id>/"> (templates.mjs photoFigure) so crawlers
+  // can reach the photo pages. Only a plain left click becomes a lightbox: modified clicks
+  // keep their native behaviour (new tab/window), and if the photo is missing from the
+  // loaded data we let the browser navigate to the real page rather than swallow the click.
+  const plainClick = (e) => !(e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || (e.button && e.button !== 0));
+  document.querySelectorAll("[data-open-photo]").forEach(link => link.addEventListener("click", e => {
+    if(!plainClick(e)) return;
+    const p = findPhoto(link.dataset.openPhoto);
+    if(!p) return;
+    e.preventDefault();
+    open(p);
   }));
   document.querySelectorAll(".photo-media").forEach(m => m.addEventListener("click", e => {
     if(e.target.closest("[data-open-photo]")) return;
+    if(!plainClick(e)) return;
     m.querySelector("[data-open-photo]")?.click();
   }));
   close.addEventListener("click", hide);

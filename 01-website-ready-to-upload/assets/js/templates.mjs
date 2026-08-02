@@ -163,8 +163,13 @@ export function featuredStoryBlock(data, story) {
 }
 export function photoFigure(p, options = {}) {
   const opts = typeof options === "object" ? options : {};
-  const button = opts.interactive ? `<button class="photo-open" type="button" data-open-photo="${esc(p.id)}" aria-label="Open ${esc(p.title)}"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M10 2h4v4M14 2l-5 5M6 14H2v-4M2 14l5-5"/></svg></button>` : "";
-  return `<figure class="photo-card ${p.featured ? "featured" : ""}" data-photo-id="${esc(p.id)}" data-category="${esc(p.category || "")}" data-tags="${esc((p.tags || []).join("|"))}" data-theme="${esc(p.theme || "")}"><div class="photo-media"${mediaRatioStyle(p)}>${responsiveImage(p, { priority: opts.priority, eager: opts.eager, sizes: opts.sizes || "(max-width: 560px) calc(100vw - 24px), (max-width: 900px) 50vw, 380px" })}${button}</div><figcaption><strong>${esc(p.title)}</strong>${p.location ? ` — ${esc(p.location)}` : ""}${p.caption ? `<br>${esc(p.caption)}` : ""}${opts.story && opts.story.slug ? `<a class="photo-story-link" href="${storyHref(opts.story.slug)}">From the story: ${esc(opts.story.title)} <span aria-hidden="true">→</span></a>` : ""}</figcaption></figure>`;
+  // A real <a href="photos/<id>/">, NOT a <button>: the gallery and series grids are the
+  // only route into the photo-permalink cluster, and a button carries no href — Googlebot
+  // could not follow it, leaving every photo page orphaned (crawled, currently not indexed).
+  // The link also lets cmd/middle-click open the photo page in a new tab. site.js intercepts
+  // the plain left click and opens the lightbox instead, so the on-page UX is unchanged.
+  const trigger = opts.interactive ? `<a class="photo-open" href="${photoHref(p.id)}" data-open-photo="${esc(p.id)}" aria-label="Open ${esc(p.title)}"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M10 2h4v4M14 2l-5 5M6 14H2v-4M2 14l5-5"/></svg></a>` : "";
+  return `<figure class="photo-card ${p.featured ? "featured" : ""}" data-photo-id="${esc(p.id)}" data-category="${esc(p.category || "")}" data-tags="${esc((p.tags || []).join("|"))}" data-theme="${esc(p.theme || "")}"><div class="photo-media"${mediaRatioStyle(p)}>${responsiveImage(p, { priority: opts.priority, eager: opts.eager, sizes: opts.sizes || "(max-width: 560px) calc(100vw - 24px), (max-width: 900px) 50vw, 380px" })}${trigger}</div><figcaption><strong>${esc(p.title)}</strong>${p.location ? ` — ${esc(p.location)}` : ""}${p.caption ? `<br>${esc(p.caption)}` : ""}${opts.story && opts.story.slug ? `<a class="photo-story-link" href="${storyHref(opts.story.slug)}">From the story: ${esc(opts.story.title)} <span aria-hidden="true">→</span></a>` : ""}</figcaption></figure>`;
 }
 export function blockHtmlInteractive(data, block) {
   if (!block) return "";
@@ -172,16 +177,16 @@ export function blockHtmlInteractive(data, block) {
   // photo()'s first-photo fallback silently pulling an unrelated image into the story.
   if (block.type === "image") {
     const p = photos(data).find((x) => x.id === block.photoId) || null;
-    return p ? `<figure class="story-inline-photo">${responsiveImage(p, { className: "story-inline-img", sizes: "(max-width: 920px) calc(100vw - 40px), 840px", fallbackSize: "full" })}<figcaption>${esc(block.caption || p.caption || "")}<button class="photo-open" type="button" data-open-photo="${esc(p.id)}" aria-label="Open ${esc(p.title)}" style="position:relative;right:auto;bottom:auto;opacity:1;transform:none;margin-left:10px;display:inline-flex;vertical-align:middle">View</button></figcaption></figure>` : "";
+    return p ? `<figure class="story-inline-photo">${responsiveImage(p, { className: "story-inline-img", sizes: "(max-width: 920px) calc(100vw - 40px), 840px", fallbackSize: "full" })}<figcaption>${esc(block.caption || p.caption || "")}<a class="photo-open" href="${photoHref(p.id)}" data-open-photo="${esc(p.id)}" aria-label="Open ${esc(p.title)}" style="position:relative;right:auto;bottom:auto;opacity:1;transform:none;margin-left:10px;display:inline-flex;vertical-align:middle">View</a></figcaption></figure>` : "";
   }
   if (block.type === "panorama") {
     const p = photos(data).find((x) => x.id === block.photoId) || null;
-    return p ? `<figure class="story-inline-photo story-panorama">${responsiveImage(p, { className: "story-inline-img", sizes: "(max-width: 1220px) calc(100vw - 40px), 1180px", fallbackSize: "full" })}<figcaption>${esc(block.caption || p.caption || "")}<button class="photo-open" type="button" data-open-photo="${esc(p.id)}" aria-label="Open ${esc(p.title)}" style="position:relative;right:auto;bottom:auto;opacity:1;transform:none;margin-left:10px;display:inline-flex;vertical-align:middle">View</button></figcaption></figure>` : "";
+    return p ? `<figure class="story-inline-photo story-panorama">${responsiveImage(p, { className: "story-inline-img", sizes: "(max-width: 1220px) calc(100vw - 40px), 1180px", fallbackSize: "full" })}<figcaption>${esc(block.caption || p.caption || "")}<a class="photo-open" href="${photoHref(p.id)}" data-open-photo="${esc(p.id)}" aria-label="Open ${esc(p.title)}" style="position:relative;right:auto;bottom:auto;opacity:1;transform:none;margin-left:10px;display:inline-flex;vertical-align:middle">View</a></figcaption></figure>` : "";
   }
   if (block.type === "image-pair") {
     const pair = (block.photoIds || []).map((id) => photos(data).find((x) => x.id === id)).filter(Boolean).slice(0, 2);
     if (!pair.length) return "";
-    const items = pair.map((p) => `<span class="pair-item">${responsiveImage(p, { className: "story-inline-img", sizes: "(max-width: 700px) calc(100vw - 40px), 420px" })}<button class="photo-open" type="button" data-open-photo="${esc(p.id)}" aria-label="Open ${esc(p.title)}"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M10 2h4v4M14 2l-5 5M6 14H2v-4M2 14l5-5"/></svg></button></span>`).join("");
+    const items = pair.map((p) => `<span class="pair-item">${responsiveImage(p, { className: "story-inline-img", sizes: "(max-width: 700px) calc(100vw - 40px), 420px" })}<a class="photo-open" href="${photoHref(p.id)}" data-open-photo="${esc(p.id)}" aria-label="Open ${esc(p.title)}"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M10 2h4v4M14 2l-5 5M6 14H2v-4M2 14l5-5"/></svg></a></span>`).join("");
     return `<figure class="story-inline-photo story-photo-pair"><span class="pair-grid">${items}</span>${block.caption ? `<figcaption>${esc(block.caption)}</figcaption>` : ""}</figure>`;
   }
   if (block.type === "quote") return `<blockquote>${esc(block.text)}</blockquote>`;
