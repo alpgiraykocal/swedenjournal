@@ -79,3 +79,27 @@ input:focus,textarea:focus,select:focus{box-shadow:0 0 0 3px rgba(53,72,94,.15)}
 :root[data-theme="dark"] .shortcuts-dialog{background:#201e1b}
 :root[data-theme="dark"] .shortcut-list kbd{background:rgba(240,236,228,.08)}
 #shortcutsBtn{min-width:40px;font-weight:700}
+
+/* Bulk photo selection. The row gains a leading checkbox column, and the action bar
+   only exists while something is selected so the list is unchanged at rest. */
+.item.photo-row{grid-template-columns:auto 72px 1fr auto}
+.row-select{display:grid;place-items:center;padding:0 2px;margin:0}
+.row-select input{width:18px;height:18px;cursor:pointer}
+.bulk-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;border:1px solid var(--strong);background:rgba(31,29,25,.05);border-radius:15px;padding:10px 12px;margin-bottom:10px}
+.bulk-bar b{font-size:13px;margin-right:2px}
+.bulk-bar select{width:auto;flex:0 0 auto;font-size:12px;padding:7px 10px;border-radius:999px}
+:root[data-theme="dark"] .bulk-bar{background:rgba(240,236,228,.07)}
+@media(pointer:coarse){.bulk-bar select{min-height:44px}.row-select input{width:22px;height:22px}}
+
+/* Cross-section finder (Cmd/Ctrl+K). */
+.search-dialog{border:1px solid var(--line);border-radius:var(--r);background:var(--panel,rgba(255,250,242,.98));color:var(--ink);box-shadow:var(--shadow);padding:20px;width:min(560px,92vw)}
+.search-dialog::backdrop{background:rgba(31,29,25,.42)}
+.search-results{display:grid;gap:6px;max-height:52vh;overflow:auto;margin-top:12px}
+.search-hit{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;align-items:baseline;text-align:left;border:1px solid var(--line);border-radius:13px;padding:9px 11px;background:rgba(255,255,255,.5)}
+.search-hit:hover,.search-hit:focus-visible{background:rgba(31,29,25,.06)}
+.search-hit b{font-size:14px;font-weight:600}
+.search-hit small{grid-column:2;color:var(--muted);font-size:12px}
+.search-type{grid-row:span 2;align-self:center;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:3px 8px;white-space:nowrap}
+:root[data-theme="dark"] .search-dialog{background:#201e1b}
+:root[data-theme="dark"] .search-hit{background:rgba(240,236,228,.05)}
+:root[data-theme="dark"] .search-hit:hover,:root[data-theme="dark"] .search-hit:focus-visible{background:rgba(240,236,228,.1)}
