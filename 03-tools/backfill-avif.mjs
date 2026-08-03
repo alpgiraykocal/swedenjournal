@@ -1,9 +1,11 @@
 // Backfill missing AVIF variants from the committed JPEG variants (sharp / libavif).
 //
 // Why this exists: the browser content editor generates thumb/medium/full JPEG + WebP
-// reliably, but its AVIF path uses canvas.toBlob("image/avif"), which Safari does not
-// support at all and Chrome produces inconsistently (often larger than WebP, so it gets
-// dropped). Result: editor-added photos shipped without AVIF.
+// reliably, but its AVIF path uses canvas.toBlob("image/avif"), which NO current browser
+// encodes — measured on Chrome 148, the callback hands back an image/png instead (the
+// spec's fallback for unsupported types), and Safari behaves the same. The editor's
+// efficiency gate then rejects that PNG as oversized and drops it. Result: editor-added
+// photos always ship without AVIF, so this step is the only producer for them.
 //
 // This step runs in the build (CI) BEFORE sync-image-variants.mjs. For every photo/size
 // that has no AVIF file on disk, it encodes one from the same-size JPEG variant. AVIF
