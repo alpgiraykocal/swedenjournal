@@ -2869,17 +2869,20 @@
         "thumb": {
           "jpeg": "assets/images/generated/thumb/engso-castle-in-evening-light.jpeg",
           "webp": "assets/images/generated/thumb/engso-castle-in-evening-light.webp",
-          "width": 480
+          "width": 480,
+          "avif": "assets/images/generated/thumb/engso-castle-in-evening-light.avif"
         },
         "medium": {
           "jpeg": "assets/images/generated/medium/engso-castle-in-evening-light.jpeg",
           "webp": "assets/images/generated/medium/engso-castle-in-evening-light.webp",
-          "width": 1200
+          "width": 1200,
+          "avif": "assets/images/generated/medium/engso-castle-in-evening-light.avif"
         },
         "full": {
           "jpeg": "assets/images/generated/full/engso-castle-in-evening-light.jpeg",
           "webp": "assets/images/generated/full/engso-castle-in-evening-light.webp",
-          "width": 2200
+          "width": 2200,
+          "avif": "assets/images/generated/full/engso-castle-in-evening-light.avif"
         }
       },
       "category": "Castles",
@@ -2935,17 +2938,20 @@
         "thumb": {
           "jpeg": "assets/images/generated/thumb/clock-tower-at-engso-castle.jpeg",
           "webp": "assets/images/generated/thumb/clock-tower-at-engso-castle.webp",
-          "width": 480
+          "width": 480,
+          "avif": "assets/images/generated/thumb/clock-tower-at-engso-castle.avif"
         },
         "medium": {
           "jpeg": "assets/images/generated/medium/clock-tower-at-engso-castle.jpeg",
           "webp": "assets/images/generated/medium/clock-tower-at-engso-castle.webp",
-          "width": 1200
+          "width": 1200,
+          "avif": "assets/images/generated/medium/clock-tower-at-engso-castle.avif"
         },
         "full": {
           "jpeg": "assets/images/generated/full/clock-tower-at-engso-castle.jpeg",
           "webp": "assets/images/generated/full/clock-tower-at-engso-castle.webp",
-          "width": 2200
+          "width": 2200,
+          "avif": "assets/images/generated/full/clock-tower-at-engso-castle.avif"
         }
       },
       "exif": {

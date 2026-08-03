@@ -762,7 +762,11 @@ body[data-page="gallery"] .container{overflow:hidden}
    ~1.5:1. Swap the chip base to the dark paper equivalent. */
 :root[data-theme="dark"] .filter:not(.active),
 :root[data-theme="dark"] .filter-reset,
-:root[data-theme="dark"] .share-action {
+:root[data-theme="dark"] .share-action,
+/* Same defect, same fix: the gallery/stories search field carries the identical
+   light rgba(255,253,248,.44) base, which composites to a mid grey over the dark
+   page and drops its light input text to ~3.5:1 (below AA). */
+:root[data-theme="dark"] .site-search {
     background: rgba(32,30,27,.44);
 }
 /* The lightbox is an always-dark glass surface with its own light-glass chips —

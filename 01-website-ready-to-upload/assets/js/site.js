@@ -5,7 +5,7 @@ import {
   collections, collectionPhotos, collectionsMain, collectionMain, collectionHref, photoExifChips,
   photoStory, photoCollection,
   websiteLdObject, imageGalleryLdObject, personLdObject, articleLdObject, photoLdObject, collectionsLdObject, collectionLdObject, fullVariantDims,
-} from "./templates.mjs?v=d4b5eda054";
+} from "./templates.mjs?v=cb915937db";
 
 // Cache-bust the runtime content fetches. /assets/data/*.json is served with a long
 // edge cache (the host ignores _headers), so without a content-versioned URL a freshly
@@ -432,8 +432,18 @@ function initThemeToggle(){
     try{ localStorage.setItem("theme", next); }catch(e){}
     sync();
   }));
-  // If the user hasn't made an explicit choice, follow OS changes live.
-  if(mq) mq.addEventListener("change", () => { let saved; try{ saved = localStorage.getItem("theme"); }catch(e){} if(!saved) sync(); });
+  // If the user hasn't made an explicit choice, follow OS changes live. The inline
+  // <head> bootstrap always stamps data-theme, and effective() reads that attribute
+  // first, so the attribute itself has to be rewritten here — calling sync() alone
+  // only relabels the toggle and the page would stay on the old theme until reload.
+  // `saved` is validated the same way the bootstrap validates it, so a junk value
+  // cannot pin the theme either.
+  if(mq) mq.addEventListener("change", () => {
+    let saved; try{ saved = localStorage.getItem("theme"); }catch(e){}
+    if(saved === "light" || saved === "dark") return;
+    root.setAttribute("data-theme", mq.matches ? "dark" : "light");
+    sync();
+  });
   sync();
 }
 async function boot(){
