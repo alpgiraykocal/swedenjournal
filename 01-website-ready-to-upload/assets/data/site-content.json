@@ -2833,6 +2833,135 @@
           "lng": 11.961367
         }
       }
+    },
+    {
+      "id": "engso-castle-in-evening-light",
+      "title": "Engsö Castle in Evening Light",
+      "location": "Ängsö, Västerås, Sweden",
+      "date": "Summer 2026",
+      "season": "Summer",
+      "theme": "Castle, Manor House, Nordic Heritage",
+      "tags": [
+        "Engsö Castle",
+        "Ängsö",
+        "Västerås",
+        "Västmanland",
+        "Sweden",
+        "Castle",
+        "Manor House",
+        "Nordic Heritage",
+        "Swedish Heritage",
+        "Architecture",
+        "Travel Photography"
+      ],
+      "src": "assets/images/photos/engso-castle-in-evening-light.jpeg",
+      "width": 6240,
+      "height": 4160,
+      "alt": "A yellow rendered castle with an orange-red base, tile roof and central clock tower at Ängsö, Västerås, Sweden, above a stone terrace and black picket fence.",
+      "caption": "Engsö Castle seen head-on late on a summer evening, where low light warms the ochre walls and throws a single long shadow across the windows. The stone terrace and small conifers below sit still, the clock tower catching the last of the sun above the roofline.",
+      "sortOrder": 55,
+      "featured": false,
+      "_exifGps": {
+        "lat": 59.531922,
+        "lng": 16.856375
+      },
+      "variants": {
+        "thumb": {
+          "jpeg": "assets/images/generated/thumb/engso-castle-in-evening-light.jpeg",
+          "webp": "assets/images/generated/thumb/engso-castle-in-evening-light.webp",
+          "width": 480
+        },
+        "medium": {
+          "jpeg": "assets/images/generated/medium/engso-castle-in-evening-light.jpeg",
+          "webp": "assets/images/generated/medium/engso-castle-in-evening-light.webp",
+          "width": 1200
+        },
+        "full": {
+          "jpeg": "assets/images/generated/full/engso-castle-in-evening-light.jpeg",
+          "webp": "assets/images/generated/full/engso-castle-in-evening-light.webp",
+          "width": 2200
+        }
+      },
+      "category": "Castles",
+      "exif": {
+        "camera": "FUJIFILM X-T30 II",
+        "lens": "XC15-45mmF3.5-5.6 OIS PZ",
+        "iso": 320,
+        "aperture": 5.6,
+        "shutter": "1/1500",
+        "focalLength": 40,
+        "focalLength35": 59,
+        "shotAt": "2026-08-01",
+        "gps": {
+          "lat": 59.531922,
+          "lng": 16.856375
+        }
+      }
+    },
+    {
+      "id": "clock-tower-at-engso-castle",
+      "title": "Clock Tower at Engsö Castle",
+      "location": "Ängsö, Västerås, Sweden",
+      "date": "Summer 2026",
+      "season": "Summer",
+      "theme": "Castle, Clock Tower, Architectural Detail, Nordic Heritage",
+      "tags": [
+        "Engsö Castle",
+        "Ängsö",
+        "Västerås",
+        "Västmanland",
+        "Sweden",
+        "Castle",
+        "Clock Tower",
+        "Manor House",
+        "Architecture",
+        "Nordic Heritage",
+        "Swedish Heritage",
+        "Travel Photography"
+      ],
+      "src": "assets/images/photos/clock-tower-at-engso-castle.jpeg",
+      "width": 6240,
+      "height": 4160,
+      "alt": "The upper storey of Engsö Castle at Ängsö, Västerås, Sweden, with its orange tile roof, four chimneys, round oculus window, and a dark clock tower and cupola against a clear sky.",
+      "caption": "Late summer light rakes across the crown of Engsö Castle, catching the tile roof and the clock tower while a shadow already climbs the far slope of the roof. Above the finial there is only clear sky and a motionless weathervane.",
+      "sortOrder": 56,
+      "featured": false,
+      "category": "Castles",
+      "_exifGps": {
+        "lat": 59.5324,
+        "lng": 16.856778
+      },
+      "variants": {
+        "thumb": {
+          "jpeg": "assets/images/generated/thumb/clock-tower-at-engso-castle.jpeg",
+          "webp": "assets/images/generated/thumb/clock-tower-at-engso-castle.webp",
+          "width": 480
+        },
+        "medium": {
+          "jpeg": "assets/images/generated/medium/clock-tower-at-engso-castle.jpeg",
+          "webp": "assets/images/generated/medium/clock-tower-at-engso-castle.webp",
+          "width": 1200
+        },
+        "full": {
+          "jpeg": "assets/images/generated/full/clock-tower-at-engso-castle.jpeg",
+          "webp": "assets/images/generated/full/clock-tower-at-engso-castle.webp",
+          "width": 2200
+        }
+      },
+      "exif": {
+        "camera": "FUJIFILM X-T30 II",
+        "lens": "XC15-45mmF3.5-5.6 OIS PZ",
+        "iso": 320,
+        "aperture": 5.6,
+        "shutter": "1/1000",
+        "focalLength": 45,
+        "focalLength35": 68,
+        "shotAt": "2026-08-01",
+        "gps": {
+          "lat": 59.5324,
+          "lng": 16.856778
+        }
+      }
     }
   ],
   "stories": [
