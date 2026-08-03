@@ -52,3 +52,30 @@ input:focus,textarea:focus,select:focus{box-shadow:0 0 0 3px rgba(53,72,94,.15)}
 :root[data-theme="dark"] .quick-card:hover,:root[data-theme="dark"] .metric:hover{box-shadow:0 12px 30px rgba(0,0,0,.45)}
 :root[data-theme="dark"] button.primary:hover{box-shadow:0 8px 20px rgba(0,0,0,.5)}
 :root[data-theme="dark"] input:focus,:root[data-theme="dark"] textarea:focus,:root[data-theme="dark"] select:focus{box-shadow:0 0 0 3px rgba(143,178,201,.2)}
+
+/* Per-block insert menu. The global `select{width:100%}` rule would stretch it across
+   the block toolbar, so it is pinned to its content width and styled as a pill to sit
+   next to the small buttons it shares the bar with. */
+.bar select.block-insert{width:auto;flex:0 0 auto;font-size:12px;padding:7px 10px;border-radius:999px;border:1px solid var(--strong);background:transparent;color:var(--ink);cursor:pointer}
+.bar select.block-insert:hover{background:rgba(31,29,25,.055)}
+:root[data-theme="dark"] .bar select.block-insert:hover{background:rgba(240,236,228,.08)}
+@media(pointer:coarse){.bar select.block-insert{min-height:44px}}
+
+/* Inline validation. Errors used to live only in the transient toast, so the user lost
+   both the message and any hint of which field it referred to. */
+.field-error{margin:.35rem 0 0;font-size:12px;color:var(--bad);font-weight:600}
+[aria-invalid="true"]{border-color:var(--bad)!important;background:rgba(155,53,46,.06)}
+[aria-invalid="true"]:focus{box-shadow:0 0 0 3px rgba(155,53,46,.18)}
+
+/* Keyboard shortcut sheet (native <dialog>: focus trap, Esc and backdrop come free). */
+.shortcuts-dialog{border:1px solid var(--line);border-radius:var(--r);background:var(--panel,rgba(255,250,242,.98));color:var(--ink);box-shadow:var(--shadow);padding:22px;max-width:min(460px,92vw)}
+.shortcuts-dialog::backdrop{background:rgba(31,29,25,.42)}
+.shortcuts-dialog h3{margin:0 0 14px}
+.shortcut-list{display:grid;gap:8px;margin:0 0 16px}
+.shortcut-list>div{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center}
+.shortcut-list dt{margin:0}
+.shortcut-list dd{margin:0;color:var(--muted);font-size:13px}
+.shortcut-list kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-bottom-width:2px;border-radius:7px;padding:4px 7px;background:rgba(255,255,255,.6);white-space:nowrap}
+:root[data-theme="dark"] .shortcuts-dialog{background:#201e1b}
+:root[data-theme="dark"] .shortcut-list kbd{background:rgba(240,236,228,.08)}
+#shortcutsBtn{min-width:40px;font-weight:700}
