@@ -1,17 +1,28 @@
 (() => {
-  const sections = [
-    ["dashboard","Kontrol Paneli","Durum ve hızlı işlemler"],
-    ["qa","QA Center","Hata ve eksik kontrolü"],
-    ["publish","Yayın Akışı","Kaydet ve GitHub'a gönder"],
-    ["settings","Site Ayarları","Genel bilgiler"],
-    ["home","Ana Sayfa","İlk izlenim"],
-    ["gallery","Galeri","Filtre ve sıralama"],
-    ["photos","Fotoğraflar","Fotoğraf arşivi"],
-    ["stories","Hikâyeler","Yazılar ve bloklar"],
-    ["series","Seriler","Foto koleksiyonları"],
-    ["about","Hakkında","Hakkımda sayfası"],
-    ["advanced","Gelişmiş JSON","Dikkatli kullanın"]
+  // Grouped sidebar, per the design: a short "get started" group, the content the user
+  // actually edits, then settings. Every section the editor had is still reachable —
+  // publish keeps its own screen even though the app bar's Yayınla button now fronts
+  // the flow, because that screen holds the SEO previews and the readiness checklist.
+  const navGroups = [
+    ["Başla", [
+      ["dashboard","Kontrol Paneli","◍","Durum ve hızlı işlemler"],
+      ["qa","QA Center","✓","Hata ve eksik kontrolü"]
+    ]],
+    ["İçerik", [
+      ["home","Ana Sayfa","▤","İlk izlenim"],
+      ["gallery","Galeri","▦","Filtre ve sıralama"],
+      ["photos","Fotoğraflar","◫","Fotoğraf arşivi"],
+      ["stories","Hikâyeler","❞","Yazılar ve bloklar"],
+      ["series","Seriler","◈","Foto koleksiyonları"],
+      ["about","Hakkında","☺","Hakkımda sayfası"]
+    ]],
+    ["Ayarlar", [
+      ["settings","Site Ayarları","⚙","Genel bilgiler"],
+      ["publish","Yayın Akışı","↗","SEO önizleme ve kontrol listesi"],
+      ["advanced","Gelişmiş JSON","{ }","Dikkatli kullanın"]
+    ]]
   ];
+  const sections = navGroups.flatMap(([,items])=>items.map(([id,label,,sub])=>[id,label,sub]));
   const state = {
     rootHandle:null, websiteHandle:null, content:null, originalJson:"", active:"dashboard", previewTab:"home",
     connected:false, dirty:false, saving:false, lastSaved:"Henüz kaydedilmedi", imageUrls:new Map(), pendingImages:new Map(),
@@ -20,6 +31,8 @@
     // whole list, and is pruned against the content on each render so a deleted photo
     // cannot linger as a phantom selection.
     bulkPhotoIds:new Set(),
+    // App-bar shell state: publish modal stage, folder label, photo filter chip.
+    publishOpen:false, publishStage:0, publishDetails:false, websiteFolderName:"", photoFilter:"all",
     history:[], future:[], draftAvailable:false, draftChecked:false, lastPackage:"Henüz üretilmedi", generatingVariants:false,
     selectedCollectionSlug:null
   };
@@ -87,6 +100,7 @@
       if(existing){const perm=await existing.requestPermission({mode:"readwrite"});if(perm!=="granted"){showToast("Klasör izni verilmedi. Lütfen tekrar klasör seçin.");return;}state.rootHandle=existing;}
       else state.rootHandle = await window.showDirectoryPicker({mode:"readwrite", id:"alpgiray-photo-blog"});
       state.websiteHandle = await resolveWebsiteHandle(state.rootHandle);
+      state.websiteFolderName = state.websiteHandle?.name || "";
       await loadFromFolder();
       try{await idbSet(IDB_KEY,state.rootHandle);}catch(e){}
       onboarding.classList.add("hidden");app.classList.remove("hidden");state.connected=true;state.dirty=false;showToast(existing?"Son klasöre tekrar bağlanıldı":"Website klasörü bağlı");render();const appHeading=document.querySelector(".topbar h1");if(appHeading){appHeading.setAttribute("tabindex","-1");appHeading.focus();}
@@ -526,9 +540,69 @@
     c.stories.forEach((s,i)=>{if(!s.slug)errors.push(`Hikâye ${i+1} slug değeri boş.`);if(!s.title)errors.push(`Hikâye ${s.slug||i+1} için başlık zorunlu.`);if(!s.category)warnings.push(`Hikâye "${s.title||s.slug}" için kategori girilmemiş.`);if(s.heroPhotoId && !photoSet.has(s.heroPhotoId))warnings.push(`Hikâye "${s.title||s.slug}" hero fotoğrafı bulunamıyor.`);(s.body||[]).forEach((b,j)=>{const missing=blockPhotoIds(b).filter(id=>!photoSet.has(id));if(missing.length)warnings.push(`Hikâye "${s.title||s.slug}" blok ${j+1} fotoğrafı bulunamıyor.`);});});
     (c.collections||[]).forEach((col,i)=>{if(!col.title)warnings.push(`Seri ${col.slug||i+1} için başlık girilmemiş.`);const missing=(col.photoIds||[]).filter(id=>!photoSet.has(id));if(missing.length)warnings.push(`Seri "${col.title||col.slug}" bulunamayan fotoğrafa başvuruyor: ${missing.join(", ")}`);if(!(col.photoIds||[]).some(id=>photoSet.has(id)))warnings.push(`Seri "${col.title||col.slug}" boş — hiç mevcut fotoğraf içermediği için yayınlanmaz.`);});
     return{errors,warnings};}
-  function render(){if(!state.content)return;renderNav();renderStatus();renderEditor();renderPreviewTabs();renderPreview();renderValidation();}
-  function renderNav(){el("nav").innerHTML=sections.map(([id,label,sub])=>`<button data-section="${id}" class="${state.active===id?"active":""}" aria-current="${state.active===id?"page":"false"}">${label}<small>${sub}</small></button>`).join("");el("nav").querySelectorAll("button").forEach(b=>b.onclick=()=>{syncAdvancedIfLeaving();state.active=b.dataset.section;render();focusMainPanel();});}
-  function renderStatus(){if(!state.content)return;const ready=state.content.photos.filter(p=>variantStatus(p).every(x=>x.ok)).length;el("globalStatus").innerHTML=`<span class="status-pill"><span class="dot ${state.connected?"ok":"bad"}"></span>${state.connected?"Website klasörü bağlı":"Website klasörü bağlı değil"}</span><span class="status-pill"><span class="dot ${state.dirty?"warn":"ok"}"></span>${state.dirty?"Değişiklikler kaydedilmedi":"Kaydedildi / bekleyen değişiklik yok"}</span><span class="status-pill"><span class="dot ${ready===state.content.photos.length?"ok":"warn"}"></span>${ready}/${state.content.photos.length} görsel seti hazır</span><span class="status-pill"><span class="dot ok"></span>Yayın: GitHub Desktop → Push</span><span class="status-pill">${esc(state.lastSaved)}</span>`;el("saveBtn").disabled=!state.connected||state.saving;{const u=el("undoBtn"),r=el("redoBtn");if(u)u.disabled=!state.content||state.history.length<=1;if(r)r.disabled=!state.content||!state.future.length;}el("backupBtn").disabled=!state.content;el("openLocalBtn").disabled=!state.content;el("buildPackageBtn").disabled=!state.content;["publishSaveBtn","publishSaveInlineBtn"].forEach(id=>{const b=el(id);if(b)b.disabled=!state.connected||state.saving;});el("previewState").innerHTML=`<span class="dot ${state.dirty?"warn":"ok"}"></span>${state.dirty?"Kaydedilmemiş ön izleme":"Kaydedilmiş çıktı ön izlemesi"}`;}
+  // Preview only re-renders while its drawer is open — it walks the whole content to
+  // build page previews, and doing that on every keystroke behind a closed drawer was
+  // pure waste once preview left the permanent third column.
+  function render(){if(!state.content)return;renderNav();renderStatus();renderEditor();
+    if(previewOpen()){renderPreviewTabs();renderPreview();renderValidation();}
+    if(state.publishOpen)renderPublishModal();}
+  // Counts sit in the nav so "how much is in there" and "what needs attention" are
+  // answerable without opening a section. The amber pill is a to-do count, not a total.
+  function navCounts(){
+    const c=state.content||{};
+    const missingAlt=(c.photos||[]).filter(p=>!p.alt).length;
+    const missingVariants=(c.photos||[]).filter(p=>!variantStatus(p).every(x=>x.ok)).length;
+    const v=validateContent(c);
+    return {
+      photos:{badge:(c.photos||[]).length,warn:missingAlt||null},
+      gallery:{badge:(c.photos||[]).length,warn:null},
+      stories:{badge:(c.stories||[]).length,warn:null},
+      series:{badge:(c.collections||[]).length,warn:null},
+      qa:{badge:null,warn:(v.errors.length+missingVariants)||null}
+    };
+  }
+  function renderNav(){
+    const counts=navCounts();
+    el("nav").innerHTML=navGroups.map(([grup,items])=>`<div class="nav-group"><div class="nav-group-label">${esc(grup)}</div>${
+      items.map(([id,label,icon,sub])=>{
+        const c=counts[id]||{};
+        return `<button data-section="${id}" class="${state.active===id?"active":""}" aria-current="${state.active===id?"page":"false"}" title="${esc(sub)}">`+
+          `<span class="nav-icon" aria-hidden="true">${esc(icon)}</span>`+
+          `<span class="nav-name">${esc(label)}</span>`+
+          (c.badge!=null?`<span class="nav-badge">${c.badge}</span>`:"")+
+          (c.warn?`<span class="nav-warn" title="${c.warn} öğe ilgi bekliyor">${c.warn}</span>`:"")+
+        `</button>`;
+      }).join("")
+    }</div>`).join("");
+    el("nav").querySelectorAll("button").forEach(b=>b.onclick=()=>{syncAdvancedIfLeaving();state.active=b.dataset.section;closeMenu();render();focusMainPanel();});
+  }
+  function renderStatus(){if(!state.content)return;
+    // The app bar carries the whole save state now: an amber count while there is
+    // unsaved work, the last-save time underneath. The old strip of five status pills
+    // repeated things the sidebar and section screens already say.
+    {const n=changedItemCount();const dl=el("dirtyLabel"),sl=el("savedLabel");
+     if(dl){dl.textContent=state.dirty?(n?`${n} kaydedilmemiş değişiklik`:"Kaydedilmemiş değişiklik var"):"Her şey kayıtlı";dl.classList.toggle("is-clean",!state.dirty);}
+     if(sl)sl.textContent=state.dirty?"Yayınla dediğinizde kaydedilir":esc(state.lastSaved);}
+    {const fc=el("folderChipName");if(fc)fc.textContent=state.websiteFolderName||"01-website-ready-to-upload";}
+    el("saveBtn").disabled=!state.connected||state.saving;{const u=el("undoBtn"),r=el("redoBtn");if(u)u.disabled=!state.content||state.history.length<=1;if(r)r.disabled=!state.content||!state.future.length;}el("backupBtn").disabled=!state.content;el("openLocalBtn").disabled=!state.content;el("buildPackageBtn").disabled=!state.content;["publishSaveBtn","publishSaveInlineBtn"].forEach(id=>{const b=el(id);if(b)b.disabled=!state.connected||state.saving;});el("previewState").innerHTML=`<span class="dot ${state.dirty?"warn":"ok"}"></span>${state.dirty?"Kaydedilmemiş değişiklikler dahil":"Kaydedilmiş çıktı"}`;}
+  // Rough "how much is unsaved" number for the app bar. Compares the live content with
+  // the last snapshot written to disk and counts differing top-level records rather
+  // than diffing every field — the label only needs an order of magnitude.
+  function changedItemCount(){
+    if(!state.dirty||!state.originalJson)return 0;
+    let old;try{old=JSON.parse(state.originalJson);}catch(e){return 0;}
+    const c=state.content,key=o=>JSON.stringify(o);
+    let n=0;
+    const cmp=(a=[],b=[],idOf)=>{const am=new Map(a.map(x=>[idOf(x),x]));const bm=new Map(b.map(x=>[idOf(x),x]));
+      for(const [id,x] of bm)if(!am.has(id)||key(am.get(id))!==key(x))n++;
+      for(const id of am.keys())if(!bm.has(id))n++;};
+    cmp(old.photos,c.photos,p=>p.id);
+    cmp(old.stories,c.stories,s=>s.slug);
+    cmp(old.collections||[],c.collections||[],x=>x.slug);
+    for(const k of ["site","home","about","gallery","storiesPage","atlasPage","collectionsPage"])
+      if(key(old[k]||null)!==key(c[k]||null))n++;
+    return n;
+  }
   function panel(html){el("editorPanel").querySelector(".pad").innerHTML=html;}
   function focusMainPanel(){const node=el("editorPanel")?.querySelector(".pad h2, .pad h3");if(node){node.setAttribute("tabindex","-1");node.focus({preventScroll:false});}}
   function focusInPanel(selector){const node=el("editorPanel")?.querySelector(selector);if(node&&typeof node.focus==="function")node.focus();}
@@ -558,6 +632,15 @@
   // default. Category comes from the curated gallery filters (same list the photo form
   // offers) and series from the existing collections — no free text, so a bulk action
   // can never invent a filter that matches nothing.
+  // Section header from the design: eyebrow, serif title, one sentence of orientation,
+  // and the section's primary actions pinned to the right of the same baseline.
+  function sectionHero(eyebrow,title,desc,actions=""){
+    return `<div class="section-hero"><div class="section-hero-text"><div class="eyebrow">${esc(eyebrow)}</div><h1>${esc(title)}</h1>${desc?`<p>${esc(desc)}</p>`:""}</div>${actions?`<div class="section-hero-actions">${actions}</div>`:""}</div>`;
+  }
+  // Amber strip for a fixable content gap, with the fix one click away.
+  function issueBanner(text,btnId,btnLabel){
+    return `<div class="issue-banner"><span class="issue-banner-mark" aria-hidden="true">!</span><span class="issue-banner-text">${esc(text)}</span><button id="${btnId}" class="small">${esc(btnLabel)}</button></div>`;
+  }
   function bulkBar(){
     const n=state.bulkPhotoIds.size;
     if(!n)return "";
@@ -572,7 +655,48 @@
   function renderPhotos(){
     // Drop ids that no longer exist (deleted or renamed) before drawing the list.
     state.bulkPhotoIds=new Set([...state.bulkPhotoIds].filter(id=>state.content.photos.some(p=>p.id===id)));
-    const selected=state.selectedPhotoId?photoById(state.selectedPhotoId):null;const isNew=state.newPhoto!==null;panel(`${introBlock("Fotoğraflar","Tüm fotoğraf arşivini yönetin. Her kayıt dosya, başlık, lokasyon, tarih, tema, etiketler, alt metin, açıklama, sıra ve öne çıkan durumunu kontrol eder.",`<button id="newPhotoBtn" class="primary">Yeni fotoğraf ekle</button><button id="bulkAddBtn">Toplu fotoğraf ekle</button><input id="bulkAddFiles" class="hidden" type="file" multiple accept="image/jpeg,image/png,image/webp,image/avif"><button id="openGaleriBtn">Galeriyi aç</button><button id="normalizeSortBtn">Sıralamayı düzenle</button><button id="missingAltBtn">Eksik alt metni bul</button>${selected?`<button id="copyPhotoUrlBtn">Seçili fotoğraf linkini kopyala</button>`:""}${countChip("kayıt",state.content.photos.length)}`)}<p class="notice">Site kayıtları <span class="code">site-content.json</span>. Yeni görseller <span class="code">assets/images/photos/</span>. Bir kaydı silmek fiziksel görsel dosyasını silmez.</p><div class="grid2"><div><div class="toolbar">${filterListInput("photoSearch","Başlık, lokasyon, etiket veya ID ara")}<span class="detail-chip">${esc(selected?.title||"Fotoğraf seçilmedi")}</span></div>${bulkBar()}<div class="list">${state.content.photos.map(p=>`<div class="item photo-row ${p.id===state.selectedPhotoId?"selected":""}"><label class="row-select"><input type="checkbox" data-select-photo="${esc(p.id)}" ${state.bulkPhotoIds.has(p.id)?"checked":""} aria-label="${esc(p.title||p.id)} — toplu işlem için seç"></label><img loading="lazy" src="${esc(imgUrlByPhoto(p))}" alt=""><div><strong>${esc(p.title)}</strong><small>${esc(p.location||"Lokasyon yok")} · ${esc(p.id)}</small><div class="item-meta"><span>${esc(p.date||"Tarih yok")}</span>${p.theme?`<span>${esc(p.theme)}</span>`:""}${p.featured?`<span>Öne çıkan</span>`:""}${!p.alt?`<span>Alt metin eksik</span>`:""}</div></div><div class="row-actions"><button class="small" data-edit-photo="${esc(p.id)}">Düzenle</button><button class="small danger" data-delete-photo="${esc(p.id)}">Kaldır</button></div></div>`).join("")||`<div class="empty-state">Henüz fotoğraf yok. İlk fotoğrafı ekleyin.</div>`}</div></div><div>${isNew?photoForm(state.newPhoto,true):selected?photoForm(selected,false):`<p class="notice">Bir fotoğraf seçin veya yeni fotoğraf ekleyin.</p>`}</div></div>`);el("newPhotoBtn").onclick=()=>{state.newPhoto={id:"",title:"",location:"",date:"",season:"",theme:"",tags:[],src:"",width:"",height:"",alt:"",caption:"",sortOrder:(state.content.photos.length+1)*10,featured:false,_file:null,_preview:""};state.selectedPhotoId=null;render();};el("openGaleriBtn").onclick=()=>openPublic("gallery/");
+    const selected=state.selectedPhotoId?photoById(state.selectedPhotoId):null;const isNew=state.newPhoto!==null;{
+    const eksikAlt=state.content.photos.filter(p=>!p.alt).length;
+    const filtreler=[["all","Tümü"],["recent","Son eklenenler"],["alt",`Alt text eksik · ${eksikAlt}`]];
+    const filtreli=state.photoFilter==="alt"?state.content.photos.filter(p=>!p.alt)
+      :state.photoFilter==="recent"?state.content.photos.slice(-12).reverse()
+      :state.content.photos;
+    panel(`${sectionHero("Arşiv","Fotoğraflar","Sürükleyip bırakın; başlık, alt text ve metadata sağdaki panelde. Boyutlandırma ve WebP varyantları kaydederken otomatik üretilir.",
+      `<button id="newPhotoBtn" class="primary">+ Fotoğraf ekle</button><button id="bulkAddBtn">Toplu ekle</button><input id="bulkAddFiles" class="hidden" type="file" multiple accept="image/jpeg,image/png,image/webp,image/avif"><button id="normalizeSortBtn" class="small">Sıralamayı düzenle</button><button id="openGaleriBtn" class="small">Galeriyi aç</button>`)}
+    ${eksikAlt?issueBanner(`${eksikAlt} fotoğrafta alt text eksik. Bu alan görme engelli ziyaretçiler ve arama motorları için gerekli.`,"missingAltBtn","Eksikleri göster"):""}
+    <div class="photo-workspace">
+      <div>
+        <div class="photo-toolbar">
+          ${filtreler.map(([id,label])=>`<button class="chip-filter ${state.photoFilter===id?"active":""}" data-photo-filter="${id}" aria-pressed="${state.photoFilter===id}">${esc(label)}</button>`).join("")}
+          <span class="photo-count">${filtreli.length} / ${state.content.photos.length}</span>
+        </div>
+        <div class="toolbar">${filterListInput("photoSearch","Başlık, lokasyon, etiket veya ID ara")}${selected?`<button id="copyPhotoUrlBtn" class="small">Linki kopyala</button>`:""}</div>
+        ${bulkBar()}
+        <div class="dropzone" id="photoDropzone"><span class="dropzone-icon" aria-hidden="true">↥</span><span>Fotoğrafları buraya sürükleyin — boyutlandırma, WebP varyantları ve metadata otomatik üretilir</span><input type="file" id="dropzoneFiles" multiple accept="image/jpeg,image/png,image/webp,image/avif" aria-label="Fotoğraf dosyaları seç"></div>
+        <div class="list photo-grid">${filtreli.map(p=>`<div class="photo-tile photo-row ${p.id===state.selectedPhotoId?"selected":""}" data-photo-tile="${esc(p.id)}">
+          <input type="checkbox" class="photo-tile-select" data-select-photo="${esc(p.id)}" ${state.bulkPhotoIds.has(p.id)?"checked":""} aria-label="${esc(p.title||p.id)} — toplu işlem için seç">
+          <div class="photo-tile-media"><img loading="lazy" src="${esc(imgUrlByPhoto(p))}" alt="">${!p.alt?`<span class="photo-tile-flag">alt yok</span>`:""}</div>
+          <div class="photo-tile-body"><div class="photo-tile-title">${esc(p.title||p.id)}</div><div class="photo-tile-file">${esc(filenameOf(p.src)||p.id)}</div></div>
+        </div>`).join("")||`<div class="empty-state">${state.photoFilter==="all"?"Henüz fotoğraf yok. İlk fotoğrafı ekleyin.":"Bu filtreye uyan fotoğraf yok."}</div>`}</div>
+      </div>
+      <div class="photo-aside">
+        <div class="photo-aside-head"><div class="eyebrow">${isNew?"Yeni fotoğraf":"Seçili fotoğraf"}</div>${!isNew&&selected?`<button class="small danger" data-delete-photo="${esc(selected.id)}">Sil</button>`:""}</div>
+        <div class="photo-aside-body">${isNew?photoForm(state.newPhoto,true):selected?photoForm(selected,false):`<p class="notice">Soldan bir fotoğraf seçin ya da yeni fotoğraf ekleyin.</p>`}</div>
+      </div>
+    </div>`);
+    el("editorPanel").querySelectorAll("[data-photo-filter]").forEach(b=>b.onclick=()=>{state.photoFilter=b.dataset.photoFilter;renderPhotos();});
+    el("editorPanel").querySelectorAll("[data-photo-tile]").forEach(t=>t.addEventListener("click",e=>{
+      if(e.target.closest("input,button"))return;
+      state.newPhoto=null;state.selectedPhotoId=t.dataset.photoTile;render();
+    }));
+    {const dz=el("photoDropzone"),fi=el("dropzoneFiles");
+     if(dz){["dragover","dragenter"].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add("dragging");}));
+       ["dragleave","drop"].forEach(ev=>dz.addEventListener(ev,()=>dz.classList.remove("dragging")));
+       dz.addEventListener("drop",e=>{e.preventDefault();const dt=new DataTransfer();[...e.dataTransfer.files].forEach(f=>dt.items.add(f));
+         el("bulkAddFiles").files=dt.files;el("bulkAddFiles").dispatchEvent(new Event("change",{bubbles:true}));});}
+     if(fi)fi.onchange=()=>{const dt=new DataTransfer();[...fi.files].forEach(f=>dt.items.add(f));fi.value="";
+       el("bulkAddFiles").files=dt.files;el("bulkAddFiles").dispatchEvent(new Event("change",{bubbles:true}));};}
+    }el("newPhotoBtn").onclick=()=>{state.newPhoto={id:"",title:"",location:"",date:"",season:"",theme:"",tags:[],src:"",width:"",height:"",alt:"",caption:"",sortOrder:(state.content.photos.length+1)*10,featured:false,_file:null,_preview:""};state.selectedPhotoId=null;render();};el("openGaleriBtn").onclick=()=>openPublic("gallery/");
     // Multi-file add: one record per file, titled from the filename, queued exactly like
     // a single add (pendingImages + variant generation on save). Beats opening the form
     // once per photo when a shoot lands.
@@ -629,7 +753,15 @@
        state.bulkPhotoIds.clear();syncDerivedContent();
        state.selectedPhotoId=state.content.photos[0]?.id||null;setDirty();render();
        showToast(`${sec.length} fotoğraf kaldırıldı. Yanlışsa Geri al (Cmd/Ctrl+Z).`);};
-    }el("normalizeSortBtn").onclick=()=>{sortedPhotos().forEach((p,i)=>p.sortOrder=(i+1)*10);setDirty();renderPhotos();showToast("Sıralama düzenlendi");};el("missingAltBtn").onclick=()=>{const p=state.content.photos.find(x=>!x.alt);if(p){state.selectedPhotoId=p.id;state.newPhoto=null;renderPhotos();showToast("İlk eksik alt text açıldı");}else showToast("Alt text eksik fotoğraf yok");};if(selected)el("copyPhotoUrlBtn").onclick=()=>copyText(publicUrl(`photos/${encodeURIComponent(selected.id)}/`),"Fotoğraf sayfası linki kopyalandı");bindListSearch("photoSearch",".photo-row");el("editorPanel").querySelectorAll("[data-edit-photo]").forEach(b=>b.onclick=()=>{state.newPhoto=null;state.selectedPhotoId=b.dataset.editPhoto;render();});el("editorPanel").querySelectorAll("[data-delete-photo]").forEach(b=>b.onclick=()=>deletePhoto(b.dataset.deletePhoto));bindPhotoForm(isNew?state.newPhoto:selected,isNew);}
+    }el("normalizeSortBtn").onclick=()=>{sortedPhotos().forEach((p,i)=>p.sortOrder=(i+1)*10);setDirty();renderPhotos();showToast("Sıralama düzenlendi");};{const mb=el("missingAltBtn");if(mb)mb.onclick=()=>{
+      // The banner's action both filters the grid and opens the first offender, so the
+      // fix is one click from the warning rather than a hunt through the archive.
+      const p=state.content.photos.find(x=>!x.alt);
+      state.photoFilter="alt";
+      if(p){state.selectedPhotoId=p.id;state.newPhoto=null;}
+      renderPhotos();
+      if(p)focusInPanel("#pAlt");
+    };}if(selected)el("copyPhotoUrlBtn").onclick=()=>copyText(publicUrl(`photos/${encodeURIComponent(selected.id)}/`),"Fotoğraf sayfası linki kopyalandı");bindListSearch("photoSearch",".photo-row");el("editorPanel").querySelectorAll("[data-edit-photo]").forEach(b=>b.onclick=()=>{state.newPhoto=null;state.selectedPhotoId=b.dataset.editPhoto;render();});el("editorPanel").querySelectorAll("[data-delete-photo]").forEach(b=>b.onclick=()=>deletePhoto(b.dataset.deletePhoto));bindPhotoForm(isNew?state.newPhoto:selected,isNew);}
   // Shows the same reference set deletePhoto() warns about, but permanently, so "can I
   // change/remove this?" is answerable without starting a destructive action. Photos
   // used nowhere are worth surfacing too — they are the ones safe to prune.
@@ -836,7 +968,7 @@
   const TITLE_CASE_RE=/(^|[\s\-_/([{"'])(\p{L})/gu;
   const titleCase=value=>String(value??"").replace(TITLE_CASE_RE,(m,pre,ch)=>pre+ch.toUpperCase());
   function photoTitleFromFile(file){return titleCase(file.name.replace(/\.[^.]+$/,"").replace(/[-_]+/g," "));}
-  el("connectFirst").onclick=()=>connectFolder();el("saveBtn").onclick=saveToDisk;el("undoBtn").onclick=undoChange;el("redoBtn").onclick=redoChange;
+  el("connectFirst").onclick=()=>connectFolder();el("undoBtn").onclick=undoChange;el("redoBtn").onclick=redoChange;
   // The keyboard shortcuts existed but were written down nowhere, so they were
   // effectively private. `?` (and the header button) opens the list. Native <dialog>
   // gives focus trapping, Esc-to-close and backdrop for free.
@@ -875,6 +1007,88 @@
     }
     dlg.showModal();dlg.querySelector("#globalSearchInput").focus();
   }
+  // ---- app bar: overflow menu ----------------------------------------------
+  function closeMenu(){const m=el("overflowMenu");if(m&&!m.classList.contains("hidden")){m.classList.add("hidden");el("menuBtn")?.setAttribute("aria-expanded","false");}}
+  function toggleMenu(){const m=el("overflowMenu");if(!m)return;const open=m.classList.toggle("hidden")===false;el("menuBtn")?.setAttribute("aria-expanded",String(open));if(open)m.querySelector("button")?.focus();}
+
+  // ---- preview drawer -------------------------------------------------------
+  // Preview used to occupy a permanent third column, which cost ~380px of editing
+  // width on every screen even when nobody was looking at it. It is now on demand.
+  function previewOpen(){return !el("previewDrawer").classList.contains("hidden");}
+  function openPreview(){
+    const d=el("previewDrawer");if(!d)return;
+    d.classList.remove("hidden");el("previewBtn")?.setAttribute("aria-expanded","true");
+    renderPreviewTabs();renderPreview();renderValidation();
+    el("previewClose")?.focus();
+  }
+  function closePreview(){el("previewDrawer")?.classList.add("hidden");el("previewBtn")?.setAttribute("aria-expanded","false");el("previewBtn")?.focus();}
+  function togglePreview(){previewOpen()?closePreview():openPreview();}
+
+  // ---- publish -------------------------------------------------------------
+  // NOTE on the third step: the design shows publishing completing inside the app.
+  // A browser page cannot push to git, so the editor does what it genuinely can —
+  // write the folder and build the image variants — and then hands off explicitly.
+  // The step is labelled as the user's action instead of faking a completed push.
+  const PUBLISH_STEPS=[
+    ["Değişiklikleri klasöre kaydet","site-content.json, sayfalar, sitemap, RSS"],
+    ["Görselleri hazırla","eksik JPEG/WebP varyantları"],
+    ["GitHub Desktop'ta Push deyin","siteyi GitHub Actions yayınlar"]
+  ];
+  function publishModalHtml(){
+    const n=changedItemCount();
+    const stage=state.publishStage||0;
+    const eksikVaryant=(state.content?.photos||[]).filter(p=>!variantStatus(p).every(x=>x.ok)).length;
+    const notlar=["",state.lastSaved&&stage>0?"yazıldı":"", eksikVaryant?`${eksikVaryant} foto`:"tam",""];
+    const mark=i=>stage===0?String(i+1):(stage>i+1?"✓":stage===i+1?"•":String(i+1));
+    const baslik=stage===0?(n?`${n} değişiklik yayına hazır`:"Kaydedilmemiş değişiklik yok")
+      :stage>=3?"Klasör güncellendi":"Kaydediliyor…";
+    const aciklama=stage===0
+      ? "Kaydetme ve görsel hazırlığı tek seferde yapılır. Son adımda GitHub Desktop'ta Push dersiniz; site 1-2 dakika içinde güncellenir."
+      : stage>=3 ? "Klasör hazır. Yayına almak için GitHub Desktop'ta Commit + Push deyin."
+      : "Bu pencereyi kapatabilirsiniz, işlem devam eder.";
+    return `<div class="modal-scrim" data-publish-close></div><div class="modal-panel" role="dialog" aria-modal="true" aria-label="Yayınla">
+      <div class="modal-head"><div class="eyebrow">Yayınla</div><h3>${esc(baslik)}</h3><p>${esc(aciklama)}</p></div>
+      <div class="publish-steps">${PUBLISH_STEPS.map(([label,note],i)=>`
+        <div class="publish-step ${stage>i+1?"done":stage===i+1?"active":""}">
+          <span class="publish-step-mark">${mark(i)}</span>
+          <span class="publish-step-label">${esc(label)}</span>
+          <span class="publish-step-note">${esc(stage>i?(notlar[i+1]||""):note)}</span>
+        </div>`).join("")}</div>
+      <div class="modal-details">
+        <button id="publishDetailsBtn" type="button">${state.publishDetails?"Teknik detayları gizle":"Teknik detayları göster"}</button>
+        ${state.publishDetails?`<div class="modal-detail-box">${esc(publishSteps())}</div>`:""}
+      </div>
+      <div class="modal-foot">
+        ${stage>=3?`<button id="publishOpenSite" class="small">Siteyi aç</button>`:""}
+        <div class="modal-foot-spacer"></div>
+        <button id="publishCloseBtn">${stage===0?"Vazgeç":"Kapat"}</button>
+        ${stage===0?`<button id="publishStartBtn" class="primary" ${state.connected&&!state.saving?"":"disabled"}>Şimdi kaydet</button>`:""}
+      </div></div>`;
+  }
+  function renderPublishModal(){
+    let m=el("publishModal");
+    if(!state.publishOpen){m?.remove();return;}
+    if(!m){m=document.createElement("div");m.id="publishModal";m.className="modal";document.body.appendChild(m);}
+    m.innerHTML=publishModalHtml();
+    m.querySelectorAll("[data-publish-close]").forEach(x=>x.onclick=closePublish);
+    el("publishCloseBtn").onclick=closePublish;
+    el("publishDetailsBtn").onclick=()=>{state.publishDetails=!state.publishDetails;renderPublishModal();};
+    const s=el("publishStartBtn");if(s)s.onclick=startPublish;
+    const o=el("publishOpenSite");if(o)o.onclick=()=>openPublic("");
+    (el("publishStartBtn")||el("publishCloseBtn")).focus();
+  }
+  function openPublish(){state.publishOpen=true;state.publishStage=0;closeMenu();renderPublishModal();}
+  function closePublish(){state.publishOpen=false;state.publishStage=0;state.publishDetails=false;renderPublishModal();el("saveBtn")?.focus();}
+  async function startPublish(){
+    state.publishStage=1;renderPublishModal();
+    await saveToDisk();
+    // saveToDisk writes the folder AND generates variants for pending images, so both
+    // of the editor's own steps are done once it resolves. A failure leaves state.dirty
+    // set and shows its own toast; don't claim success in that case.
+    state.publishStage=state.dirty?0:3;
+    renderPublishModal();
+  }
+
   function showShortcuts(){
     let dlg=el("shortcutsDialog");
     if(!dlg){
@@ -886,10 +1100,24 @@
     }
     dlg.open?dlg.close():dlg.showModal();
   }
-  {const b=document.createElement("button");b.id="shortcutsBtn";b.type="button";b.title="Klavye kısayolları (?)";b.setAttribute("aria-label","Klavye kısayollarını göster");b.textContent="?";
-   document.querySelector(".top-actions")?.prepend(b);b.onclick=showShortcuts;}
-  {const b=document.createElement("button");b.id="searchBtn";b.type="button";b.title="Her şeyde ara (Cmd/Ctrl+K)";b.setAttribute("aria-label","Fotoğraf, hikâye ve serilerde ara");b.textContent="⌕ Ara";
-   document.querySelector(".top-actions")?.prepend(b);b.onclick=showSearch;}
+  // App-bar wiring. Yayınla fronts the publish flow rather than saving silently, so
+  // the user sees what is about to happen before the folder is written.
+  el("saveBtn").onclick=openPublish;
+  el("searchBtn").onclick=showSearch;
+  el("previewBtn").onclick=togglePreview;
+  el("previewClose").onclick=closePreview;
+  el("previewScrim").onclick=closePreview;
+  el("menuBtn").onclick=e=>{e.stopPropagation();toggleMenu();};
+  el("shortcutsMenuBtn").onclick=()=>{closeMenu();showShortcuts();};
+  el("folderChip").onclick=()=>{closeMenu();goSection("dashboard");};
+  el("overflowMenu").addEventListener("click",e=>{if(e.target.closest("button")&&e.target.closest("button").id!=="themeToggleBtn")closeMenu();});
+  document.addEventListener("click",e=>{if(!e.target.closest(".menu-wrap"))closeMenu();});
+  document.addEventListener("keydown",e=>{
+    if(e.key!=="Escape")return;
+    if(state.publishOpen&&state.publishStage===0){closePublish();return;}
+    if(!el("overflowMenu").classList.contains("hidden")){closeMenu();return;}
+    if(previewOpen())closePreview();
+  });
   window.addEventListener("keydown",e=>{
     if(e.key!=="?"||e.metaKey||e.ctrlKey||e.altKey)return;
     if(["INPUT","TEXTAREA","SELECT"].includes(document.activeElement?.tagName))return;

@@ -3,23 +3,86 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Photo Blog Local CMS</title>
+  <title>Photo Blog CMS</title>
   <meta name="description" content="Local CMS for editing a static personal photo blog." />
   <meta name="robots" content="noindex,nofollow" />
   <link rel="icon" href="data:," />
   <link rel="stylesheet" href="assets/vendor/leaflet.css" />
-  <link rel="stylesheet" href="assets/editor.css?v=20260804a" />
-  <script>try{var t=localStorage.getItem('editor-theme');if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+  <link rel="stylesheet" href="assets/editor.css?v=20260804b" />
+  <script>try{var t=localStorage.getItem('editor-theme');if(t!=='light'&&t!=='dark')t='dark';document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
 </head>
 <body>
   <div id="unsupported" class="unsupported hidden"><div class="welcome"><p class="eyebrow">Browser not supported</p><h1>Please open this editor in Google Chrome or Microsoft Edge.</h1><p class="intro">Bu editör, web sitesi klasörünü doğrudan okuyup yazmak için Chrome/Edge tarafından desteklenen güvenli klasör erişimini kullanır. Safari bu işlem için uygun değildir.</p></div></div>
-  <div id="onboarding" class="onboarding"><div class="welcome"><p class="eyebrow">Photo Blog Local CMS</p><h1>Web sitenizi teknik bilgi gerekmeden düzenleyin.</h1><p class="intro">Bu editör bilgisayarınızdaki <span class="code">01-website-ready-to-upload</span> klasörünü okur ve değişikliklerinizi doğrudan oraya kaydeder. Yayınlamak için tek yapmanız gereken GitHub Desktop'ta <b>Commit</b> + <b>Push</b> demek — gerisini GitHub otomatik halleder.</p><div class="steps"><div class="step"><b>1</b><h3>Proje klasörünü seçin</h3><p class="muted">GitHub Desktop'ta gördüğünüz proje klasörünü (içinde <span class="code">01-website-ready-to-upload</span> olan) seçin. Editör değişiklikleri bu klasöre yazar; böylece GitHub Desktop'ta hemen görünür.</p></div><div class="step"><b>2</b><h3>İçeriği düzenleyin</h3><p class="muted">Fotoğraf, hikâye, filtre, okuma süresi, slug ve metadata alanlarını düzenleyin. <b>Kaydet</b>'e bastığınızda hepsi otomatik senkronlanır ve görsel varyantları üretilir.</p></div><div class="step"><b>3</b><h3>GitHub ile yayınlayın</h3><p class="muted">Kaydettikten sonra GitHub Desktop'ta <b>Commit</b> + <b>Push</b> deyin. GitHub Actions siteyi otomatik derleyip yayına alır (~1-2 dk). Ek bir paket üretmenize gerek yok.</p></div></div><div class="bar"><button id="connectFirst" class="primary">Proje klasörünü seç</button><span class="status-pill"><span class="dot warn"></span>Chrome veya Edge kullanın</span></div></div></div>
-  <main id="app" class="app hidden">
-    <header class="topbar"><div><p class="eyebrow">Local content editor</p><h1>Photo Blog CMS</h1><p class="intro">Değişiklikler seçtiğiniz <span class="code">01-website-ready-to-upload</span> klasörüne kaydedilir. Yayınlamak için kayıttan sonra <b>GitHub Desktop'ta Commit + Push</b> deyin; GitHub Actions siteyi otomatik günceller.</p><div id="globalStatus" class="bar" style="margin-top:12px"></div></div><div class="top-actions"><button id="themeToggleBtn" class="theme-toggle-ed" title="Karanlık / aydınlık tema" aria-label="Temayı değiştir"><svg class="ic-moon" width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.5 14.8A8.3 8.3 0 0 1 9.2 3.5a8.3 8.3 0 1 0 11.3 11.3z"/></svg><svg class="ic-sun" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2M12 19.5v2M4.7 4.7l1.5 1.5M17.8 17.8l1.5 1.5M2.5 12h2M19.5 12h2M4.7 19.3l1.5-1.5M17.8 6.2l1.5-1.5"/></svg></button><button id="undoBtn" title="Geri al (Cmd/Ctrl+Z)">↶ Geri al</button><button id="redoBtn" title="Yinele (Cmd/Ctrl+Shift+Z)">↷ Yinele</button><button id="openLocalBtn" title="Yayındaki domaini (Site Ayarları) yeni sekmede açar. Yerel adres için 03-tools sunucusu çalışmalı.">Siteyi aç</button><button id="backupBtn">JSON yedeği indir</button><button id="buildPackageBtn">İndirilebilir kopya (opsiyonel)</button><button id="reloadBtn">Klasörden tekrar yükle</button><button id="saveBtn" class="primary">Değişiklikleri kaydet</button></div></header>
-    <section class="layout"><aside class="panel sidebar"><div class="pad"><nav id="nav" class="nav" aria-label="Editör bölümleri"></nav><p class="side-note">Yardım: Alt text erişilebilirlik ve SEO için kullanılır. Slug, hikâyenin URL dostu kısa adıdır.</p></div></aside><section id="editorPanel" class="panel"><div class="pad"></div></section><aside class="panel preview-panel"><div class="pad"><div class="section-head"><h2>Ön izleme</h2><span id="previewState" class="status-pill"><span class="dot"></span>Unsaved preview</span></div><div class="tabs" id="previewTabs" role="tablist" aria-label="Önizleme sayfaları"></div><div id="preview" class="preview"></div><div class="divider"></div><div id="validationPanel"></div><p class="field-help">Yayındaki siteyi kontrol etmenin en güvenilir yolu, GitHub Desktop'ta Commit + Push ettikten sonra canlı domaininizi açmaktır (GitHub Actions ~1-2 dk içinde yayınlar). Sağdaki ön izleme ise kaydetmeden önceki güncel düzenlemeleri gösterir.</p></div></aside></section>
-  </main>
+
+  <div id="onboarding" class="onboarding"><div class="welcome"><p class="eyebrow">Photo Blog CMS</p><h1>Web sitenizi teknik bilgi gerekmeden düzenleyin.</h1><p class="intro">Bu editör bilgisayarınızdaki <span class="code">01-website-ready-to-upload</span> klasörünü okur ve değişikliklerinizi doğrudan oraya kaydeder. Yayına almak için tek yapmanız gereken <b>Yayınla</b> demek.</p><div class="steps"><div class="step"><b>1</b><h3>Proje klasörünü seçin</h3><p class="muted">GitHub Desktop'ta gördüğünüz proje klasörünü (içinde <span class="code">01-website-ready-to-upload</span> olan) seçin. Editör değişiklikleri bu klasöre yazar.</p></div><div class="step"><b>2</b><h3>İçeriği düzenleyin</h3><p class="muted">Fotoğraf, hikâye, filtre, okuma süresi, slug ve metadata alanlarını düzenleyin. Görsel varyantları otomatik üretilir.</p></div><div class="step"><b>3</b><h3>Yayınlayın</h3><p class="muted">Yayınla penceresi kaydeder ve görselleri hazırlar; son adımda GitHub Desktop'ta Push dersiniz, site 1-2 dakikada güncellenir.</p></div></div><div class="bar"><button id="connectFirst" class="primary">Proje klasörünü seç</button><span class="status-pill"><span class="dot warn"></span>Chrome veya Edge kullanın</span></div></div></div>
+
+  <div id="app" class="app hidden">
+    <header class="appbar">
+      <div class="brand"><span class="brand-mark">P</span><span class="brand-name">Photo Blog CMS</span></div>
+
+      <button id="folderChip" class="folder-chip" title="Bağlı klasör"><span class="dot ok"></span><span id="folderChipName">01-website-ready-to-upload</span></button>
+
+      <div class="appbar-spacer"></div>
+
+      <button id="searchBtn" class="search-trigger" aria-label="Fotoğraf, hikâye ve serilerde ara"><span aria-hidden="true">⌕</span><span class="search-trigger-label">Ara</span><kbd>⌘K</kbd></button>
+
+      <div class="seg" role="group" aria-label="Geri al ve yinele">
+        <button id="undoBtn" title="Geri al (⌘Z)" aria-label="Geri al">↶</button>
+        <span class="seg-div"></span>
+        <button id="redoBtn" title="Yinele (⌘⇧Z)" aria-label="Yinele">↷</button>
+      </div>
+
+      <button id="previewBtn" class="ghost-btn" aria-expanded="false"><span aria-hidden="true">▤</span> Ön izleme</button>
+
+      <div class="menu-wrap">
+        <button id="menuBtn" class="icon-btn" title="Diğer işlemler" aria-haspopup="true" aria-expanded="false" aria-label="Diğer işlemler">···</button>
+        <div id="overflowMenu" class="menu hidden" role="menu">
+          <button id="openLocalBtn" role="menuitem"><span>Siteyi yeni sekmede aç</span><span class="menu-hint">yayında</span></button>
+          <button id="backupBtn" role="menuitem"><span>JSON yedeği indir</span><span class="menu-hint">⌘B</span></button>
+          <button id="reloadBtn" role="menuitem"><span>Klasörden tekrar yükle</span><span class="menu-hint"></span></button>
+          <button id="buildPackageBtn" role="menuitem"><span>İndirilebilir kopya üret</span><span class="menu-hint">opsiyonel</span></button>
+          <button id="themeToggleBtn" class="theme-toggle-ed" role="menuitem" aria-label="Temayı değiştir"><span>Karanlık / aydınlık tema</span><span class="menu-hint"><svg class="ic-moon" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.5 14.8A8.3 8.3 0 0 1 9.2 3.5a8.3 8.3 0 1 0 11.3 11.3z"/></svg><svg class="ic-sun" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2M12 19.5v2M4.7 4.7l1.5 1.5M17.8 17.8l1.5 1.5M2.5 12h2M19.5 12h2M4.7 19.3l1.5-1.5M17.8 6.2l1.5-1.5"/></svg></span></button>
+          <button id="shortcutsMenuBtn" role="menuitem"><span>Yardım ve kısayollar</span><span class="menu-hint">?</span></button>
+        </div>
+      </div>
+
+      <span class="appbar-div"></span>
+
+      <div class="save-state"><span id="dirtyLabel" class="dirty-label"></span><span id="savedLabel" class="saved-label"></span></div>
+      <button id="saveBtn" class="publish-btn">Yayınla</button>
+    </header>
+
+    <div class="shell">
+      <aside class="side">
+        <nav id="nav" class="nav" aria-label="Editör bölümleri"></nav>
+        <div class="side-foot">
+          <div class="side-card">
+            <div class="side-card-top"><span class="dot ok"></span>Klasör bağlı, yazma izni var</div>
+            <p>Kaydettiğiniz her şey doğrudan bu klasöre yazılır. Yayına almak için üstteki <b>Yayınla</b> yeterli.</p>
+          </div>
+        </div>
+      </aside>
+
+      <main id="editorPanel" class="main"><div class="pad"></div></main>
+    </div>
+  </div>
+
+  <div id="previewDrawer" class="drawer hidden" role="dialog" aria-modal="true" aria-label="Ön izleme">
+    <div id="previewScrim" class="drawer-scrim"></div>
+    <div class="drawer-panel">
+      <div class="drawer-head">
+        <h2>Ön izleme</h2>
+        <span id="previewState" class="status-pill"><span class="dot"></span>Ön izleme</span>
+        <div class="drawer-head-spacer"></div>
+        <button id="previewClose" class="icon-btn" aria-label="Ön izlemeyi kapat">✕</button>
+      </div>
+      <div class="drawer-tabs"><div class="tabs" id="previewTabs" role="tablist" aria-label="Önizleme sayfaları"></div></div>
+      <div class="drawer-body"><div id="preview" class="preview"></div><div id="validationPanel"></div></div>
+    </div>
+  </div>
+
   <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 <script src="assets/vendor/leaflet.js"></script>
-<script src="assets/editor.js?v=20260804a"></script>
+<script src="assets/editor.js?v=20260804b"></script>
 </body>
 </html>
