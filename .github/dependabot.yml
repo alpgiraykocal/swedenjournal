@@ -9,10 +9,18 @@ version: 2
 #
 # npm covers sharp / sharp-cli / exif-reader. They are devDependencies with no runtime
 # footprint on the published site, but `npm ci` and the AVIF backfill do run in the
-# deploy pipeline, so they are worth tracking. Major bumps are deliberately excluded:
-# sharp-cli changes its CLI flags across majors and 03-tools/generate-image-variants.sh
-# calls it directly, so those upgrades need a human to re-run image generation and
-# compare output rather than a green CI check.
+# deploy pipeline, so they are worth tracking.
+#
+# Nothing is filtered out here on purpose. An earlier version of this file ignored
+# semver-major for sharp, which does not do what it looks like: sharp is a 0.x package,
+# so its breaking changes land in the minor position and Dependabot classified
+# 0.30.6 -> 0.35.3 as semver-minor and raised the PR anyway. Rather than encode a rule
+# that quietly fails, the filtering is left off and the constraint is written down:
+#
+#   sharp and sharp-cli upgrades must not be merged on a green CI run alone.
+#   03-tools/generate-image-variants.sh drives the sharp-cli binary directly and its
+#   flags have changed across majors, and a new encoder can change AVIF output for
+#   every photo. Re-run image generation and compare output before merging.
 
 updates:
   - package-ecosystem: github-actions
@@ -32,8 +40,3 @@ updates:
     commit-message:
       prefix: "build"
     open-pull-requests-limit: 5
-    ignore:
-      - dependency-name: "sharp"
-        update-types: ["version-update:semver-major"]
-      - dependency-name: "sharp-cli"
-        update-types: ["version-update:semver-major"]
