@@ -1,0 +1,39 @@
+version: 2
+
+# Two ecosystems, for different reasons.
+#
+# github-actions pairs with the SHA pinning in workflows/deploy.yml: pinned SHAs are
+# secure but frozen, and nothing would ever tell us a pinned action has shipped a fix.
+# Dependabot rewrites the SHA and the trailing version comment together, so pinning
+# stays maintainable instead of rotting.
+#
+# npm covers sharp / sharp-cli / exif-reader. They are devDependencies with no runtime
+# footprint on the published site, but `npm ci` and the AVIF backfill do run in the
+# deploy pipeline, so they are worth tracking. Major bumps are deliberately excluded:
+# sharp-cli changes its CLI flags across majors and 03-tools/generate-image-variants.sh
+# calls it directly, so those upgrades need a human to re-run image generation and
+# compare output rather than a green CI check.
+
+updates:
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: monthly
+    commit-message:
+      prefix: "ci"
+    groups:
+      actions:
+        patterns: ["*"]
+
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: monthly
+    commit-message:
+      prefix: "build"
+    open-pull-requests-limit: 5
+    ignore:
+      - dependency-name: "sharp"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "sharp-cli"
+        update-types: ["version-update:semver-major"]
