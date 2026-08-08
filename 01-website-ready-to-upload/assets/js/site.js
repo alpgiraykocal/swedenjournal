@@ -5,7 +5,7 @@ import {
   collections, collectionPhotos, collectionsMain, collectionMain, collectionHref, photoExifChips,
   photoStory, photoCollection,
   websiteLdObject, imageGalleryLdObject, personLdObject, articleLdObject, photoLdObject, collectionsLdObject, collectionLdObject, fullVariantDims,
-} from "./templates.mjs?v=cb915937db";
+} from "./templates.mjs?v=1c3a177249";
 
 // Cache-bust the runtime content fetches. /assets/data/*.json is served with a long
 // edge cache (the host ignores _headers), so without a content-versioned URL a freshly
@@ -38,6 +38,19 @@ async function loadGalleryData(){
   return res.json();
 }
 function $(s, r=document){ return r.querySelector(s); }
+// Search folding: Swedish place names are full of å/ä/ö and most visitors type
+// plain ASCII ("vasteras" for Västerås), so strip combining marks before matching.
+// Typographic punctuation is folded for the same reason ("Helsingborg's" vs the
+// curly ’ the content is written with).
+function foldText(value){
+  return String(value == null ? "" : value)
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .replace(/[‘’ʼ]/g, "'")
+    .replace(/[“”]/g, '"')
+    .replace(/[–—]/g, "-")
+    .toLowerCase();
+}
 function currentPage(){ return document.body.dataset.page || "home"; }
 const query = () => new URLSearchParams(location.search);
 function ensureMeta(selector, tagName, attrs){
@@ -411,6 +424,32 @@ function initMap(elId, dataId){
     io.observe(el);
   }else{ start(); }
 }
+// The narrow-screen nav is a horizontally scrolling strip with a hidden scrollbar,
+// so the theme toggle and Instagram link can sit off-screen with nothing to show it.
+// Mark the edges that still have content behind them and let CSS fade them; the
+// attributes are dropped when the strip fits, so desktop is untouched.
+function initNavScrollHint(){
+  const nav = $(".nav-links");
+  if(!nav) return;
+  // Tolerance, not 1px: scroll-snap parks the strip on the first item's snap
+  // position (the 2px inline padding), so an exact test would fade the left edge
+  // even when the nav is sitting at rest at the start.
+  const EDGE = 8;
+  const sync = () => {
+    const overflow = nav.scrollWidth - nav.clientWidth;
+    if(overflow <= EDGE){
+      nav.removeAttribute("data-scroll-start");
+      nav.removeAttribute("data-scroll-end");
+      return;
+    }
+    nav.toggleAttribute("data-scroll-start", nav.scrollLeft > EDGE);
+    nav.toggleAttribute("data-scroll-end", nav.scrollLeft < overflow - EDGE);
+  };
+  nav.addEventListener("scroll", sync, {passive:true});
+  window.addEventListener("resize", sync);
+  if(window.ResizeObserver) new ResizeObserver(sync).observe(nav);
+  sync();
+}
 function initThemeToggle(){
   const root = document.documentElement;
   const mq = window.matchMedia ? matchMedia("(prefers-color-scheme: dark)") : null;
@@ -451,6 +490,7 @@ async function boot(){
     const page = document.body.dataset.page;
     setContext({root: window.__ROOT__ || "", prefix: window.__ASSET_PREFIX__ || "", page});
     initThemeToggle();
+    initNavScrollHint();
     if(document.body.dataset.prerendered === "1"){
       await hydrate(page);
       bindScrollReveal();
@@ -622,8 +662,8 @@ function initGalleryMasonry(){
 // (tags/category live there, not in the text). Empty query matches everything.
 function cardMatchesQuery(card, queryText){
   if(!queryText) return true;
-  const hay = (card.textContent + " " + (card.dataset.tags || "") + " " + (card.dataset.category || "")).toLowerCase();
-  return queryText.split(/\s+/).filter(Boolean).every(word => hay.includes(word));
+  const hay = foldText(card.textContent + " " + (card.dataset.tags || "") + " " + (card.dataset.category || ""));
+  return foldText(queryText).split(/\s+/).filter(Boolean).every(word => hay.includes(word));
 }
 function bindSearchInput(input, onQuery){
   if(!input) return;

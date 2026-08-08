@@ -105,6 +105,22 @@ button:disabled{opacity:.48;cursor:not-allowed;transform:none}
 .nav-links a{min-height:44px;display:inline-flex;align-items:center;border-radius:999px;padding:0 12px;border:1px solid transparent;transition:background .18s var(--ease),color .18s var(--ease),border-color .18s var(--ease)}
 .nav-links a:hover,.nav-links a[aria-current="page"]{color:var(--text);background:rgba(31,29,25,.055);border-color:var(--line)}
 .nav-links a:last-child{color:var(--accent-cool);border-color:rgba(36,91,106,.28)}
+/* Scroll affordance: on narrow screens the nav is a horizontally scrolling strip
+   with a hidden scrollbar, so the theme toggle and Instagram link sit off-screen
+   with nothing to signal it. site.js sets data-scroll-start/end when the strip
+   actually overflows; the mask fades whichever edge still has content behind it. */
+.nav-links[data-scroll-end]{
+  -webkit-mask-image:linear-gradient(to right,#000 calc(100% - 30px),transparent);
+  mask-image:linear-gradient(to right,#000 calc(100% - 30px),transparent);
+}
+.nav-links[data-scroll-start]{
+  -webkit-mask-image:linear-gradient(to left,#000 calc(100% - 30px),transparent);
+  mask-image:linear-gradient(to left,#000 calc(100% - 30px),transparent);
+}
+.nav-links[data-scroll-start][data-scroll-end]{
+  -webkit-mask-image:linear-gradient(to right,transparent,#000 30px,#000 calc(100% - 30px),transparent);
+  mask-image:linear-gradient(to right,transparent,#000 30px,#000 calc(100% - 30px),transparent);
+}
 .theme-toggle{min-height:44px;min-width:44px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:0 10px;border:1px solid transparent;background:none;color:var(--muted);cursor:pointer;transition:background .18s var(--ease),color .18s var(--ease),border-color .18s var(--ease)}
 .theme-toggle:hover{color:var(--text);background:rgba(31,29,25,.055);border-color:var(--line)}
 :root[data-theme="dark"] .theme-toggle:hover{background:rgba(240,236,228,.08)}
@@ -593,9 +609,21 @@ body[data-page="gallery"] .container{overflow:hidden}
   .photo-card,.photo-card:nth-child(n){grid-column:auto}
   .gallery-grid[data-masonry]{grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:0 16px}
   .nav{align-items:flex-start;padding:11px 0;display:grid;gap:10px}
-  .nav-links{width:100%;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
-  .nav-links a{justify-content:center;padding:0 10px}
-  .nav-links a:last-child{grid-column:1/-1}
+  /* Single scrolling row. A fixed column count wrapped the 8 items (6 links +
+     theme toggle + Instagram) onto 4 rows and pushed the sticky header to 228px
+     on tablets, where there is in fact room for all of them on one line. */
+  .nav-links{
+    width:100%;
+    display:flex;
+    gap:6px;
+    overflow-x:auto;
+    overscroll-behavior-x:contain;
+    scroll-snap-type:x proximity;
+    scrollbar-width:none;
+  }
+  .nav-links::-webkit-scrollbar{display:none}
+  .nav-links a{flex:0 0 auto;justify-content:center;padding:0 10px;scroll-snap-align:start}
+  .nav-links .theme-toggle{flex:0 0 auto}
   .lightbox{grid-template-columns:1fr;align-items:end;padding:16px;gap:16px;overflow:auto}
   .lightbox-media{display:block}
   .lightbox-media picture{display:block;width:100%}
@@ -619,24 +647,13 @@ body[data-page="gallery"] .container{overflow:hidden}
   .brand{font-size:16px;line-height:1.15}
   .brand{min-height:44px}
   .brand::after{display:none}
-  .nav-links{
-    display:flex;
-    gap:4px;
-    overflow-x:auto;
-    overscroll-behavior-x:contain;
-    padding:0 2px 3px;
-    scroll-snap-type:x proximity;
-    scrollbar-width:none;
-  }
-  .nav-links::-webkit-scrollbar{display:none}
+  /* Layout comes from the max-width:850px block; only the sizing differs here. */
+  .nav-links{gap:4px;padding:0 2px 3px}
   .nav-links a{
-    flex:0 0 auto;
     min-height:44px;
     padding:0 8px;
     font-size:12px;
-    scroll-snap-align:start;
   }
-  .nav-links a:last-child{grid-column:auto}
   .headline{font-size:2.45rem;line-height:1.02}
   h2{font-size:2.35rem}
   .intro,.prose{font-size:16px}
