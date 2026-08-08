@@ -275,9 +275,15 @@ export function galleryMain(data) {
   const g = data.gallery || {};
   const list = sortPhotos(photos(data));
   const series = liveCollections(data);
+  // No photo is above the fold here — the hero, series strip and filter toolbar push
+  // the first card to ~978px (desktop) / ~1066px (mobile), so nothing in this grid is
+  // ever the LCP element. Eager-loading a dozen of them only spent bandwidth on
+  // off-screen content; a small head start is enough, and fetchpriority would compete
+  // with the text that is actually visible. Card heights come from the inline
+  // aspect-ratio (mediaRatioStyle), so lazy loading costs no layout stability.
   return `<main><section class="hero container"><p class="eyebrow">${esc(g.eyebrow)}</p><h1 class="headline">${esc(g.headline)}</h1><p class="intro">${esc(g.intro)}</p></section>
   ${series.length ? `<section class="section series-strip"><div class="container"><div class="section-head"><div><p class="eyebrow">Browse by series</p><h2>Follow a thread</h2></div><a class="text-link" href="${root()}series/index.html">All series</a></div><div class="series-chip-row">${series.map((c) => `<a class="series-chip" href="${collectionHref(c.slug)}">${esc(c.title)}<span>${collectionPhotos(data, c).length}</span></a>`).join("")}</div></div></section>` : ""}
-  <section class="section" aria-labelledby="galleryHeading"><div class="container"><h2 id="galleryHeading" class="visually-hidden">Photographs</h2><div class="gallery-toolbar"><div><input type="search" id="gallerySearch" class="site-search" placeholder="Search photographs…" aria-label="Search photographs by title, place, or tag" autocomplete="off"><div class="filters" role="group" aria-label="Gallery filters">${(g.filters || ["All"]).map((f, i) => `<button class="filter ${i === 0 ? "active" : ""}" data-filter="${esc(f)}" aria-pressed="${i === 0 ? "true" : "false"}">${esc(f)}</button>`).join("")}</div><p class="gallery-count" id="galleryCount" aria-live="polite">${list.length} photographs</p></div><button class="filter-reset" type="button">Reset</button></div><div class="gallery-empty" id="galleryEmpty" hidden><h2>No photographs found.</h2><p class="muted">Reset the filters to return to the full edit.</p></div><div class="gallery-grid" id="galleryGrid" data-masonry>${list.map((p, i) => photoFigure(p, { priority: i < 2, eager: i < 12, interactive: true, story: photoStory(data, p.id) })).join("")}</div></div></section><div id="lightboxRoot"></div></main>`;
+  <section class="section" aria-labelledby="galleryHeading"><div class="container"><h2 id="galleryHeading" class="visually-hidden">Photographs</h2><div class="gallery-toolbar"><div><input type="search" id="gallerySearch" class="site-search" placeholder="Search photographs…" aria-label="Search photographs by title, place, or tag" autocomplete="off"><div class="filters" role="group" aria-label="Gallery filters">${(g.filters || ["All"]).map((f, i) => `<button class="filter ${i === 0 ? "active" : ""}" data-filter="${esc(f)}" aria-pressed="${i === 0 ? "true" : "false"}">${esc(f)}</button>`).join("")}</div><p class="gallery-count" id="galleryCount" aria-live="polite">${list.length} photographs</p></div><button class="filter-reset" type="button">Reset</button></div><div class="gallery-empty" id="galleryEmpty" hidden><h2>No photographs found.</h2><p class="muted">Reset the filters to return to the full edit.</p></div><div class="gallery-grid" id="galleryGrid" data-masonry>${list.map((p, i) => photoFigure(p, { eager: i < 4, interactive: true, story: photoStory(data, p.id) })).join("")}</div></div></section><div id="lightboxRoot"></div></main>`;
 }
 export function storiesMain(data) {
   const sp = data.storiesPage || {};
@@ -331,8 +337,12 @@ export function collectionsMain(data) {
 }
 export function collectionMain(data, col) {
   const list = collectionPhotos(data, col);
+  // Unlike the gallery, this page has no filter toolbar, so the grid starts at ~537px
+  // and photos really are above the fold (1 on mobile, 5 on a 1440x900 desktop). The
+  // first one is the LCP element and keeps fetchpriority; the rest of the opening row
+  // stays eager.
   return `<main><section class="hero container"><p class="eyebrow"><a class="text-link" href="${root()}series/index.html">Series</a></p><h1 class="headline">${esc(col.title)}</h1>${col.description ? `<p class="intro">${esc(col.description)}</p>` : ""}<p class="gallery-count">${list.length} ${list.length === 1 ? "photograph" : "photographs"}</p></section>
-  <section class="section selected-section" aria-labelledby="seriesHeading"><div class="container"><h2 id="seriesHeading" class="visually-hidden">Photographs in ${esc(col.title)}</h2><div class="gallery-grid" data-masonry>${list.map((p, i) => photoFigure(p, { priority: i < 2, eager: i < 12, interactive: true, story: photoStory(data, p.id) })).join("")}</div></div></section><div id="lightboxRoot"></div></main>`;
+  <section class="section selected-section" aria-labelledby="seriesHeading"><div class="container"><h2 id="seriesHeading" class="visually-hidden">Photographs in ${esc(col.title)}</h2><div class="gallery-grid" data-masonry>${list.map((p, i) => photoFigure(p, { priority: i < 1, eager: i < 6, interactive: true, story: photoStory(data, p.id) })).join("")}</div></div></section><div id="lightboxRoot"></div></main>`;
 }
 export function aboutMain(data) {
   const a = data.about || {}, p = photo(data, a.portraitPhotoId);
@@ -456,7 +466,11 @@ export function articleLdObject(data, story, heroPhoto) {
   const base = String(data.site?.baseUrl || "").replace(/\/+$/, "");
   const hasGeo = story.coordinates && Number.isFinite(Number(story.coordinates.lat)) && Number.isFinite(Number(story.coordinates.lng));
   const contentLocation = hasGeo ? { "@type": "Place", name: story.location || story.title || "", geo: { "@type": "GeoCoordinates", latitude: Number(story.coordinates.lat), longitude: Number(story.coordinates.lng) } } : undefined;
-  return { "@context": "https://schema.org", "@type": "Article", headline: story.title || "", description: story.summary || data.site?.description || "", image: jsonLdImageUrl(data, heroPhoto), datePublished: machineDate(story.isoDate) || machineDate(story.date), author: { "@type": "Person", name: data.site?.ownerName || "", url: base || undefined }, publisher: { "@type": "Organization", name: data.site?.siteTitle || data.site?.ownerName || "", logo: { "@type": "ImageObject", url: (base || "") + "/icon-512.png" } }, contentLocation, url: absoluteUrl(data, "stories/" + encodeURIComponent(story.slug) + "/") };
+  // No per-story modification tracking exists, so dateModified mirrors datePublished:
+  // accurate (nothing has been revised since publication) and it stops consumers from
+  // treating the article as having an unknown freshness.
+  const published = machineDate(story.isoDate) || machineDate(story.date);
+  return { "@context": "https://schema.org", "@type": "Article", headline: story.title || "", description: story.summary || data.site?.description || "", image: jsonLdImageUrl(data, heroPhoto), datePublished: published, dateModified: published, author: { "@type": "Person", name: data.site?.ownerName || "", url: base || undefined }, publisher: { "@type": "Organization", name: data.site?.siteTitle || data.site?.ownerName || "", logo: { "@type": "ImageObject", url: (base || "") + "/icon-512.png" } }, contentLocation, url: absoluteUrl(data, "stories/" + encodeURIComponent(story.slug) + "/") };
 }
 export function photoLdObject(data, p) {
   const st = photoStory(data, p.id);
