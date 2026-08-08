@@ -48,7 +48,7 @@ for (const photo of data.photos || []) {
     full:   { width: 2200 },
   };
   // Declared srcset width = the target cap, but never wider than the source itself.
-  // generate-image-variants.sh resizes with no enlargement, so a small/portrait source
+  // generate-image-variants.mjs resizes with no enlargement, so a small/portrait source
   // yields a variant narrower than the cap; advertising the cap as its `w` descriptor
   // would make the browser overrate the candidate. Clamp to the real pixel width.
   const sourceWidth = Number(photo.width);

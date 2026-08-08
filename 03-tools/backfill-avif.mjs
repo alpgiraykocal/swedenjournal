@@ -11,7 +11,7 @@
 // that has no AVIF file on disk, it encodes one from the same-size JPEG variant. AVIF
 // from an already-downsized JPEG is still ~50–60% smaller than the WebP, so the
 // efficiency gate in sync-image-variants keeps it. Variants generated from the original
-// source (generate-image-variants.sh) are left untouched — we only fill gaps.
+// source (generate-image-variants.mjs) are left untouched — we only fill gaps.
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -21,8 +21,9 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const websiteDir = path.join(root, "01-website-ready-to-upload");
 const data = JSON.parse(fs.readFileSync(path.join(websiteDir, "assets/data/site-content.json"), "utf8"));
 
-// Match the qualities used by generate-image-variants.sh so AVIF looks consistent.
-const SIZES = { thumb: 42, medium: 44, full: 46 };
+// Match the qualities used by generate-image-variants.mjs so AVIF looks consistent — see
+// the note there on why these are 50/52/54 rather than the 42/44/46 used under sharp 0.30.
+const SIZES = { thumb: 50, medium: 52, full: 54 };
 
 const generatedDir = (size) => path.join(websiteDir, "assets/images/generated", size);
 const baseName = (src) => path.basename(src, path.extname(src));
