@@ -26,7 +26,7 @@ graphify-out/
 # Local-only Claude Code config (preview server, agent settings) — not needed in the repo
 .claude/
 
-# Original full-resolution source photos (~182 MB). Kept out of git to keep the repo
+# Original full-resolution source photos (~365 MB). Kept out of git to keep the repo
 # lean and to avoid deploying the originals. The site serves only the generated
 # variants (assets/images/generated/), which ARE committed.
 # >>> Keep your own backup of this folder — you need it to re-encode image variants.

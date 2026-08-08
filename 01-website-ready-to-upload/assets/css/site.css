@@ -844,7 +844,7 @@ body[data-page="gallery"] .container{overflow:hidden}
 @media print{
   .js-reveal .photo-card,.js-reveal .story-card,.js-reveal .story-inline-photo,
   .js-reveal .story-body > p,.js-reveal .story-body > h2,.js-reveal .story-body > blockquote{opacity:1!important;transform:none!important}
-  .site-header,.lightbox,.share-panel,.stories-map-section{display:none!important}
+  .site-header,.lightbox,.share-panel{display:none!important}
 }
 @media (forced-colors: active){
   .nav-links a,.filter,.filter-reset,.share-action,.photo-open,
@@ -853,10 +853,8 @@ body[data-page="gallery"] .container{overflow:hidden}
   .text-link::after,.story-link::after{forced-color-adjust:none}
 }
 
-/* Stories map (Leaflet). Enhancement only — hidden without JS (the story list is
-   the fallback). Fixed height reserves space so the map never causes layout shift. */
-.stories-map-section{display:none}
-.js-reveal .stories-map-section{display:block}
+/* Leaflet map surface (atlas page). Fixed height reserves space so the map never
+   causes layout shift. */
 .stories-map{height:440px;border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow);background:var(--surface-strong)}
 /* Atlas page */
 .atlas-hero{padding-bottom:46px}

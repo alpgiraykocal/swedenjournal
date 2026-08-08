@@ -45,7 +45,6 @@ export function responsiveImage(p, opts = {}) {
   const fallback = variant(p, opts.fallbackSize || "medium", "jpeg") || imgPath(p);
   return `<picture>${avifSet ? `<source type="image/avif" srcset="${esc(avifSet)}" sizes="${sizes}">` : ""}${webpSet ? `<source type="image/webp" srcset="${esc(webpSet)}" sizes="${sizes}">` : ""}<img${className} src="${esc(fallback)}"${jpegSet ? ` srcset="${esc(jpegSet)}" sizes="${sizes}"` : ""} alt="${esc(alt)}"${loading} decoding="async"${size}${vt}></picture>`;
 }
-export const storyMeta = (s) => metaText([s.location, s.date, s.readingTime]);
 export const storyCardMeta = (s) => metaText([s.location, s.date]);
 export const storyHref = (slug) => `${root()}stories/${encodeURIComponent(slug)}/`;
 export function absoluteUrl(data, path = "") {
