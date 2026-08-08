@@ -1034,6 +1034,21 @@
   function closeMenu(){const m=el("overflowMenu");if(m&&!m.classList.contains("hidden")){m.classList.add("hidden");el("menuBtn")?.setAttribute("aria-expanded","false");}}
   function toggleMenu(){const m=el("overflowMenu");if(!m)return;const open=m.classList.toggle("hidden")===false;el("menuBtn")?.setAttribute("aria-expanded",String(open));if(open)m.querySelector("button")?.focus();}
 
+  // ---- overlay focus containment -------------------------------------------
+  // The drawer and the publish modal are hand-rolled overlays that claim
+  // aria-modal="true". Without help that claim is a lie: everything behind them
+  // stays tabbable and visible to screen readers. `inert` removes a subtree from
+  // focus, hit-testing and the accessibility tree, which is what the native
+  // <dialog showModal()> used for the shortcut/search sheets does for free.
+  function syncOverlayInert(){
+    const app=el("app"), drawer=el("previewDrawer");
+    const modalAcik=!!el("publishModal");
+    const drawerAcik=drawer&&!drawer.classList.contains("hidden");
+    // The modal sits above the drawer, so the drawer is inert while it is open.
+    app.toggleAttribute("inert", modalAcik||drawerAcik);
+    if(drawer)drawer.toggleAttribute("inert", modalAcik);
+  }
+
   // ---- preview drawer -------------------------------------------------------
   // Preview used to occupy a permanent third column, which cost ~380px of editing
   // width on every screen even when nobody was looking at it. It is now on demand.
@@ -1042,9 +1057,10 @@
     const d=el("previewDrawer");if(!d)return;
     d.classList.remove("hidden");el("previewBtn")?.setAttribute("aria-expanded","true");
     renderPreviewTabs();renderPreview();renderValidation();
+    syncOverlayInert();
     el("previewClose")?.focus();
   }
-  function closePreview(){el("previewDrawer")?.classList.add("hidden");el("previewBtn")?.setAttribute("aria-expanded","false");el("previewBtn")?.focus();}
+  function closePreview(){el("previewDrawer")?.classList.add("hidden");el("previewBtn")?.setAttribute("aria-expanded","false");syncOverlayInert();el("previewBtn")?.focus();}
   function togglePreview(){previewOpen()?closePreview():openPreview();}
 
   // ---- publish -------------------------------------------------------------
@@ -1090,7 +1106,7 @@
   }
   function renderPublishModal(){
     let m=el("publishModal");
-    if(!state.publishOpen){m?.remove();return;}
+    if(!state.publishOpen){m?.remove();syncOverlayInert();return;}
     if(!m){m=document.createElement("div");m.id="publishModal";m.className="modal";document.body.appendChild(m);}
     m.innerHTML=publishModalHtml();
     m.querySelectorAll("[data-publish-close]").forEach(x=>x.onclick=closePublish);
@@ -1098,6 +1114,7 @@
     el("publishDetailsBtn").onclick=()=>{state.publishDetails=!state.publishDetails;renderPublishModal();};
     const s=el("publishStartBtn");if(s)s.onclick=startPublish;
     const o=el("publishOpenSite");if(o)o.onclick=()=>openPublic("");
+    syncOverlayInert();
     (el("publishStartBtn")||el("publishCloseBtn")).focus();
   }
   function openPublish(){state.publishOpen=true;state.publishStage=0;closeMenu();renderPublishModal();}
@@ -1145,7 +1162,26 @@
     if(e.key!=="?"||e.metaKey||e.ctrlKey||e.altKey)return;
     if(["INPUT","TEXTAREA","SELECT"].includes(document.activeElement?.tagName))return;
     e.preventDefault();showShortcuts();
-  });{const tb=el("themeToggleBtn");if(tb){const rootEl=document.documentElement;const eff=()=>rootEl.getAttribute("data-theme")||"light";const sync=()=>{const d=eff()==="dark";tb.dataset.mode=d?"dark":"light";tb.setAttribute("aria-label",d?"Aydınlık temaya geç":"Karanlık temaya geç");};tb.onclick=()=>{const next=eff()==="dark"?"light":"dark";rootEl.setAttribute("data-theme",next);try{localStorage.setItem("editor-theme",next);}catch(e){}sync();};sync();}}el("backupBtn").onclick=downloadJsonBackup;el("buildPackageBtn").onclick=buildUploadPackage;el("openLocalBtn").onclick=()=>openPublic("");el("reloadBtn").onclick=async()=>{if(state.dirty&&!confirm("Kaydedilmemiş değişiklikler var. Klasörden yeniden yükleyip bu değişiklikleri kaybetmek istiyor musunuz?"))return;try{await loadFromFolder();render();showToast("Klasörden yeniden yüklendi");}catch(e){showToast(e.message);}};
+  });let _themeSwitchTimer=0;
+  {const tb=el("themeToggleBtn");if(tb){const rootEl=document.documentElement;const eff=()=>rootEl.getAttribute("data-theme")||"light";const sync=()=>{const d=eff()==="dark";tb.dataset.mode=d?"dark":"light";tb.setAttribute("aria-label",d?"Aydınlık temaya geç":"Karanlık temaya geç");};tb.onclick=()=>{
+      const next=eff()==="dark"?"light":"dark";
+      // Chrome does not restart a running CSS transition when only the custom property
+      // behind it changes, so every transitioned property — button colour, background
+      // and border — kept its OLD theme's value after a toggle while untransitioned
+      // ones (body, headings, the sidebar plate) flipped. The sidebar ended up light
+      // with dark-theme label text at 1.3:1. Suppressing transitions for one frame
+      // forces those properties to recompute against the new variables.
+      rootEl.classList.add("theme-switching");
+      rootEl.setAttribute("data-theme",next);
+      void rootEl.offsetWidth;   // commit the transition-free state before restoring
+      // Cleared on a timer, not requestAnimationFrame: rAF does not run in a
+      // background or throttled tab, and a toggle there would leave the class stuck,
+      // killing every hover/press animation until reload.
+      clearTimeout(_themeSwitchTimer);
+      _themeSwitchTimer=setTimeout(()=>rootEl.classList.remove("theme-switching"),60);
+      try{localStorage.setItem("editor-theme",next);}catch(e){}
+      sync();
+    };sync();}}el("backupBtn").onclick=downloadJsonBackup;el("buildPackageBtn").onclick=buildUploadPackage;el("openLocalBtn").onclick=()=>openPublic("");el("reloadBtn").onclick=async()=>{if(state.dirty&&!confirm("Kaydedilmemiş değişiklikler var. Klasörden yeniden yükleyip bu değişiklikleri kaybetmek istiyor musunuz?"))return;try{await loadFromFolder();render();showToast("Klasörden yeniden yüklendi");}catch(e){showToast(e.message);}};
   window.addEventListener("keydown",e=>{const mod=e.metaKey||e.ctrlKey;if(!mod)return;const inField=["INPUT","TEXTAREA","SELECT"].includes(document.activeElement?.tagName);if(e.key.toLowerCase()==="z"&&!inField){e.preventDefault();e.shiftKey?redoChange():undoChange();}if(e.key.toLowerCase()==="y"&&!inField){e.preventDefault();redoChange();}if(e.key.toLowerCase()==="s"){e.preventDefault();saveToDisk();}if(e.key.toLowerCase()==="k"&&state.content){e.preventDefault();showSearch();}if(e.key.toLowerCase()==="b"&&!inField){e.preventDefault();downloadJsonBackup();}if(e.key==="Enter"&&!inField){e.preventDefault();if(state.previewTab==="story"&&state.selectedStorySlug)openPublic(storyPublicPath(state.selectedStorySlug));else if(state.previewTab==="gallery")openPublic("gallery/");else if(state.previewTab==="stories")openPublic("stories/");else openPublic("");}});
   window.addEventListener("beforeunload", e=>{if(state.dirty){e.preventDefault();e.returnValue="Kaydedilmemiş değişiklikler var.";}});
   if(ensureSupported()){tryAutoReconnect();}
