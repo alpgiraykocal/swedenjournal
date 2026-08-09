@@ -564,6 +564,26 @@
   // would silently reshuffle the PUBLIC gallery order for photos that tie on sortOrder.
   function sortedPhotos(){return [...state.content.photos].sort((a,b)=>{const ao=sortOrderValue(a.sortOrder),bo=sortOrderValue(b.sortOrder);if(ao!==bo)return ao-bo;if(Boolean(a.featured)!==Boolean(b.featured))return a.featured?-1:1;return String(a.title||"").localeCompare(String(b.title||""));});}
   function validateContent(c=state.content){const errors=[], warnings=[];if(!c){errors.push("İçerik yüklenmedi.");return{errors,warnings};}
+    // Destructive-change guard. normalizeContent fills in empty arrays for anything the
+    // incoming JSON omits, so pasting valid-but-empty JSON (literally "{}") into the
+    // Advanced section silently emptied the site — and with nothing left to iterate, every
+    // other rule below found nothing to complain about and QA reported zero blocking
+    // errors. Publishing that state would prune every story, photo and series directory
+    // off the live site. Compare against what was actually loaded from disk.
+    try{
+      const disk=state.originalJson?JSON.parse(state.originalJson):null;
+      if(disk){
+        const was={photos:(disk.photos||[]).length,stories:(disk.stories||[]).length,collections:(disk.collections||[]).length};
+        const now={photos:(c.photos||[]).length,stories:(c.stories||[]).length,collections:(c.collections||[]).length};
+        for(const k of ["photos","stories","collections"]){
+          const label={photos:"fotoğraf",stories:"hikâye",collections:"seri"}[k];
+          if(was[k]>0&&now[k]===0)
+            errors.push(`Tüm ${label} kayıtları silinmiş görünüyor (diskte ${was[k]}, şu an 0). Yayınlarsanız bu sayfalar siteden kaldırılır — yanlışlıkla olduysa Geri Al ile dönün.`);
+          else if(was[k]>=4&&now[k]<Math.ceil(was[k]/2))
+            warnings.push(`${label} sayısı ${was[k]} → ${now[k]} düştü. Bu kadar silme amaçlıysa devam edin.`);
+        }
+      }
+    }catch(e){/* originalJson unparseable: nothing to compare against, skip the guard */}
     const ids=c.photos.map(p=>p.id).filter(Boolean), slugs=c.stories.map(s=>s.slug).filter(Boolean);const photoSet=new Set(ids), slugSet=new Set(slugs);
     if(ids.length!==photoSet.size)errors.push("Tekrarlanan fotoğraf ID tespit edildi. Her fotoğrafın benzersiz bir ID değeri olmalı.");
     if(slugs.length!==slugSet.size)errors.push("Tekrarlanan hikâye slug'ı. Her hikâyenin benzersiz bir slug değeri olmalı.");
