@@ -70,7 +70,7 @@ function checkFile(filePath, label = path.relative(root, filePath)) {
 }
 
 function checkHtmlMetadata(baseDir) {
-  const pages = ["index.html", "gallery/index.html", "stories/index.html", "story/index.html", "about/index.html", "atlas/index.html", "series/index.html", "404.html"];
+  const pages = ["index.html", "gallery/index.html", "stories/index.html", "story/index.html", "about/index.html", "atlas/index.html", "404.html"];
   for (const page of pages) {
     const filePath = path.join(baseDir, page);
     checkFile(filePath);
@@ -252,8 +252,8 @@ function checkPhotoShells(baseDir) {
   }
 }
 
-// Series (photo collections): the index and one page per non-empty collection must
-// exist with the right shell paths, canonical, JSON-LD, and sitemap entries — mirrors
+// Series (photo collections): one page per non-empty collection must exist with the
+// right shell paths, canonical, JSON-LD, and sitemap entries — mirrors
 // the guards on story/photo pages so the collections feature can't silently degrade.
 function checkCollections(baseDir) {
   const dataPath = path.join(baseDir, "assets", "data", "site-content.json");
@@ -270,13 +270,21 @@ function checkCollections(baseDir) {
   const cols = (content.collections || []).filter((c) => c.slug && c.title && (c.photoIds || []).some((id) => photoIds.has(id)));
   unique(cols.map((c) => c.slug), "collection slug");
 
-  const indexPath = path.join(baseDir, "series", "index.html");
-  checkFile(indexPath, "series/index.html");
-  if (exists(indexPath)) {
-    const html = read(indexPath);
-    if (!html.includes('rel="canonical" href="https://sweden-journal.com/series/"')) fail("series/index.html has wrong canonical");
-    if (!html.includes('data-page="series"')) fail('series/index.html missing data-page="series"');
-    if (cols.length && !html.includes('"@type":"CollectionPage"')) fail("series/index.html missing CollectionPage JSON-LD");
+  // The /series/ index was folded into the gallery. Assert it stays gone: render-site no
+  // longer emits it, and a stray copy would be an orphaned URL competing with /gallery/.
+  if (exists(path.join(baseDir, "series", "index.html"))) {
+    fail("series/index.html is back — the series listing belongs on the gallery page");
+  }
+  // …and assert the listing actually made it there, so the section cannot silently
+  // vanish and leave the collections reachable only by direct URL.
+  const galleryPath = path.join(baseDir, "gallery", "index.html");
+  if (cols.length && exists(galleryPath)) {
+    const gallery = read(galleryPath);
+    for (const col of cols) {
+      if (!gallery.includes(`href="../series/${encodeURIComponent(col.slug)}/"`)) {
+        fail(`gallery/index.html is missing the series listing link for: ${col.slug}`);
+      }
+    }
   }
 
   for (const col of cols) {
@@ -295,7 +303,7 @@ function checkCollections(baseDir) {
   const sitemapPath = path.join(baseDir, "sitemap.xml");
   if (exists(sitemapPath)) {
     const sm = read(sitemapPath);
-    if (cols.length && !/<loc>https:\/\/[^<]+\/series\/<\/loc>/.test(sm)) fail("sitemap.xml missing /series/ index URL");
+    if (/<loc>https:\/\/[^<]+\/series\/<\/loc>/.test(sm)) fail("sitemap.xml still lists the removed /series/ index URL");
     for (const col of cols) {
       if (!sm.includes(`<loc>https://sweden-journal.com/series/${encodeURIComponent(col.slug)}/</loc>`)) fail(`sitemap.xml missing series URL: ${col.slug}`);
     }

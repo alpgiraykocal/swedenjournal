@@ -39,7 +39,10 @@ const speculationLine = `  <script type="speculationrules">${SPECULATION_RULES}<
 const SIZES_STORY = "(max-width: 1220px) calc(100vw - 40px), 1180px";
 const sizesFor = {
   "index.html": "(max-width: 850px) calc(100vw - 28px), 620px",
-  "gallery/index.html": "(max-width: 560px) calc(100vw - 24px), (max-width: 900px) 50vw, 380px",
+  // Matches collectionCard()'s img sizes — the gallery LCP is the first series cover,
+  // not a grid thumb. A mismatch here makes the scanner preload a candidate the render
+  // never uses (the bug that made this preload get dropped in the first place).
+  "gallery/index.html": "(max-width: 850px) calc(100vw - 28px), 48vw",
   "stories/index.html": "(max-width: 850px) calc(100vw - 28px), 620px",
   "about/index.html": "(max-width: 850px) calc(100vw - 28px), 520px",
 };
@@ -63,14 +66,25 @@ function featuredStoryHeroId() {
   return (stories.find((s) => s.featured) || stories[0])?.heroPhotoId || null;
 }
 
+// First cover of the first live collection — mirrors liveCollections()/collectionCard()
+// in templates.mjs: a collection counts only when it has a slug, a title and at least one
+// photo that still exists.
+function firstSeriesCoverId() {
+  for (const col of data.collections || []) {
+    if (!col.slug || !col.title) continue;
+    const cover = (col.photoIds || []).map(photoById).find(Boolean);
+    if (cover) return cover.id;
+  }
+  return null;
+}
+
 // page file -> hero photo id (null = no hero, fonts + theme-color only)
 const heroFor = {
   "index.html": data.home?.heroPhotoId || null,
-  // No hero preload for the gallery: it's a grid with no single dominant LCP, and the
-  // first grid images already render eager + fetchpriority="high". Preloading one thumb
-  // made the scanner fetch a `thumb` candidate the render never used (medium), wasting
-  // bandwidth + emitting a "preloaded but not used" console warning.
-  "gallery/index.html": null,
+  // The gallery opens with the series listing (the old /series/ index moved here), so its
+  // first cover sits at ~500px and IS the dominant LCP — the photo grid below it is fully
+  // lazy now. Preload that cover; sizesFor must stay in step with collectionCard().
+  "gallery/index.html": firstSeriesCoverId(),
   "stories/index.html": featuredStoryHeroId(),
   "about/index.html": data.about?.portraitPhotoId || null,
   "atlas/index.html": null,
@@ -83,7 +97,6 @@ for (const s of data.stories || []) {
 // Series pages are card / gallery grids with no single dominant LCP (same reasoning as
 // the gallery) — no hero preload, but they still need the perf-head block (theme, fonts,
 // speculation rules), so register them with a null hero.
-heroFor["series/index.html"] = null;
 for (const col of data.collections || []) {
   if (col.slug) heroFor[`series/${col.slug}/index.html`] = null;
 }

@@ -27,7 +27,6 @@ const out = `# ${owner}
 ## Main pages
 ${line("Home", base + "/", "Featured stories and a curated edit of photographs.")}
 ${line("Stories", base + "/stories/", "Long-form visual essays built around place, light, and movement.")}
-${line("Series", base + "/series/", "Curated groups of photographs — a subject or place followed across the journal.")}
 ${line("Atlas", base + "/atlas/", "Every story mapped to where it happened — explore the journal geographically.")}
 ${line("Gallery", base + "/gallery/", "A curated, image-first archive of photographs.")}
 ${line("About", base + "/about/", "About the photographer and the project.")}

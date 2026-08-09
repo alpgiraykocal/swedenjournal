@@ -11,9 +11,9 @@ import { fileURLToPath } from "node:url";
 import {
   setContext, photos, photo, storyPhotos, photoStoryMap, photoCollectionMap, fullVariantDims,
   header, footer, homeMain, galleryMain, storiesMain, aboutMain, atlasMain, storyMain, legacyStoryMain, notFoundMain, photoMain, photoTitleCore,
-  collections, collectionPhotos, liveCollections, collectionsMain, collectionMain,
+  collections, collectionPhotos, collectionMain,
   websiteLdObject, imageGalleryLdObject, personLdObject, articleLdObject, photoLdObject,
-  breadcrumbLdObject, storiesLdObject, atlasLdObject, collectionsLdObject, collectionLdObject,
+  breadcrumbLdObject, storiesLdObject, atlasLdObject, collectionLdObject,
 } from "../01-website-ready-to-upload/assets/js/templates.mjs";
 
 const crumbs = (...trail) => breadcrumbLdObject(data, trail);
@@ -242,29 +242,11 @@ for (const p of photos(data)) {
   });
 }
 
-// Series (photo collections): an index at /series/ plus one page per collection.
-// The detail shells are written from content on every build (like photoShell) so a
-// title/description edit is always reflected; renderInto then injects the body.
-n += page("series/index.html", {
-  pfx: "../", active: "series",
-  mainHtml: () => collectionsMain(data),
-  headLd: ld(collectionsLdObject(data)) + ld(crumbs({ name: "Home", path: "" }, { name: "Series", path: "series/" })),
-});
-// The series-index shell ships a generic icon og:image; point it at the first
-// collection's cover so social/search cards show a real photograph (+ width/alt).
-{
-  const cover = collectionPhotos(data, liveCollections(data)[0] || {})[0];
-  const file = path.join(websiteDir, "series/index.html");
-  if (cover && fs.existsSync(file)) {
-    const img = encAttr(`${base}/${String(cover.variants?.full?.jpeg || cover.src || "").replace(/^\/+/, "")}`);
-    let html = fs.readFileSync(file, "utf8");
-    html = html
-      .replace(/(<meta property="og:image" content=")[^"]*(">)/, `$1${img}$2`)
-      .replace(/(<meta name="twitter:image" content=")[^"]*(">)/, `$1${img}$2`);
-    html = injectOgImageMeta(html, cover);
-    fs.writeFileSync(file, html);
-  }
-}
+// Series (photo collections): one page per collection. There is no /series/ index
+// any more — that listing moved onto the gallery page (see galleryMain), so the
+// gallery is also the breadcrumb parent below. The detail shells are written from
+// content on every build (like photoShell) so a title/description edit is always
+// reflected; renderInto then injects the body.
 function collectionShell(col) {
   const cover = collectionPhotos(data, col)[0];
   const title = encAttr(`${col.title || "Series"} — ${data.site?.siteTitle || data.site?.ownerName || "Photo Blog"}`);
@@ -311,7 +293,7 @@ for (const col of collections(data)) {
   n += page(rel, {
     pfx: "../../", active: "collection",
     mainHtml: () => collectionMain(data, col),
-    headLd: ld(collectionLdObject(data, col)) + ld(crumbs({ name: "Home", path: "" }, { name: "Series", path: "series/" }, { name: col.title || col.slug, path: `series/${encodeURIComponent(col.slug)}/` })),
+    headLd: ld(collectionLdObject(data, col)) + ld(crumbs({ name: "Home", path: "" }, { name: "Gallery", path: "gallery/" }, { name: col.title || col.slug, path: `series/${encodeURIComponent(col.slug)}/` })),
   });
 }
 

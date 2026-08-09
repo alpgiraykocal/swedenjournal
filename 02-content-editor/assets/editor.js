@@ -216,7 +216,6 @@
     const liveCols=(c.collections||[]).filter(col=>col.slug&&col.title&&(col.photoIds||[]).some(id=>photosById.has(id)));
     if(liveCols.length){
       const cover=photosById.get(liveCols[0].photoIds.find(id=>photosById.has(id)));
-      pages["series/index.html"]={title:"Series",description:c.collectionsPage?.intro||c.site.description||"",image:cover?.variants?.full?.jpeg||cover?.src||"",photo:cover,canonicalPath:"series/"};
     }
     for(const col of liveCols){
       const cover=photosById.get(col.photoIds.find(id=>photosById.has(id)));
@@ -250,7 +249,7 @@
     for(const p of list.filter(p=>p.id&&p.title)){
       entries.push(urlEntry({loc:`${base}/photos/${encodeURIComponent(p.id)}/`,lastmod:machineDate(p.date)||machineDate(p.exif?.shotAt)||buildDay,images:imageTags([p])}));
     }
-    entries.push(urlEntry({loc:`${base}/series/`,lastmod:buildDay}));
+    /* no /series/ index — that listing lives on /gallery/ now */
     for(const col of (c.collections||[]).filter(x=>x.slug&&x.title)){
       const pics=(col.photoIds||[]).map(id=>photosById.get(id)).filter(Boolean);
       if(!pics.length)continue;
@@ -385,8 +384,7 @@
       "stories/index.html":{active:"stories",main:()=>M.storiesMain(c),headLd:()=>ld(M.storiesLdObject(c))+crumbs({name:"Home",path:""},{name:"Stories",path:"stories/"})},
       "story/index.html":{active:"story",main:()=>M.legacyStoryMain(c),headLd:()=>""},
       "about/index.html":{active:"about",main:()=>M.aboutMain(c),headLd:()=>ld(M.personLdObject(c))+crumbs({name:"Home",path:""},{name:"About",path:"about/"})},
-      "atlas/index.html":{active:"atlas",main:()=>M.atlasMain(c),headLd:()=>ld(M.atlasLdObject(c))+crumbs({name:"Home",path:""},{name:"Atlas",path:"atlas/"})},
-      "series/index.html":{active:"series",main:()=>M.collectionsMain(c),headLd:()=>ld(M.collectionsLdObject(c))+crumbs({name:"Home",path:""},{name:"Series",path:"series/"})}
+      "atlas/index.html":{active:"atlas",main:()=>M.atlasMain(c),headLd:()=>ld(M.atlasLdObject(c))+crumbs({name:"Home",path:""},{name:"Atlas",path:"atlas/"})}
     };
     const f=fixed[path];
     return f?{pfx,active:f.active,main:f.main,headLd:f.headLd,hydrate:null}:null;
@@ -960,7 +958,7 @@
   function renderSeries(){
     const cols=state.content.collections||[];
     const selected=state.selectedCollectionSlug?collectionBySlug(state.selectedCollectionSlug):null;
-    panel(`${draftBanner()}${introBlock("Seriler","Fotoğraf serilerini yönetin. Her seri, bir konu ya da yer etrafında toplanmış küçük bir foto grubudur — hikâyelerden bağımsız, /series/ altında kendi sayfasına sahip.",`<button id="newCollectionBtn" class="primary">Yeni seri ekle</button>${countChip("seri",cols.length)}`)}<p class="notice">Seri sayfaları galeri ızgarası olarak yayınlanır; lightbox, klavye ve paylaşımı destekler. Slug yayından sonra sabit tutulmalı.</p><div class="grid2"><div><div class="list">${cols.map(c=>`<div class="item collection-row ${c.slug===state.selectedCollectionSlug?"selected":""}"><img loading="lazy" src="${esc(imgUrlByPhoto(photoById((c.photoIds||[])[0])))}" alt=""><div><strong>${esc(c.title||"(başlıksız)")}</strong><small>${esc(c.slug)} · ${(c.photoIds||[]).length} foto</small></div><div class="row-actions"><button class="small" data-edit-collection="${esc(c.slug)}">Düzenle</button><button class="small danger" data-delete-collection="${esc(c.slug)}">Kaldır</button></div></div>`).join("")||`<div class="empty-state">Henüz seri yok. İlk seriyi ekleyin.</div>`}</div></div><div>${selected?collectionForm(selected):`<p class="notice">Bir seri seçin veya yeni seri ekleyin.</p>`}</div></div>`);
+    panel(`${draftBanner()}${introBlock("Seriler","Fotoğraf serilerini yönetin. Her seri, bir konu ya da yer etrafında toplanmış küçük bir foto grubudur — hikâyelerden bağımsız, /series/&lt;slug&gt;/ altında kendi sayfasına sahip. Seriler artık Galeri sayfasında listeleniyor; ayrı bir /series/ dizin sayfası yok.",`<button id="newCollectionBtn" class="primary">Yeni seri ekle</button>${countChip("seri",cols.length)}`)}<p class="notice">Seri sayfaları galeri ızgarası olarak yayınlanır; lightbox, klavye ve paylaşımı destekler. Galeri sayfasındaki seri listesi buradan otomatik üretilir. Slug yayından sonra sabit tutulmalı — link kırılır.</p><div class="grid2"><div><div class="list">${cols.map(c=>`<div class="item collection-row ${c.slug===state.selectedCollectionSlug?"selected":""}"><img loading="lazy" src="${esc(imgUrlByPhoto(photoById((c.photoIds||[])[0])))}" alt=""><div><strong>${esc(c.title||"(başlıksız)")}</strong><small>${esc(c.slug)} · ${(c.photoIds||[]).length} foto</small></div><div class="row-actions"><button class="small" data-edit-collection="${esc(c.slug)}">Düzenle</button><button class="small danger" data-delete-collection="${esc(c.slug)}">Kaldır</button></div></div>`).join("")||`<div class="empty-state">Henüz seri yok. İlk seriyi ekleyin.</div>`}</div></div><div>${selected?collectionForm(selected):`<p class="notice">Bir seri seçin veya yeni seri ekleyin.</p>`}</div></div>`);
     el("newCollectionBtn").onclick=()=>{const col={slug:"series-draft",title:"Yeni seri",description:"",photoIds:[]};let base=col.slug,n=2;while(collectionBySlug(col.slug))col.slug=`${base}-${n++}`;state.content.collections.push(col);state.selectedCollectionSlug=col.slug;setDirty();render();showToast("Yeni seri eklendi");};
     el("editorPanel").querySelectorAll("[data-edit-collection]").forEach(b=>b.onclick=()=>{state.selectedCollectionSlug=b.dataset.editCollection;render();});
     el("editorPanel").querySelectorAll("[data-delete-collection]").forEach(b=>b.onclick=()=>{const c=collectionBySlug(b.dataset.deleteCollection);if(!c)return;if(!confirm(`Seriyi kaldır "${c.title||c.slug}"?`))return;state.content.collections=state.content.collections.filter(x=>x!==c);state.selectedCollectionSlug=state.content.collections[0]?.slug||null;setDirty();render();showToast("Seri kaldırıldı");});

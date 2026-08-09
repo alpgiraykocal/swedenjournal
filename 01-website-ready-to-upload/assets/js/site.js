@@ -2,10 +2,10 @@ import {
   setContext, esc, photos, photo, imgPath, metaText, variant, srcset, responsiveImage,
   sortPhotos, storyPhotos, storyHref, photoHref, absoluteUrl, root, header, footer,
   homeMain, galleryMain, storiesMain, aboutMain, atlasMain, storyMain, legacyStoryMain, photoMain, photoTitleCore,
-  collections, collectionPhotos, collectionsMain, collectionMain, collectionHref, photoExifChips,
+  collections, collectionPhotos, collectionMain, collectionHref, photoExifChips,
   photoStory, photoCollection,
-  websiteLdObject, imageGalleryLdObject, personLdObject, articleLdObject, photoLdObject, collectionsLdObject, collectionLdObject, fullVariantDims,
-} from "./templates.mjs?v=65441ad45e";
+  websiteLdObject, imageGalleryLdObject, personLdObject, articleLdObject, photoLdObject, collectionLdObject, fullVariantDims,
+} from "./templates.mjs?v=166ef52558";
 
 // Cache-bust the runtime content fetches. /assets/data/*.json is served with a long
 // edge cache (the host ignores _headers), so without a content-versioned URL a freshly
@@ -511,7 +511,6 @@ async function boot(){
       atlas: null,
       story: photo(data, ((data.stories || []).find(x => x.slug===currentStorySlug()) || data.stories?.[0])?.heroPhotoId),
       photo: photos(data).find(x => x.id === currentPhotoId()) || null,
-      series: collectionPhotos(data, collections(data)[0] || {})[0] || null,
       collection: collectionPhotos(data, (data.collections||[]).find(c => c.slug===currentCollectionSlug()) || {})[0] || null
     };
     injectPreload(preloadMap[page], "(max-width: 850px) calc(100vw - 28px), 1180px", "medium");
@@ -522,7 +521,6 @@ async function boot(){
     if(page === "atlas") renderAtlas(data);
     if(page === "story") renderStory(data);
     if(page === "photo") renderPhoto(data);
-    if(page === "series") renderCollections(data);
     if(page === "collection") renderCollection(data);
     bindScrollReveal();
     bindImageLoadFade();
@@ -567,19 +565,11 @@ function renderAtlas(data){
   $("#app").innerHTML = atlasMain(data);
   initMap("atlasMap", "atlas-map-data");
 }
-function renderCollections(data){
-  const cp = data.collectionsPage || {};
-  const list = collections(data).filter(c => c.slug && c.title);
-  const cover = list[0] ? photos(data).find(p => p.id === list[0].photoIds?.[0]) : null;
-  updateMeta(data, {title: cp.headline || "Series", description: cp.intro || data.site?.description, path:"series/", imagePhoto: cover});
-  injectJsonLd(collectionsLdObject(data));
-  $("#app").innerHTML = collectionsMain(data);
-}
 function renderCollection(data){
   const col = (data.collections||[]).find(c => c.slug === currentCollectionSlug());
   if(!col){
-    updateMeta(data, {title:"Series not found", description:"The requested series is not available.", path:"series/", robots:"noindex,follow"});
-    $("#app").innerHTML = `<main class="container section"><p class="eyebrow">Series not found</p><h1 class="headline">This series is not available.</h1><p class="intro">The link may be outdated or the series may have been removed.</p><p><a class="text-link" href="${root()}series/index.html">Back to series</a></p></main>`;
+    updateMeta(data, {title:"Series not found", description:"The requested series is not available.", path:"gallery/", robots:"noindex,follow"});
+    $("#app").innerHTML = `<main class="container section"><p class="eyebrow">Series not found</p><h1 class="headline">This series is not available.</h1><p class="intro">The link may be outdated or the series may have been removed.</p><p><a class="text-link" href="${root()}gallery/index.html">Back to the gallery</a></p></main>`;
     return;
   }
   const cover = collectionPhotos(data, col)[0];

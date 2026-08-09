@@ -5,7 +5,6 @@
 ## Main pages
 - [Home](https://sweden-journal.com/): Featured stories and a curated edit of photographs.
 - [Stories](https://sweden-journal.com/stories/): Long-form visual essays built around place, light, and movement.
-- [Series](https://sweden-journal.com/series/): Curated groups of photographs — a subject or place followed across the journal.
 - [Atlas](https://sweden-journal.com/atlas/): Every story mapped to where it happened — explore the journal geographically.
 - [Gallery](https://sweden-journal.com/gallery/): A curated, image-first archive of photographs.
 - [About](https://sweden-journal.com/about/): About the photographer and the project.
