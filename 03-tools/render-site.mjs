@@ -166,10 +166,39 @@ n += page("atlas/index.html", { pfx: "../", active: "atlas", mainHtml: () => atl
 // root-absolute ("/…") so they resolve the same from "/" and "/deep/missing/path/".
 n += page("404.html", { pfx: "/", active: "", mainHtml: () => notFoundMain(data) });
 n += page("story/index.html", { pfx: "../", active: "story", mainHtml: () => legacyStoryMain(data) });
+// Story pages are the one page type whose <head> is not regenerated from content:
+// photoShell/collectionShell rewrite their whole shell each build, and the browser
+// editor patches story heads on publish, but a story edited directly in
+// site-content.json (or published by anything other than the editor) left the
+// title/description/og text frozen at whatever the shell was first written with.
+// Refresh those tags from the story before renderInto runs, so a story head tracks its
+// content like every other page. clampDescription then trims the meta description.
+function refreshStoryHead(rel, story) {
+  const file = path.join(websiteDir, rel);
+  if (!fs.existsSync(file)) return;
+  const siteTitle = data.site?.siteTitle || data.site?.ownerName || "";
+  const title = story.title ? `${story.title} \u2014 ${siteTitle}` : siteTitle;
+  const desc = story.summary || data.site?.description || "";
+  let html = fs.readFileSync(file, "utf8");
+  const swap = (re, build) => { if (re.test(html)) html = html.replace(re, () => build()); };
+  swap(/<title>[^<]*<\/title>/, () => `<title>${encAttr(title)}</title>`);
+  for (const [attr, name, value] of [
+    ["name", "description", desc],
+    ["property", "og:title", title],
+    ["property", "og:description", desc],
+    ["name", "twitter:title", title],
+    ["name", "twitter:description", desc],
+  ]) {
+    swap(new RegExp(`<meta ${attr}="${name}" content="[^"]*">`), () => `<meta ${attr}="${name}" content="${encAttr(value)}">`);
+  }
+  fs.writeFileSync(file, html);
+}
+
 const liveSlugs = new Set();
 for (const s of data.stories || []) {
   if (!s.slug) continue;
   liveSlugs.add(s.slug);
+  refreshStoryHead(`stories/${s.slug}/index.html`, s);
   n += page(`stories/${s.slug}/index.html`, {
     pfx: "../../", active: "story",
     mainHtml: () => storyMain(data, s),
