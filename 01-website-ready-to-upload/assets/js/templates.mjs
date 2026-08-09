@@ -190,9 +190,15 @@ export function blockHtmlInteractive(data, block) {
     const items = pair.map((p) => `<span class="pair-item">${responsiveImage(p, { className: "story-inline-img", sizes: "(max-width: 700px) calc(100vw - 40px), 420px" })}<a class="photo-open" href="${photoHref(p.id)}" data-open-photo="${esc(p.id)}" aria-label="Open ${esc(p.title)}"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M10 2h4v4M14 2l-5 5M6 14H2v-4M2 14l5-5"/></svg></a></span>`).join("");
     return `<figure class="story-inline-photo story-photo-pair"><span class="pair-grid">${items}</span>${block.caption ? `<figcaption>${esc(block.caption)}</figcaption>` : ""}</figure>`;
   }
-  if (block.type === "quote") return `<blockquote>${esc(block.text)}</blockquote>`;
-  if (block.type === "heading") return `<h2>${esc(block.text)}</h2>`;
-  return `<p>${esc(block.text || "")}</p>`;
+  // A text block with no text renders nothing. The editor lets you insert a block and fill
+  // it in later, and publishing in between used to emit <p></p> / <h2></h2> /
+  // <blockquote></blockquote> onto the live page — an empty heading is both an
+  // accessibility defect and a structure signal pointing at nothing. qa-static-checks
+  // fails the build on these, so the content still gets fixed rather than silently hidden.
+  const text = String(block.text || "").trim();
+  if (block.type === "quote") return text ? `<blockquote>${esc(block.text)}</blockquote>` : "";
+  if (block.type === "heading") return text ? `<h2>${esc(block.text)}</h2>` : "";
+  return text ? `<p>${esc(block.text)}</p>` : "";
 }
 function sharePanelHtml({ url, title, text, heading, blurb }) {
   const subject = encodeURIComponent(title || "Photo story");
@@ -562,9 +568,11 @@ export function feedXml(data, now = new Date().toUTCString()) {
         if (!imgs) return "";
         return `<figure>${imgs}${b.caption ? `<figcaption>${esc(b.caption)}</figcaption>` : ""}</figure>`;
       }
-      if (b.type === "heading") return `<h2>${esc(b.text || "")}</h2>`;
-      if (b.type === "quote") return `<blockquote><p>${esc(b.text || "")}</p></blockquote>`;
-      return `<p>${esc(b.text || "")}</p>`;
+      // Same rule in the feed: no empty elements in <content:encoded> either.
+      const t = String(b.text || "").trim();
+      if (b.type === "heading") return t ? `<h2>${esc(b.text)}</h2>` : "";
+      if (b.type === "quote") return t ? `<blockquote><p>${esc(b.text)}</p></blockquote>` : "";
+      return t ? `<p>${esc(b.text)}</p>` : "";
     }).join("");
     return html.replace(/]]>/g, "]]]]><![CDATA[>");
   };

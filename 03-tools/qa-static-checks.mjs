@@ -122,6 +122,12 @@ function checkContent(baseDir, { requireSourcePhotos }) {
   for (const story of stories) {
     if (story.heroPhotoId && !photoIds.has(story.heroPhotoId)) fail(`Story ${story.slug} references missing hero photo: ${story.heroPhotoId}`);
     for (const block of story.body || []) {
+      // A paragraph/heading/quote with no text is an unfinished block. templates.mjs skips
+      // rendering it so nothing empty reaches the page, which means the only way anyone
+      // finds out is here — fail, so the content gets finished instead of quietly dropped.
+      if (["paragraph", "heading", "quote"].includes(block.type) && !String(block.text || "").trim()) {
+        fail(`Story ${story.slug} has an empty ${block.type} block`);
+      }
       const ids = block.type === "image" || block.type === "panorama" ? [block.photoId]
         : block.type === "image-pair" ? (block.photoIds || []) : [];
       for (const id of ids.filter(Boolean)) {

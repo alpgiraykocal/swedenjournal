@@ -121,7 +121,13 @@
       if(perm==="granted"){await connectFolder(handle);return;}
       const bar=onboarding.querySelector(".bar");
       if(bar&&!el("reconnectBtn")){const btn=document.createElement("button");btn.id="reconnectBtn";btn.className="primary";btn.textContent="Son klasöre tekrar bağlan";btn.onclick=()=>connectFolder(handle);bar.insertBefore(btn,bar.firstChild);}
-    }catch(e){}
+    }catch(e){
+      // connectFolder reports its own failures; this only covers reading the stored
+      // handle and checking its permission. Silence here left the user on the
+      // onboarding screen with no idea why the last folder did not come back.
+      console.warn("Auto-reconnect failed:",e);
+      showToast("Son klasöre otomatik bağlanılamadı — klasörü yeniden seçin.");
+    }
   }
   async function loadFromFolder(){
     if(!state.websiteHandle) throw new Error("Website klasörü bağlı değil.");
@@ -428,12 +434,16 @@
       series:new Set((c.collections||[]).filter(col=>col.slug&&col.title&&(col.photoIds||[]).some(id=>photosById.has(id))).map(col=>col.slug))
     };
     let removed=0;
+    const failedRemovals=[];
     for(const [root,keep] of Object.entries(live)){
       let dir;try{dir=await getDir(state.websiteHandle,[root],false);}catch(e){continue;}
       const stale=[];
       try{for await(const [name,handle] of dir.entries()){if(handle.kind==="directory"&&!keep.has(name))stale.push(name);}}catch(e){continue;}
-      for(const name of stale){try{await dir.removeEntry(name,{recursive:true});removed++;}catch(e){}}
+      for(const name of stale){try{await dir.removeEntry(name,{recursive:true});removed++;}catch(e){failedRemovals.push(`${root}/${name}`);console.warn("Stale entry not removed:",root+"/"+name,e);}}
     }
+    // A directory that could not be pruned is still live on the site — say so instead
+    // of returning a count that implies the cleanup succeeded.
+    if(failedRemovals.length)showToast(`Uyarı: ${failedRemovals.length} eski sayfa klasörü silinemedi (${failedRemovals.slice(0,3).join(", ")}) — elle silin.`);
     return removed;
   }
   async function refreshHtmlMetadata(){
@@ -558,6 +568,13 @@
     if(ids.length!==photoSet.size)errors.push("Tekrarlanan fotoğraf ID tespit edildi. Her fotoğrafın benzersiz bir ID değeri olmalı.");
     if(slugs.length!==slugSet.size)errors.push("Tekrarlanan hikâye slug'ı. Her hikâyenin benzersiz bir slug değeri olmalı.");
     c.photos.forEach((p,i)=>{if(!p.id)errors.push(`Fotoğraf ${i+1} ID değeri yok.`);if(!p.title)errors.push(`Fotoğraf ${p.id||i+1} için başlık zorunlu.`);if(!p.src)errors.push(`Fotoğraf ${p.id||i+1} görsel yolu (src) yok.`);if(!p.alt)warnings.push(`Fotoğraf "${p.title||p.id}" için alt metin girilmemiş.`);if(!p.variants?.thumb?.jpeg||!p.variants?.thumb?.webp||!p.variants?.medium?.jpeg||!p.variants?.medium?.webp||!p.variants?.full?.jpeg||!p.variants?.full?.webp)warnings.push(`Fotoğraf "${p.title||p.id}" için optimize görsel varyantları eksik.`);});
+    // Unfinished blocks: templates.mjs renders nothing for an empty paragraph/heading/quote
+    // and qa-static-checks fails the build on them, so catch it here first — while the
+    // author is still in the editor and can just type the missing text.
+    (c.stories||[]).forEach(st=>{(st.body||[]).forEach((b,bi)=>{
+      if(["paragraph","heading","quote"].includes(b.type)&&!String(b.text||"").trim())
+        errors.push(`Hikâye "${st.title||st.slug}" — ${bi+1}. blok (${b.type}) boş. Metni doldurun ya da bloğu kaldırın.`);
+    });});
     if(!(c.gallery.filters||[]).length||c.gallery.filters[0]!=="All")warnings.push('Galeri filtreleri "All" ile başlamalı; sıfırlama ve URL filtresi bu sayede tutarlı çalışır.');
     if(c.home.heroPhotoId && !photoSet.has(c.home.heroPhotoId))warnings.push("Ana Sayfa — hero fotoğrafı bulunamıyor.");
     (c.home.galleryPhotoIds||[]).forEach(id=>{if(!photoSet.has(id))warnings.push(`Ana Sayfa — seçili galeri fotoğrafı bulunamadı: ${id}`);});
