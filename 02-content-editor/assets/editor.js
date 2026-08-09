@@ -88,11 +88,16 @@
   async function writeTextIfChanged(handle,path,text,normalize){const n=normalize||(x=>x);try{const cur=await readText(handle,path);if(n(cur)===n(text))return false;}catch(e){}await writeText(handle,path,text);return true;}
   async function writeBlob(handle,path,blob){const fh=await getFile(handle,path.split("/"),true);const w=await fh.createWritable();await w.write(blob);await w.close();}
   async function removeWebsiteFile(path){try{const parts=path.split("/");const file=parts.pop();const dir=await getDir(state.websiteHandle,parts,false);await dir.removeEntry(file);return true;}catch(e){return false;}}
-  async function hasContentFile(handle){try{await readText(handle,"assets/data/site-content.json");await getDir(handle,["assets","images","photos"],false);return true;}catch(e){return false;}}
+  // site-content.json at this exact path is signal enough that the folder is the website
+  // root. assets/images/photos is deliberately NOT required: it is gitignored, so a fresh
+  // clone does not have it, and demanding it made connectFolder reject the correct folder
+  // with a misleading "wrong folder" message. writeBlob creates the directory on demand
+  // the first time a photo is saved.
+  async function hasContentFile(handle){try{await readText(handle,"assets/data/site-content.json");return true;}catch(e){return false;}}
   async function resolveWebsiteHandle(selected){
     if(await hasContentFile(selected)) return selected;
     try{const child=await selected.getDirectoryHandle("01-website-ready-to-upload");if(await hasContentFile(child))return child;}catch(e){}
-    throw new Error("Yanlış klasör seçildi. Lütfen 01-website-ready-to-upload klasörünü veya onu içeren ana proje klasörünü seçin. site-content.json ve assets/images/photos bulunamadı.");
+    throw new Error("Bu klasörde assets/data/site-content.json bulunamadı. 01-website-ready-to-upload klasörünü ya da onu içeren ana proje klasörünü seçin.");
   }
   const IDB_NAME="photo-blog-cms", IDB_STORE="handles", IDB_KEY="rootHandle";
   function idbOpen(){return new Promise((res,rej)=>{const r=indexedDB.open(IDB_NAME,1);r.onupgradeneeded=()=>r.result.createObjectStore(IDB_STORE);r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);});}
@@ -214,9 +219,6 @@
     // and keeps title/description/og in sync with the content on every save. Only
     // collections with at least one existing photo publish — same rule as the build.
     const liveCols=(c.collections||[]).filter(col=>col.slug&&col.title&&(col.photoIds||[]).some(id=>photosById.has(id)));
-    if(liveCols.length){
-      const cover=photosById.get(liveCols[0].photoIds.find(id=>photosById.has(id)));
-    }
     for(const col of liveCols){
       const cover=photosById.get(col.photoIds.find(id=>photosById.has(id)));
       pages[`series/${col.slug}/index.html`]={title:col.title,description:col.description||c.site.description||"",image:cover?.variants?.full?.jpeg||cover?.src||"",photo:cover,collectionPage:col,canonicalPath:`series/${encodeURIComponent(col.slug)}/`};
@@ -376,7 +378,7 @@
     const crumbs=(...trail)=>ld(M.breadcrumbLdObject(c,trail));
     const pfx=shellPrefix(path);
     if(item.photoPage){const p=item.photoPage;return{pfx,active:"photo",main:()=>M.photoMain(c,p),headLd:()=>ld(M.photoLdObject(c,p))+crumbs({name:"Home",path:""},{name:"Gallery",path:"gallery/"},{name:p.title||p.id,path:`photos/${encodeURIComponent(p.id)}/`}),hydrate:null};}
-    if(item.collectionPage){const col=item.collectionPage;return{pfx,active:"collection",main:()=>M.collectionMain(c,col),headLd:()=>ld(M.collectionLdObject(c,col))+crumbs({name:"Home",path:""},{name:"Series",path:"series/"},{name:col.title||col.slug,path:`series/${encodeURIComponent(col.slug)}/`}),hydrate:null};}
+    if(item.collectionPage){const col=item.collectionPage;return{pfx,active:"collection",main:()=>M.collectionMain(c,col),headLd:()=>ld(M.collectionLdObject(c,col))+crumbs({name:"Home",path:""},{name:"Gallery",path:"gallery/"},{name:col.title||col.slug,path:`series/${encodeURIComponent(col.slug)}/`}),hydrate:null};}
     if(item.story){const s=item.story;return{pfx,active:"story",main:()=>M.storyMain(c,s),headLd:()=>ld(M.articleLdObject(c,s,M.photo(c,s.heroPhotoId)))+crumbs({name:"Home",path:""},{name:"Stories",path:"stories/"},{name:s.title||s.slug,path:`stories/${encodeURIComponent(s.slug)}/`}),hydrate:()=>{const photoCols=M.photoCollectionMap(c);return{stories:[s],photos:M.storyPhotos(c,s).map(p=>{const cl=photoCols.get(p.id);return cl?{...p,series:{slug:cl.slug,title:cl.title}}:p;})};}};}
     const fixed={
       "index.html":{active:"home",main:()=>M.homeMain(c),headLd:()=>ld(M.websiteLdObject(c))},
@@ -384,10 +386,13 @@
       "stories/index.html":{active:"stories",main:()=>M.storiesMain(c),headLd:()=>ld(M.storiesLdObject(c))+crumbs({name:"Home",path:""},{name:"Stories",path:"stories/"})},
       "story/index.html":{active:"story",main:()=>M.legacyStoryMain(c),headLd:()=>""},
       "about/index.html":{active:"about",main:()=>M.aboutMain(c),headLd:()=>ld(M.personLdObject(c))+crumbs({name:"Home",path:""},{name:"About",path:"about/"})},
-      "atlas/index.html":{active:"atlas",main:()=>M.atlasMain(c),headLd:()=>ld(M.atlasLdObject(c))+crumbs({name:"Home",path:""},{name:"Atlas",path:"atlas/"})}
+      "atlas/index.html":{active:"atlas",main:()=>M.atlasMain(c),headLd:()=>ld(M.atlasLdObject(c))+crumbs({name:"Home",path:""},{name:"Atlas",path:"atlas/"})},
+      // Mirrors render-site: pfx "/" because GH Pages serves 404.html at any depth,
+      // with no active nav item and no JSON-LD.
+      "404.html":{active:"",pfx:"/",main:()=>M.notFoundMain(c),headLd:()=>""}
     };
     const f=fixed[path];
-    return f?{pfx,active:f.active,main:f.main,headLd:f.headLd,hydrate:null}:null;
+    return f?{pfx:f.pfx||pfx,active:f.active,main:f.main,headLd:f.headLd,hydrate:null}:null;
   }
   // MIRRORS render-site.mjs renderInto() byte for byte (markers, indentation,
   // data-prerendered flag, head-block placement) so a build rerun is a no-op.
@@ -492,6 +497,16 @@
       if(item.robots)html=replaceOrInsertMeta(html,"robots",`<meta name="robots" content="${escapeAttr(item.robots)}">`);else html=html.replace(/\n\s*<meta name="robots" content="[^"]*">/,"");
       if(M){const plan=ssgPlanFor(path,item,M,state.content);if(plan)html=applySsgRender(html,plan,M,state.content);}
       if(html!==original)await writeText(state.websiteHandle,path,html);
+    }
+    // 404.html: body only. render-site rebuilds its header/footer every build and leaves
+    // the head alone, so mirror exactly that — no title/canonical/og rewrite here, which
+    // is also why 404 is deliberately absent from staticPageMeta.
+    if(M){
+      try{
+        const before=await readText(state.websiteHandle,"404.html");
+        const plan=ssgPlanFor("404.html",{},M,state.content);
+        if(plan){const after=applySsgRender(before,plan,M,state.content);if(after!==before)await writeText(state.websiteHandle,"404.html",after);}
+      }catch(e){showToast("Uyarı: 404.html güncellenemedi — "+(e.message||e));}
     }
   }
   async function loadImages(){
