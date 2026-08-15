@@ -30,8 +30,12 @@ const outputDir = path.join(root, "01-website-ready-to-upload/assets/images/gene
 // lands about 6-12% larger than the current files.
 //
 // These values keep new photographs consistent with the 46 already published rather than
-// quietly encoding them softer. Existing variants are intentionally NOT regenerated: they
-// are already at this fidelity, and re-encoding them would only add ~130MB of binary churn.
+// quietly encoding them softer. Existing variants are NOT regenerated: a source is skipped
+// when all nine of its outputs are present and no older than it, so adding one photo costs
+// nine files. Without that skip every run re-encodes the whole library — ~130MB of binary
+// churn plus a silent fidelity shift on already-published photos, because sharp 0.35 does
+// not reproduce byte-identical output for the files sharp 0.30 encoded. Pass --force to
+// re-encode everything on purpose (e.g. after changing the quality table above).
 const SIZES = [
   { dir: "thumb", width: 480, jpeg: 78, webp: 72, avif: 50 },
   { dir: "medium", width: 1200, jpeg: 82, webp: 76, avif: 52 },
@@ -39,6 +43,20 @@ const SIZES = [
 ];
 
 const SOURCE_EXT = new Set([".jpeg", ".jpg", ".png", ".webp", ".avif"]);
+const FORMATS = ["jpeg", "webp", "avif"];
+const force = process.argv.includes("--force");
+
+// A source is up to date when every output exists and none is older than the source, so
+// replacing a photo with an edited version (fresh mtime) still re-encodes it.
+const isUpToDate = (base, src) => {
+  const srcMtime = fs.statSync(src).mtimeMs;
+  return SIZES.every(({ dir }) =>
+    FORMATS.every((ext) => {
+      const out = path.join(outputDir, dir, `${base}.${ext}`);
+      return fs.existsSync(out) && fs.statSync(out).mtimeMs >= srcMtime;
+    })
+  );
+};
 
 for (const { dir } of SIZES) fs.mkdirSync(path.join(outputDir, dir), { recursive: true });
 
@@ -52,9 +70,15 @@ if (!images.length) {
 }
 
 let written = 0;
+let skipped = 0;
 for (const name of images) {
   const base = name.slice(0, name.length - path.extname(name).length);
   const src = path.join(photoDir, name);
+
+  if (!force && isUpToDate(base, src)) {
+    skipped += 1;
+    continue;
+  }
 
   for (const size of SIZES) {
     // withoutEnlargement matches the old behaviour for sources narrower than the target:
@@ -70,4 +94,5 @@ for (const name of images) {
 }
 
 execFileSync(process.execPath, [path.join(toolsDir, "sync-image-variants.mjs")], { stdio: "inherit" });
-console.log(`Done. ${written} variants generated and site-content.json variant paths synced.`);
+const skipNote = skipped ? ` ${skipped} photo(s) already up to date (--force to re-encode).` : "";
+console.log(`Done. ${written} variants generated and site-content.json variant paths synced.${skipNote}`);

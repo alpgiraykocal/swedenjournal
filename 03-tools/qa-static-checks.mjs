@@ -409,19 +409,24 @@ function checkRootCleanliness() {
 
 function checkWorkspaceCleanliness() {
   const disposableNames = new Set([".DS_Store", "Thumbs.db", ".codex-ui-review", ".upload-package-tmp"]);
+  // .git and node_modules are not part of the workspace we publish, and their contents are
+  // not ours to keep clean: a dependency shipping a .log or ._* file would fail this check
+  // for no reason. Skipping them also keeps the walk to the tree that actually ships.
+  const skipDirs = new Set([".git", "node_modules"]);
   const stack = [root];
   while (stack.length) {
     const current = stack.pop();
     for (const entry of fs.readdirSync(current, { withFileTypes: true })) {
       const nextPath = path.join(current, entry.name);
       const label = path.relative(root, nextPath);
+      if (entry.isDirectory() && skipDirs.has(entry.name)) continue;
       if (
         disposableNames.has(entry.name) ||
         entry.name.startsWith("._") ||
         /\.(log|tmp|temp|swp)$/.test(entry.name) ||
         entry.name.endsWith("~")
       ) {
-        fail(`Disposable workspace artifact found: ${label}`);
+        fail(`Disposable workspace artifact found: ${label} — clear it with: npm run clean`);
       }
       if (entry.isDirectory()) {
         if (/^(04-upload-package|\.upload-package-tmp) [0-9]+$/.test(entry.name)) {

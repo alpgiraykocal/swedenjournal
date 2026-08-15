@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "generate-variants": "node 03-tools/generate-image-variants.mjs",
+    "clean": "find . \\( -name node_modules -o -name .git \\) -prune -o \\( -name '.DS_Store' -o -name 'Thumbs.db' -o -name '.codex-ui-review' -o -name '.upload-package-tmp' -o -name '._*' -o -name '*.log' -o -name '*.tmp' -o -name '*.temp' -o -name '*.swp' -o -name '*~' \\) -print -exec rm -rf {} +",
     "exif": "node 03-tools/backfill-exif.mjs",
     "build": "node 03-tools/build.mjs",
     "build:package": "bash 03-tools/build-upload-package.sh",
