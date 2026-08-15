@@ -2968,6 +2968,69 @@
           "lng": 16.856778
         }
       }
+    },
+    {
+      "id": "katarina-kyrka",
+      "title": "Katarina Kyrka",
+      "location": "Södermalm, Stockholm, Sweden",
+      "date": "Summer 2026",
+      "season": "Summer",
+      "theme": "Church, Baroque Architecture, Nordic Heritage",
+      "tags": [
+        "Katarina Kyrka",
+        "Katarina Church",
+        "Södermalm",
+        "Stockholm",
+        "Sweden",
+        "Historic Church",
+        "Baroque Architecture",
+        "Copper Dome",
+        "Churchyard",
+        "Nordic Heritage",
+        "Travel Photography"
+      ],
+      "src": "assets/images/photos/katarina-kyrka.jpeg",
+      "width": 4160,
+      "height": 6240,
+      "alt": "Katarina Kyrka in Södermalm, Stockholm, seen from its churchyard through summer foliage, with a copper dome, clock tower, yellow and white façade, and stone gravestones on the grass.",
+      "caption": "Katarina Kyrka rises above its churchyard in Södermalm, its copper dome and clock tower framed by summer leaves while gravestones stand quietly in the grass below.",
+      "sortOrder": 57,
+      "featured": false,
+      "category": "Churches",
+      "variants": {
+        "thumb": {
+          "jpeg": "assets/images/generated/thumb/katarina-kyrka.jpeg",
+          "webp": "assets/images/generated/thumb/katarina-kyrka.webp",
+          "width": 480,
+          "avif": "assets/images/generated/thumb/katarina-kyrka.avif"
+        },
+        "medium": {
+          "jpeg": "assets/images/generated/medium/katarina-kyrka.jpeg",
+          "webp": "assets/images/generated/medium/katarina-kyrka.webp",
+          "width": 1200,
+          "avif": "assets/images/generated/medium/katarina-kyrka.avif"
+        },
+        "full": {
+          "jpeg": "assets/images/generated/full/katarina-kyrka.jpeg",
+          "webp": "assets/images/generated/full/katarina-kyrka.webp",
+          "width": 2200,
+          "avif": "assets/images/generated/full/katarina-kyrka.avif"
+        }
+      },
+      "exif": {
+        "camera": "FUJIFILM X-T30 II",
+        "lens": "XC15-45mmF3.5-5.6 OIS PZ",
+        "iso": 320,
+        "aperture": 6.4,
+        "shutter": "1/1250",
+        "focalLength": 22,
+        "focalLength35": 33,
+        "shotAt": "2026-08-14",
+        "gps": {
+          "lat": 59.316767,
+          "lng": 18.078753
+        }
+      }
     }
   ],
   "stories": [
