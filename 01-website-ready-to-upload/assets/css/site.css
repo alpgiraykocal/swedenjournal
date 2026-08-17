@@ -861,6 +861,14 @@ body[data-page="gallery"] .container{overflow:hidden}
 .atlas-layout{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(280px,.85fr);gap:30px;align-items:start}
 .atlas-map{display:none;height:min(70vh,600px)}
 .js-reveal .atlas-map{display:block}
+/* Leaflet never loaded: pull the empty 600px panel back out of the layout and let the
+   .map-fallback note stand in its place. Needs the .js-reveal prefix to outrank the
+   display:block above. */
+.js-reveal .atlas-map.is-failed{display:none}
+.map-fallback{margin:0;padding:20px 22px;border:1px solid var(--line);border-radius:var(--radius-lg);background:var(--surface);color:var(--text-soft);font-size:14px;line-height:1.5}
+/* Basemap missing but the map still works — sits over the pins, click-through so it
+   never blocks one. */
+.map-notice{position:absolute;left:50%;top:14px;transform:translateX(-50%);z-index:700;max-width:min(88%,340px);text-align:center;background:var(--paper);color:var(--text-soft);border:1px solid var(--line-strong);border-radius:12px;padding:9px 14px;font-size:12.5px;line-height:1.4;box-shadow:var(--shadow);pointer-events:none}
 .atlas-places .eyebrow{margin:0 0 16px}
 .atlas-places ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
 .atlas-place{display:grid;grid-template-columns:66px minmax(0,1fr);gap:13px;align-items:start;padding:11px;border:1px solid var(--line);border-radius:15px;background:var(--surface);transition:border-color .18s var(--ease),background .18s var(--ease),transform .28s var(--ease)}
@@ -919,7 +927,8 @@ body[data-page="gallery"] .container{overflow:hidden}
 }
 .map-hint{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);z-index:500;background:var(--paper);color:var(--text-soft);border:1px solid var(--line-strong);border-radius:999px;padding:6px 12px;font-size:12px;font-weight:600;box-shadow:var(--shadow);pointer-events:none;opacity:1;transition:opacity .3s var(--ease)}
 .map-zoom-on .map-hint{opacity:0}
-@media (pointer:coarse){.map-hint{display:none}}
+/* The hint shows on touch too: there it is the tap-to-pan affordance, without which a
+   map that ignores a one-finger drag reads as broken. */
 .map-popup-wrap .leaflet-popup-content-wrapper{border-radius:14px;padding:0;overflow:hidden;box-shadow:var(--shadow);background:var(--paper)}
 .map-popup-wrap .leaflet-popup-content{margin:0}
 .map-popup-wrap .leaflet-popup-tip{background:var(--paper)}

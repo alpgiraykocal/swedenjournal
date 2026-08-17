@@ -5,7 +5,7 @@ import {
   collections, collectionPhotos, collectionMain, collectionHref, photoExifChips,
   photoStory, photoCollection,
   websiteLdObject, imageGalleryLdObject, personLdObject, articleLdObject, photoLdObject, collectionLdObject, fullVariantDims,
-} from "./templates.mjs?v=faa768022c";
+} from "./templates.mjs?v=a204755257";
 
 // Cache-bust the runtime content fetches. /assets/data/*.json is served with a long
 // edge cache (the host ignores _headers), so without a content-versioned URL a freshly
@@ -265,17 +265,57 @@ function initMap(elId, dataId){
   try{ stories = JSON.parse(dataEl.textContent); }catch(e){ return; }
   if(!Array.isArray(stories) || !stories.length) return;
   const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const coarse = !!(window.matchMedia && window.matchMedia("(pointer: coarse)").matches);
   const themeDark = () => (document.documentElement.getAttribute("data-theme") || (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")) === "dark";
   const cards = Array.from(document.querySelectorAll(".atlas-place[data-place-slug]"));
+  // Deep-link target, read before the map starts loading: it also decides whether the
+  // lazy-load gate below may be skipped (see the IntersectionObserver at the end).
+  let focused = null;
+  try{ focused = new URLSearchParams(location.search).get("place"); }catch(e){}
+  // The map element is a 600px-tall bordered panel, so a silent failure leaves a blank
+  // box with no explanation. Replace it with a note pointing at the place list, which
+  // is server-rendered and works without any of this.
+  const failMap = (text) => {
+    el.classList.add("is-failed");
+    const wrap = el.parentElement;
+    if(!wrap || wrap.querySelector(".map-fallback")) return;
+    const p = document.createElement("p");
+    p.className = "map-fallback";
+    p.setAttribute("role", "status");
+    p.textContent = text;
+    wrap.insertBefore(p, el.nextSibling);
+  };
+  // Softer failure: the map itself works, something layered on it does not. Keeps the
+  // pins (their positions still mean something) and explains the gap over them.
+  const noticeMap = (text) => {
+    if(el.querySelector(".map-notice")) return;
+    const n = document.createElement("div");
+    n.className = "map-notice";
+    n.setAttribute("role", "status");
+    n.textContent = text;
+    el.appendChild(n);
+  };
   const start = () => loadLeaflet().then(L => {
     if(el._mapReady) return;
     el._mapReady = true;
-    const map = L.map(el, { scrollWheelZoom:false, attributionControl:true });
+    // Touch: a one-finger drag must scroll the PAGE, not pan the map — a full-width
+    // 60vh map would otherwise swallow the scroll gesture on phones. Dragging starts
+    // off on coarse pointers and is armed by a deliberate tap (the same gating the
+    // wheel gets further down); pinch-zoom stays live throughout.
+    const map = L.map(el, { scrollWheelZoom:false, dragging:!coarse, attributionControl:true });
     const tileUrl = d => `https://{s}.basemaps.cartocdn.com/${d?"dark_all":"light_all"}/{z}/{x}/{y}{r}.png`;
     const tiles = L.tileLayer(tileUrl(themeDark()), {
       maxZoom:19, subdomains:"abcd",
       attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
     }).addTo(map);
+    // The basemap is a third-party host. If it is unreachable the pins end up floating
+    // over an empty grid, so say so once it is clear that NO tile arrived — a single
+    // `tileerror` is normal (a missing tile at the edge of a zoom level).
+    // `tileload` (one tile arrived), NOT `load` — Leaflet fires `load` once nothing is
+    // left in flight, counting failed tiles as done, so it stays silent on a dead host.
+    let tileOk = false;
+    tiles.on("tileload", () => { tileOk = true; });
+    setTimeout(() => { if(!tileOk) noticeMap("The map background could not be loaded. The pins are still in their right places."); }, 8000);
     // Match the basemap to the active theme, and swap it live when the user toggles.
     window.addEventListener("themechange", () => tiles.setUrl(tileUrl(themeDark())));
     const bySlug = new Map();
@@ -349,8 +389,6 @@ function initMap(elId, dataId){
       else map.setView([stories[0].lat, stories[0].lng], 9, { animate:false });
     };
     // Deep-link focus: /atlas/?place=<slug> (from a story's "View on the map").
-    let focused = null;
-    try{ focused = new URLSearchParams(location.search).get("place"); }catch(e){}
     const focusTarget = focused && bySlug.has(focused) ? bySlug.get(focused) : null;
     // Zoom 10: close enough that neighbouring stories (e.g. the Skåne cluster) separate
     // clearly, and past PHOTO_MIN_ZOOM so the photographs around the place show too.
@@ -363,6 +401,17 @@ function initMap(elId, dataId){
     // positioned outside the clipped map pane — they silently "disappear". Recompute
     // the size before fitting, and again after layout settles, so pins always show.
     map.invalidateSize(false);
+    // Keep the reader inside the journal's geography. Left unbounded, Leaflet zooms out
+    // to the whole globe (every pin collapsing into one dot) and pans into empty ocean
+    // with no way back except the recenter button. The limits are derived from the data
+    // rather than hardcoded to Sweden, so they follow the pins wherever they go. Both
+    // pads are looser than fitAll's 0.25, so they never fight the fitted view.
+    // getBoundsZoom needs a measured container — hence after invalidateSize.
+    if(markers.length > 1){
+      const dataBounds = L.featureGroup(markers).getBounds();
+      map.setMaxBounds(dataBounds.pad(0.9));
+      map.setMinZoom(Math.max(3, map.getBoundsZoom(dataBounds.pad(0.35), false) - 1));
+    }
     applyView();
     syncLayers();
     if(focusTarget){ if(reduce) focusTarget.openPopup(); else setTimeout(() => focusTarget.openPopup(), 380); }
@@ -378,18 +427,23 @@ function initMap(elId, dataId){
       return b;
     }});
     map.addControl(new Recenter());
-    // Scroll-wheel zoom stays off so the map never hijacks page scrolling. Enable it
-    // only once the user deliberately clicks (or keyboard-focuses) the map, and turn it
-    // back off when the pointer leaves. A small hint makes the affordance discoverable.
+    // The map never hijacks page scrolling: the gesture that would scroll the page is
+    // off until the reader deliberately engages the map, and released afterwards. Which
+    // gesture that is depends on the pointer — wheel zoom on a mouse, one-finger drag on
+    // touch. A small hint makes the affordance discoverable.
     const hint = L.DomUtil.create("div", "map-hint", el);
-    hint.textContent = "Click the map to zoom";
+    hint.textContent = coarse ? "Tap the map to move it" : "Click the map to zoom";
     hint.setAttribute("aria-hidden", "true");
-    const enableWheel = () => { map.scrollWheelZoom.enable(); el.classList.add("map-zoom-on"); };
-    const disableWheel = () => { map.scrollWheelZoom.disable(); el.classList.remove("map-zoom-on"); };
-    map.on("click", enableWheel);
-    el.addEventListener("focusin", enableWheel);
-    el.addEventListener("mouseleave", disableWheel);
-    el.addEventListener("focusout", e => { if(!el.contains(e.relatedTarget)) disableWheel(); });
+    const activate = () => { if(coarse) map.dragging.enable(); else map.scrollWheelZoom.enable(); el.classList.add("map-zoom-on"); };
+    const release = () => { if(coarse) map.dragging.disable(); else map.scrollWheelZoom.disable(); el.classList.remove("map-zoom-on"); };
+    map.on("click", activate);
+    el.addEventListener("focusin", activate);
+    el.addEventListener("mouseleave", release);
+    el.addEventListener("focusout", e => { if(!el.contains(e.relatedTarget)) release(); });
+    // Touch has no "pointer left the map" event, so release the map when the reader
+    // taps anywhere else on the page — otherwise the first swipe after using the map
+    // would pan it again instead of scrolling on.
+    if(coarse) document.addEventListener("pointerdown", e => { if(!el.contains(e.target)) release(); }, { passive:true });
     // Two-way highlight between the place list and the map pins.
     const setActive = (slug) => {
       cards.forEach(c => c.classList.toggle("is-active", !!slug && c.dataset.placeSlug === slug));
@@ -416,13 +470,18 @@ function initMap(elId, dataId){
       });
       m.on("popupclose", () => setActive(null));
     });
-  }).catch(() => {});
-  if("IntersectionObserver" in window){
+  }).catch(() => failMap("The map could not be loaded — the list of places still works."));
+  // Lazily started so the tiles and pin thumbnails are not fetched for a reader who
+  // never scrolls this far — but a reader arriving on ?place=<slug> is here FOR the map
+  // and must get it (and its popup) even if the element never enters the viewport.
+  if(focused || !("IntersectionObserver" in window)){
+    start();
+  }else{
     const io = new IntersectionObserver((entries) => {
       entries.forEach(e => { if(e.isIntersecting){ start(); io.disconnect(); } });
     }, { rootMargin:"200px" });
     io.observe(el);
-  }else{ start(); }
+  }
 }
 // The narrow-screen nav is a horizontally scrolling strip with a hidden scrollbar,
 // so the theme toggle and Instagram link can sit off-screen with nothing to show it.
