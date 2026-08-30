@@ -5,7 +5,7 @@ import {
   collections, collectionPhotos, collectionMain, collectionHref, photoExifChips,
   photoStory, photoCollection,
   websiteLdObject, imageGalleryLdObject, personLdObject, articleLdObject, photoLdObject, collectionLdObject, fullVariantDims,
-} from "./templates.mjs?v=a204755257";
+} from "./templates.mjs?v=f49f32c435";
 
 // Cache-bust the runtime content fetches. /assets/data/*.json is served with a long
 // edge cache (the host ignores _headers), so without a content-versioned URL a freshly
@@ -303,7 +303,12 @@ function initMap(elId, dataId){
     // off on coarse pointers and is armed by a deliberate tap (the same gating the
     // wheel gets further down); pinch-zoom stays live throughout.
     const map = L.map(el, { scrollWheelZoom:false, dragging:!coarse, attributionControl:true });
-    const tileUrl = d => `https://{s}.basemaps.cartocdn.com/${d?"dark_all":"light_all"}/{z}/{x}/{y}{r}.png`;
+    // CARTO raster basemaps require a key since 2026 — without it every tile comes
+    // back stamped "API KEY REQUIRED". It is a public, per-origin basemap key, not a
+    // secret: it ships in this file by design (see carto.com/basemaps/apikey). Free
+    // up to 5M tile requests/month, in exchange for the attribution kept below.
+    const CARTO_KEY = "cb1_2b18_1_1b805b6ec36113391484f593";
+    const tileUrl = d => `https://{s}.basemaps.cartocdn.com/${d?"dark_all":"light_all"}/{z}/{x}/{y}{r}.png?key=${CARTO_KEY}`;
     const tiles = L.tileLayer(tileUrl(themeDark()), {
       maxZoom:19, subdomains:"abcd",
       attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'

@@ -944,7 +944,7 @@
     function setInputs(lat,lng,fromMap){latEl.value=round(lat);lngEl.value=round(lng);latEl.dispatchEvent(new Event("input",{bubbles:true}));lngEl.dispatchEvent(new Event("input",{bubbles:true}));if(!fromMap)placeMarker(lat,lng,true);}
     const start=curLatLng();
     map=L.map(mapEl,{scrollWheelZoom:false,attributionControl:true}).setView(start||[62.5,15.5],start?9:4);
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",{maxZoom:19,subdomains:"abcd",attribution:'&copy; OpenStreetMap &copy; CARTO'}).addTo(map);
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png?key=cb1_2b18_1_1b805b6ec36113391484f593",{maxZoom:19,subdomains:"abcd",attribution:'&copy; OpenStreetMap &copy; CARTO'}).addTo(map);
     if(start)placeMarker(start[0],start[1],false);
     map.on("click",e=>setInputs(e.latlng.lat,e.latlng.lng,false));
     setTimeout(()=>map.invalidateSize(false),120);
