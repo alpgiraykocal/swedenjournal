@@ -5,7 +5,7 @@ import {
   collections, collectionPhotos, collectionMain, collectionHref, photoExifChips,
   photoStory, photoCollection,
   websiteLdObject, imageGalleryLdObject, personLdObject, articleLdObject, photoLdObject, collectionLdObject, fullVariantDims,
-} from "./templates.mjs?v=f49f32c435";
+} from "./templates.mjs?v=d9159593df";
 
 // Cache-bust the runtime content fetches. /assets/data/*.json is served with a long
 // edge cache (the host ignores _headers), so without a content-versioned URL a freshly
@@ -882,6 +882,9 @@ function bindLightbox(data, getVisiblePhotos){
   const focusableSelector = "a[href],button:not([disabled]),textarea,input,select,[tabindex]:not([tabindex='-1'])";
   let current = null;
   let lastFocus = null;
+  // True while the lightbox owns a history entry it pushed itself (a click on a photo,
+  // not a ?photo= deep link). hide() has to pop that entry instead of replacing it.
+  let pushedEntry = false;
   let hiddenBackground = [];
   const setBackgroundInert = hidden => {
     if(hidden){
@@ -922,7 +925,12 @@ function bindLightbox(data, getVisiblePhotos){
     // Only capture the origin element when opening from a closed state. step()
     // re-opens with mode "replace"; capturing there would overwrite lastFocus
     // with the (soon-hidden) close button and break focus restoration on close.
-    if(box.hidden) lastFocus = document.activeElement;
+    // The same moment records whether THIS open pushed a history entry, which is
+    // what hide() has to pop — see the note there.
+    if(box.hidden){
+      lastFocus = document.activeElement;
+      pushedEntry = mode === "push";
+    }
     current = p;
     media.innerHTML = responsiveImage(p,{className:"lightbox-img is-loading",priority:true,sizes:"(max-width: 850px) 100vw, 1200px",fallbackSize:"full"});
     const fullImg = media.querySelector(".lightbox-img");
@@ -976,13 +984,25 @@ function bindLightbox(data, getVisiblePhotos){
     setUrlParam("photo", p.id, mode);
     close.focus();
   };
-  const hide = () => {
+  // DOM-only close, shared by the close button and the popstate handler.
+  const teardown = () => {
     box.hidden = true;
     current = null;
     document.body.classList.remove("has-lightbox");
     setBackgroundInert(false);
-    setUrlParam("photo", null);
     lastFocus?.focus?.();
+  };
+  const hide = () => {
+    // Opening pushed a history entry so Back (or the Android/iOS back gesture) closes
+    // the photo. Closing has to POP that entry, not replace it: a replaceState left a
+    // second entry behind for the same URL, and the next Back press then navigated to
+    // an identical URL — the button looked broken and the reader had to press it twice
+    // to leave the page. popstate sees an already-hidden box and does nothing further.
+    const pop = pushedEntry;
+    pushedEntry = false;
+    teardown();
+    if(pop) history.back();
+    else setUrlParam("photo", null); // arrived on ?photo= — no entry of ours to pop
   };
   const step = direction => {
     if(!current) return;
@@ -1068,14 +1088,10 @@ function bindLightbox(data, getVisiblePhotos){
   if(p) open(p, "replace");
   window.addEventListener("popstate", () => {
     if(box.hidden) return;
-    const photoParam = new URLSearchParams(location.search).get("photo");
-    if(!photoParam) {
-      box.hidden = true;
-      current = null;
-      document.body.classList.remove("has-lightbox");
-      setBackgroundInert(false);
-      lastFocus?.focus?.();
-    }
+    if(new URLSearchParams(location.search).get("photo")) return;
+    // The reader popped our own entry with Back — it is gone, so nothing left to pop.
+    pushedEntry = false;
+    teardown();
   });
 }
 async function copyText(text){

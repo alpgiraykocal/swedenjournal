@@ -235,6 +235,11 @@ export function photoSharePanel(data, p) {
     blurb: "Send it to someone who would enjoy this place and light.",
   });
 }
+// "Related photographs" renders in the same 880px-capped two-column grid on the story
+// page and the photo page, so both quote the same `sizes`. Measured against the real
+// layout: one column below 560px, two above it, each card capped at ~426px from 1100px
+// up. The old flat "280px" under-declared the wide case by half.
+const RELATED_SIZES = "(max-width: 560px) calc(100vw - 40px), (max-width: 850px) calc(50vw - 34px), 430px";
 export function relatedPanel(data, story) {
   const storyTags = new Set((story.tags || []).map((x) => x.toLowerCase()));
   const relatedStories = (data.stories || []).filter((item) => item.slug !== story.slug).map((item) => {
@@ -249,7 +254,7 @@ export function relatedPanel(data, story) {
     return { item, score };
   }).filter((x) => x.score > 0 && !usedPhotos.has(x.item.id)).sort((a, b) => b.score - a.score).slice(0, 3).map((x) => x.item);
   if (!relatedStories.length && !relatedPhotos.length) return "";
-  return `<section class="section related-section"><div class="container related-container"><div class="section-head"><div><p class="eyebrow">Continue exploring</p><h2>Related notes and photographs</h2></div></div>${relatedStories.length ? `<div class="related-stories">${relatedStories.map((s) => storyCard(data, s)).join("")}</div>` : ""}${relatedPhotos.length ? `<div class="gallery-grid selected-grid related-photos">${relatedPhotos.map((p, i) => photoFigure(p, { priority: i === 0, sizes: "(max-width: 560px) calc(100vw - 24px), 280px" })).join("")}</div>` : ""}</div></section>`;
+  return `<section class="section related-section"><div class="container related-container"><div class="section-head"><div><p class="eyebrow">Continue exploring</p><h2>Related notes and photographs</h2></div></div>${relatedStories.length ? `<div class="related-stories">${relatedStories.map((s) => storyCard(data, s)).join("")}</div>` : ""}${relatedPhotos.length ? `<div class="gallery-grid selected-grid related-photos">${relatedPhotos.map((p, i) => `<a class="photo-page-related" href="${photoHref(p.id)}">${photoFigure(p, { priority: i === 0, sizes: RELATED_SIZES })}</a>`).join("")}</div>` : ""}</div></section>`;
 }
 
 export function storyNav(data, story) {
@@ -416,7 +421,7 @@ export function photoMain(data, p) {
   const walk = (prev || next)
     ? `<nav class="story-walk container" aria-label="More photographs"><p class="eyebrow story-walk-eyebrow">More from the gallery</p><div class="story-walk-row">${walkLink(prev, "prev", "Previous")}${walkLink(next, "next", "Next")}</div></nav>`
     : "";
-  return `<main><section class="story-hero container photo-page-hero"><div class="story-meta" role="group" aria-label="Photograph details">${chips}</div><h1 class="headline">${esc(p.title)}</h1>${p.caption ? `<p class="intro">${esc(p.caption)}</p>` : ""}${storyLink}${collectionLink}${responsiveImage(p, { priority: true, sizes: "(max-width: 1220px) calc(100vw - 40px), 1180px", fallbackSize: "full", viewTransitionName: p.id ? `photo-${p.id}` : undefined })}${photoExifChips(p) ? `<p class="photo-page-tags photo-exif" aria-label="Camera and exposure settings">${photoExifChips(p)}</p>` : ""}${(p.tags || []).length ? `<p class="photo-page-tags">${(p.tags || []).slice(0, 6).map((t) => `<span>${esc(t)}</span>`).join("")}</p>` : ""}<p class="photo-page-back"><a class="text-link" href="${root()}gallery/index.html">Back to the gallery</a></p></section>${related.length ? `<section class="section related-section"><div class="container related-container"><div class="section-head"><div><p class="eyebrow">Same collection</p><h2>Related photographs</h2></div></div><div class="gallery-grid selected-grid related-photos">${related.map((rp) => `<a class="photo-page-related" href="${photoHref(rp.id)}">${photoFigure(rp, { sizes: "(max-width: 560px) calc(100vw - 24px), 280px" })}</a>`).join("")}</div></div></section>` : ""}${photoSharePanel(data, p)}${walk}</main>`;
+  return `<main><section class="story-hero container photo-page-hero"><div class="story-meta" role="group" aria-label="Photograph details">${chips}</div><h1 class="headline">${esc(p.title)}</h1>${p.caption ? `<p class="intro">${esc(p.caption)}</p>` : ""}${storyLink}${collectionLink}${responsiveImage(p, { priority: true, sizes: "(max-width: 1220px) calc(100vw - 40px), 1180px", fallbackSize: "full", viewTransitionName: p.id ? `photo-${p.id}` : undefined })}${photoExifChips(p) ? `<p class="photo-page-tags photo-exif" aria-label="Camera and exposure settings">${photoExifChips(p)}</p>` : ""}${(p.tags || []).length ? `<p class="photo-page-tags">${(p.tags || []).slice(0, 6).map((t) => `<span>${esc(t)}</span>`).join("")}</p>` : ""}<p class="photo-page-back"><a class="text-link" href="${root()}gallery/index.html">Back to the gallery</a></p></section>${related.length ? `<section class="section related-section"><div class="container related-container"><div class="section-head"><div><p class="eyebrow">Same collection</p><h2>Related photographs</h2></div></div><div class="gallery-grid selected-grid related-photos">${related.map((rp) => `<a class="photo-page-related" href="${photoHref(rp.id)}">${photoFigure(rp, { sizes: RELATED_SIZES })}</a>`).join("")}</div></div></section>` : ""}${photoSharePanel(data, p)}${walk}</main>`;
 }
 export function legacyStoryMain(data) {
   return `<main class="container section"><p class="eyebrow">Stories</p><h1 class="headline">${esc(data.storiesPage?.headline || "Stories")}</h1><p class="intro">${esc(data.storiesPage?.intro || data.site?.description || "")}</p><p><a class="text-link" href="${root()}stories/index.html">Return to stories</a></p></main>`;

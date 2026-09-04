@@ -95,6 +95,14 @@ function checkHtmlMetadata(baseDir) {
   }
 }
 
+// The original full-resolution sources (assets/images/photos/) are gitignored — they
+// exist on the author's machine and nowhere else, so a CI checkout has none of them.
+// Requiring them unconditionally made `npm run qa` fail with ~50 phantom "Missing …"
+// lines on any clean clone, which is why the deploy workflow could never gate on it.
+// Detect instead of assume: check them where they are, skip where they cannot be.
+const sourcePhotosDir = path.join(websiteDir, "assets", "images", "photos");
+const hasSourcePhotos = exists(sourcePhotosDir);
+
 function checkContent(baseDir, { requireSourcePhotos }) {
   const dataPath = path.join(baseDir, "assets", "data", "site-content.json");
   checkFile(dataPath);
@@ -347,7 +355,9 @@ function checkUploadPackagePrivacy() {
 }
 
 function checkSourcePhotoGuard() {
-  const guardPath = path.join(websiteDir, "assets", "images", "photos", ".htaccess");
+  // Lives inside the gitignored sources folder, so it only exists where the sources do.
+  if (!hasSourcePhotos) return;
+  const guardPath = path.join(sourcePhotosDir, ".htaccess");
   checkFile(guardPath, "assets/images/photos/.htaccess");
   if (exists(guardPath) && !read(guardPath).includes("Require all denied")) {
     fail("assets/images/photos/.htaccess should deny direct source photo access");
@@ -412,7 +422,10 @@ function checkWorkspaceCleanliness() {
   // .git and node_modules are not part of the workspace we publish, and their contents are
   // not ours to keep clean: a dependency shipping a .log or ._* file would fail this check
   // for no reason. Skipping them also keeps the walk to the tree that actually ships.
-  const skipDirs = new Set([".git", "node_modules"]);
+  // .playwright-mcp is browser-tooling scratch (snapshots + console *.log), gitignored
+  // like the two below and never published — without it QA fails on its own logs the
+  // moment anyone drives the site through the Playwright MCP.
+  const skipDirs = new Set([".git", "node_modules", ".playwright-mcp"]);
   const stack = [root];
   while (stack.length) {
     const current = stack.pop();
@@ -450,6 +463,13 @@ function checkEditor() {
   if (!js.includes("storyPublicPath")) fail("Editor story URL builder should use clean story paths");
   if (js.includes("story/?slug=")) fail("Editor still emits legacy story query URLs");
   if (!js.includes("function rssXml") || !js.includes('"feed.xml"')) fail("Editor save/package flow should regenerate feed.xml");
+  // rssXml() mirrors templates.mjs feedXml() byte for byte, and checkGeneratedXmlParity
+  // only catches drift once a divergent feed is on disk. The empty-text-block guard is
+  // the clause that actually drifted (the editor emitted <p></p> where the canonical
+  // builder emits nothing), so assert it directly — before a save can ship the bad feed.
+  if (!/if\(b\.type==="heading"\)return t\?/.test(js) || !/return t\?`<p>/.test(js)) {
+    fail("Editor rssXml() is missing the empty-text-block guard that templates.mjs feedXml() applies");
+  }
   if (!js.includes("removeWebsiteFile") || !js.includes("bestRaster*1.1")) fail("Editor should prune oversized browser-generated AVIF variants");
   if (/function imageDimensions\(url\).*URL\.revokeObjectURL\(url\)/s.test(js)) fail("Editor imageDimensions should not revoke caller-owned preview URLs");
 }
@@ -487,7 +507,7 @@ function checkPublicRuntime(baseDir) {
 
 checkRootCleanliness();
 checkWorkspaceCleanliness();
-checkContent(websiteDir, { requireSourcePhotos: true });
+checkContent(websiteDir, { requireSourcePhotos: hasSourcePhotos });
 checkHtmlMetadata(websiteDir);
 checkSitemap(websiteDir);
 checkRss(websiteDir);
@@ -530,4 +550,6 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log("Static QA passed");
+console.log(hasSourcePhotos
+  ? "Static QA passed"
+  : "Static QA passed (original source photos not present — source-file checks skipped)");

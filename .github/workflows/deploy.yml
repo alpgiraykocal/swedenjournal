@@ -40,6 +40,14 @@ jobs:
         run: npm ci
       - name: Build (SSG pre-render)
         run: npm run build
+      # Gate the deploy on the static QA suite. It checks the things a bad content save
+      # can break and a build will happily carry through: dangling photo/story/series
+      # references, missing image variants, broken shell paths, and byte-parity between
+      # sitemap.xml / feed.xml and their canonical builders in templates.mjs. Runs after
+      # the build so it validates the artifact that is about to ship. Checks that need
+      # the gitignored original photos skip themselves here (see qa-static-checks.mjs).
+      - name: QA (static checks)
+        run: npm run qa
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
           path: 01-website-ready-to-upload
