@@ -62,6 +62,15 @@ const DV = hashOf(
 // 3. Normalize every HTML: site.js MUST be type="module" (it imports templates.mjs),
 //    and both site.js + site.css get the content-hashed ?v=. Fixes anything the editor
 //    wrote (non-module tag, stale version).
+// The brand for machine-readable head tags — site.ownerName ("Sweden Journal"), not
+// site.siteTitle, which holds the tagline. Mirrors templates.mjs brandName().
+const BRAND = (() => {
+  try {
+    const c = JSON.parse(fs.readFileSync(path.join(websiteDir, "assets/data/site-content.json"), "utf8"));
+    return String(c.site?.ownerName || c.site?.siteTitle || "").trim();
+  } catch { return ""; }
+})();
+
 function walkHtml(dir) {
   let out = [];
   for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -90,6 +99,16 @@ for (const f of walkHtml(websiteDir)) {
     /(window\.__ASSET_PREFIX__="[^"]*";)(window\.__DATA_VERSION__="[^"]*";)?/,
     `$1window.__DATA_VERSION__="${DV}";`,
   );
+  // og:site_name was absent everywhere, so social cards and search results had no
+  // brand line at all. Injected here rather than in each shell because that is the one
+  // loop that touches every page, and it is idempotent: the tag is only added when the
+  // page has an og:type to anchor to and does not already carry it.
+  if (BRAND && !html.includes('property="og:site_name"')) {
+    html = html.replace(
+      /(<meta property="og:type" content="[^"]*">)/,
+      `$1\n  <meta property="og:site_name" content="${BRAND.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;")}">`,
+    );
+  }
   fs.writeFileSync(f, html);
   pages += 1;
 }

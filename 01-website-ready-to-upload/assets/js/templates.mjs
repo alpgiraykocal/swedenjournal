@@ -324,7 +324,9 @@ export function atlasMain(data) {
     .filter((s) => s.coordinates && Number.isFinite(Number(s.coordinates.lat)) && Number.isFinite(Number(s.coordinates.lng)))
     .map((s) => {
       const hero = photo(data, s.heroPhotoId);
-      return { kind: "story", slug: s.slug, title: s.title, location: s.location || "", date: s.date || "", summary: s.summary || "", lat: Number(s.coordinates.lat), lng: Number(s.coordinates.lng), href: storyHref(s.slug), thumb: variant(hero, "thumb", "jpeg") || imgPath(hero), alt: (hero && hero.alt) || s.title };
+      const tw = Number(hero?.variants?.thumb?.width) || 480;
+      const th = hero?.width && hero?.height ? Math.round(tw * Number(hero.height) / Number(hero.width)) : 0;
+      return { kind: "story", slug: s.slug, title: s.title, location: s.location || "", date: s.date || "", summary: s.summary || "", lat: Number(s.coordinates.lat), lng: Number(s.coordinates.lng), href: storyHref(s.slug), thumbW: tw, thumbH: th, thumb: variant(hero, "thumb", "jpeg") || imgPath(hero), alt: (hero && hero.alt) || s.title };
     });
   // Photograph pins from camera GPS (exif.gps, extracted locally by backfill-exif).
   // Rendered smaller than story pins; the place LIST stays stories-only so it reads
@@ -332,7 +334,7 @@ export function atlasMain(data) {
   const mapPhotos = photos(data)
     .filter((p) => p.exif?.gps && Number.isFinite(Number(p.exif.gps.lat)) && Number.isFinite(Number(p.exif.gps.lng)))
     .map((p) => ({ kind: "photo", title: p.title || p.id, location: p.location || "", lat: Number(p.exif.gps.lat), lng: Number(p.exif.gps.lng), href: photoHref(p.id), thumb: variant(p, "thumb", "jpeg") || imgPath(p), alt: p.alt || p.title || "" }));
-  const places = mapStories.map((s) => `<li><a class="atlas-place" href="${s.href}" data-place-slug="${esc(s.slug)}"><span class="atlas-place-thumb">${s.thumb ? `<img src="${esc(s.thumb)}" alt="" loading="lazy">` : ""}</span><span class="atlas-place-copy"><span class="atlas-place-title">${esc(s.title)}</span>${metaText([s.location, s.date]) ? `<span class="meta">${esc(metaText([s.location, s.date]))}</span>` : ""}${s.summary ? `<span class="atlas-place-snippet">${esc(s.summary)}</span>` : ""}</span></a></li>`).join("");
+  const places = mapStories.map((s) => `<li><a class="atlas-place" href="${s.href}" data-place-slug="${esc(s.slug)}"><span class="atlas-place-thumb">${s.thumb ? `<img src="${esc(s.thumb)}" alt=""${s.thumbH ? ` width="${s.thumbW}" height="${s.thumbH}"` : ""} loading="lazy">` : ""}</span><span class="atlas-place-copy"><span class="atlas-place-title">${esc(s.title)}</span>${metaText([s.location, s.date]) ? `<span class="meta">${esc(metaText([s.location, s.date]))}</span>` : ""}${s.summary ? `<span class="atlas-place-snippet">${esc(s.summary)}</span>` : ""}</span></a></li>`).join("");
   const mapData = JSON.stringify([...mapStories, ...mapPhotos]).replace(/</g, "\\u003c");
   const counts = `${mapStories.length} ${mapStories.length === 1 ? "place" : "places"}${mapPhotos.length ? ` · ${mapPhotos.length} photographs` : ""}`;
   return `<main><section class="hero container atlas-hero"><p class="eyebrow">${esc(ap.eyebrow || "Explore by place")}</p><h1 class="headline">${esc(ap.headline || "An atlas of quiet places")}</h1><p class="intro">${esc(ap.intro || "Every story mapped to where it happened. Wander the journal geographically — or browse the places below.")}</p></section>
@@ -463,7 +465,7 @@ export const jsonLdImageUrl = (data, p) => (p ? absoluteUrl(data, (variant(p, "f
 export function websiteLdObject(data) {
   const base = String(data.site?.baseUrl || "").replace(/\/+$/, "");
   if (!base) return null;
-  return { "@context": "https://schema.org", "@type": "WebSite", name: data.site?.siteTitle || data.site?.ownerName || "", url: base + "/", author: { "@type": "Person", name: data.site?.ownerName || "" } };
+  return { "@context": "https://schema.org", "@type": "WebSite", name: brandName(data), alternateName: data.site?.siteTitle || undefined, url: base + "/", author: { "@type": "Person", name: data.site?.ownerName || "" } };
 }
 // Shared image-metadata rights block for every ImageObject (Google "Image Metadata"
 // structured data: creator, creditText, copyrightNotice, license, acquireLicensePage).
@@ -492,6 +494,13 @@ export function personLdObject(data) {
   const portrait = photo(data, data.about?.portraitPhotoId);
   return { "@context": "https://schema.org", "@type": "Person", name: data.site?.ownerName || "", url: base || absoluteUrl(data, "about/"), sameAs: data.site?.instagramUrl ? [data.site.instagramUrl] : undefined, image: jsonLdImageUrl(data, portrait), description: (data.about?.paragraphs || [])[0] || data.site?.description || "" };
 }
+// The name for machine-readable surfaces. site.siteTitle holds the tagline
+// ("Photography & Travel Notes"); site.ownerName holds the name the header, the domain
+// and the Instagram account all use. Search results, feed readers and structured data
+// should carry the name — the tagline ranks for nothing and crowds out the title. The
+// visible header, footer and homepage title are unaffected.
+export const brandName = (data) => String(data?.site?.ownerName || data?.site?.siteTitle || "Photo Blog").trim();
+
 export function articleLdObject(data, story, heroPhoto) {
   const base = String(data.site?.baseUrl || "").replace(/\/+$/, "");
   const hasGeo = story.coordinates && Number.isFinite(Number(story.coordinates.lat)) && Number.isFinite(Number(story.coordinates.lng));
@@ -500,7 +509,7 @@ export function articleLdObject(data, story, heroPhoto) {
   // accurate (nothing has been revised since publication) and it stops consumers from
   // treating the article as having an unknown freshness.
   const published = machineDate(story.isoDate) || machineDate(story.date);
-  return { "@context": "https://schema.org", "@type": "Article", headline: story.title || "", description: story.summary || data.site?.description || "", image: jsonLdImageUrl(data, heroPhoto), datePublished: published, dateModified: published, author: { "@type": "Person", name: data.site?.ownerName || "", url: base || undefined }, publisher: { "@type": "Organization", name: data.site?.siteTitle || data.site?.ownerName || "", logo: { "@type": "ImageObject", url: (base || "") + "/icon-512.png" } }, contentLocation, url: absoluteUrl(data, "stories/" + encodeURIComponent(story.slug) + "/") };
+  return { "@context": "https://schema.org", "@type": "Article", headline: story.title || "", description: story.summary || data.site?.description || "", image: jsonLdImageUrl(data, heroPhoto), datePublished: published, dateModified: published, author: { "@type": "Person", name: data.site?.ownerName || "", url: base || undefined }, publisher: { "@type": "Organization", name: brandName(data), logo: { "@type": "ImageObject", url: (base || "") + "/icon-512.png" } }, contentLocation, url: absoluteUrl(data, "stories/" + encodeURIComponent(story.slug) + "/"), mainEntityOfPage: { "@type": "WebPage", "@id": absoluteUrl(data, "stories/" + encodeURIComponent(story.slug) + "/") }, articleSection: story.category || undefined, keywords: (story.tags || []).length ? (story.tags || []).join(", ") : undefined };
 }
 export function photoLdObject(data, p) {
   const st = photoStory(data, p.id);
@@ -623,7 +632,7 @@ ${media ? `    <media:content url="${escX(media)}" medium="image" type="image/jp
   return `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
-    <title>${escX(data.site?.siteTitle || data.site?.ownerName || "Photo Blog")}</title>
+    <title>${escX(brandName(data))}</title>
     <link>${base}/</link>
     <description>${escX(data.site?.description || "")}</description>
     <language>en</language>

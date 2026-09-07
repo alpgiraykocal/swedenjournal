@@ -299,7 +299,7 @@
       const pubDate=rssDate(s);const media=heroUrl(s);const body=contentEncoded(s);
       return `  <item>\n    <title>${escXml(s.title)}</title>\n    <link>${base}/stories/${encodeURIComponent(s.slug)}/</link>\n    <guid isPermaLink="true">${base}/stories/${encodeURIComponent(s.slug)}/</guid>\n    <description>${escXml(s.summary||"")}</description>\n${pubDate?`    <pubDate>${escXml(pubDate)}</pubDate>\n`:""}    <category>${escXml(s.category||s.theme||"Travel Notes")}</category>\n${media?`    <media:content url="${escXml(media)}" medium="image" type="image/jpeg"/>\n`:""}${body?`    <content:encoded><![CDATA[${body}]]></content:encoded>\n`:""}  </item>`;
     }).join("\n");
-    return `<?xml version="1.0" encoding="UTF-8"?>\n<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/" xmlns:content="http://purl.org/rss/1.0/modules/content/">\n  <channel>\n    <title>${escXml(c.site?.siteTitle||c.site?.ownerName||"Photo Blog")}</title>\n    <link>${base}/</link>\n    <description>${escXml(c.site?.description||"")}</description>\n    <language>en</language>\n    <lastBuildDate>${now}</lastBuildDate>\n    <atom:link href="${base}/feed.xml" rel="self" type="application/rss+xml"/>\n${items}\n  </channel>\n</rss>\n`;
+    return `<?xml version="1.0" encoding="UTF-8"?>\n<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/" xmlns:content="http://purl.org/rss/1.0/modules/content/">\n  <channel>\n    <title>${escXml(c.site?.ownerName||c.site?.siteTitle||"Photo Blog")}</title>\n    <link>${base}/</link>\n    <description>${escXml(c.site?.description||"")}</description>\n    <language>en</language>\n    <lastBuildDate>${now}</lastBuildDate>\n    <atom:link href="${base}/feed.xml" rel="self" type="application/rss+xml"/>\n${items}\n  </channel>\n</rss>\n`;
   }
   function escXml(value){return String(value??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
   function escapeAttr(value){return String(value||"").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;");}
@@ -309,7 +309,7 @@
   function storyHtmlShell(path,page="story"){
     const prefix=shellPrefix(path);
     const fallbackImage=escapeAttr(absoluteAssetUrl(""));
-    const siteTitle=escapeAttr(state.content?.site?.siteTitle||"Photography & Travel Notes");
+    const siteTitle=escapeAttr(state.content?.site?.ownerName||state.content?.site?.siteTitle||"Photo Blog");
     const base=publicBaseUrl();
     const isPhoto=page==="photo";
     const isCollection=page==="collection";
@@ -471,7 +471,8 @@
       let html,original=null;try{html=await readText(state.websiteHandle,path);original=html;}catch(e){if(item.photoPage)html=storyHtmlShell(path,"photo");else if(item.collectionPage)html=storyHtmlShell(path,"collection");else if(item.story)html=storyHtmlShell(path);else continue;}
       // Home gets the brand-led title, same as the build's brandHomeTitle().
       const _st=state.content.site?.siteTitle||"", _own=state.content.site?.ownerName||"";
-      const title=path==="index.html"&&_st&&_own&&_own!==_st?`${_own} — ${_st}`:item.title===_st?item.title:`${item.title} — ${_st||_own||"Photo Blog"}`;
+      const _brand=_own||_st||"Photo Blog";
+      const title=path==="index.html"&&_st&&_own&&_own!==_st?`${_own} — ${_st}`:item.title===_brand?item.title:`${item.title} — ${_brand}`;
       const desc=item.description||state.content.site?.description||"";
       // Same ~155-char word-boundary clamp as the build's clampDescription()
       // (03-tools/render-site.mjs) — ONLY for <meta name="description">; og:/twitter:

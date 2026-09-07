@@ -10,6 +10,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   setContext, photos, photo, storyPhotos, photoStoryMap, photoCollectionMap, fullVariantDims,
+  brandName,
   header, footer, homeMain, galleryMain, storiesMain, aboutMain, atlasMain, storyMain, legacyStoryMain, notFoundMain, photoMain, photoTitleCore,
   collections, collectionPhotos, collectionMain,
   websiteLdObject, imageGalleryLdObject, personLdObject, articleLdObject, photoLdObject,
@@ -177,8 +178,8 @@ const base = String(data.site?.baseUrl || "").replace(/\/+$/, "");
 function refreshStoryHead(rel, story) {
   const file = path.join(websiteDir, rel);
   if (!fs.existsSync(file)) return;
-  const siteTitle = data.site?.siteTitle || data.site?.ownerName || "";
-  const title = story.title ? `${story.title} \u2014 ${siteTitle}` : siteTitle;
+  const brand = brandName(data);
+  const title = story.title ? `${story.title} \u2014 ${brand}` : brand;
   const desc = story.summary || data.site?.description || "";
   // Identity tags, not just the text: a shell that started life as another story — a
   // folder copied to add a story outside the editor — otherwise keeps that story's
@@ -239,8 +240,8 @@ for (const s of data.stories || []) {
 // The shell (head metadata) is rewritten from content on every build, so a photo
 // title/caption/alt edit is always reflected; renderInto then injects the body.
 function photoShell(p) {
-  const siteTitle = encAttr(data.site?.siteTitle || "Photography & Travel Notes");
-  const title = encAttr(`${photoTitleCore(p)} — ${data.site?.siteTitle || data.site?.ownerName || "Photo Blog"}`);
+  const siteTitle = encAttr(brandName(data));
+  const title = encAttr(`${photoTitleCore(p)} — ${brandName(data)}`);
   const desc = encAttr(p.caption || p.alt || data.site?.description || "");
   const url = encAttr(`${base}/photos/${encodeURIComponent(p.id)}/`);
   const image = encAttr(`${base}/${String(p.variants?.full?.jpeg || p.src || "").replace(/^\/+/, "")}`);
@@ -294,10 +295,10 @@ for (const p of photos(data)) {
 // reflected; renderInto then injects the body.
 function collectionShell(col) {
   const cover = collectionPhotos(data, col)[0];
-  const title = encAttr(`${col.title || "Series"} — ${data.site?.siteTitle || data.site?.ownerName || "Photo Blog"}`);
+  const title = encAttr(`${col.title || "Series"} — ${brandName(data)}`);
   const desc = encAttr(col.description || data.site?.description || "");
   const url = encAttr(`${base}/series/${encodeURIComponent(col.slug)}/`);
-  const siteTitle = encAttr(data.site?.siteTitle || "Photography & Travel Notes");
+  const siteTitle = encAttr(brandName(data));
   const image = encAttr(`${base}/${String(cover?.variants?.full?.jpeg || cover?.src || "").replace(/^\/+/, "")}`);
   return `<!doctype html>
 <html lang="en">
