@@ -3931,14 +3931,14 @@
       "location": "Sigtuna, Uppland, Sweden",
       "date": "Summer 2026",
       "isoDate": "2026-09-07",
-      "readingTime": "2 min read",
+      "readingTime": "3 min read",
       "heroPhotoId": "steninge-slott",
       "featured": false,
       "coordinates": {
         "lat": 59.601772,
         "lng": 17.804903
       },
-      "summary": "Two palaces three and a half kilometres apart on the Sigtuna shore of Mälaren, photographed forty-five minutes apart on the same afternoon. One turns a single face to the drive; the other opens a courtyard and closes it around you.",
+      "summary": "Two palaces three and a half kilometres apart on the Sigtuna shore of Mälaren, sixty years and one social rank apart. Steninge was begun in 1694 for a courtier; Rosersberg, built in the 1630s for the Oxenstiernas, has been a royal palace since 1762.",
       "tags": [
         "Steninge Slott",
         "Rosersbergs Slott",
@@ -3949,6 +3949,10 @@
         "Palace",
         "Royal Palace",
         "Baroque Architecture",
+        "Nicodemus Tessin the Younger",
+        "Axel von Fersen",
+        "Oxenstierna",
+        "Karl XIII",
         "Courtyard",
         "Forecourt",
         "Nordic Heritage",
@@ -3957,7 +3961,7 @@
       "body": [
         {
           "type": "paragraph",
-          "text": "Steninge and Rosersberg stand three and a half kilometres apart on the Sigtuna shore of Mälaren, close enough that the camera puts forty-five minutes between the last frame at one and the first at the other. Seeing them in that order is useful. They are the same kind of building — a great pale house under a black roof with a flag on top — and they solve the problem of arrival in opposite ways."
+          "text": "Steninge and Rosersberg stand three and a half kilometres apart on the Sigtuna shore of Mälaren, close enough that the camera puts forty-five minutes between the last frame at one and the first at the other. Sixty years separate them, and so does the difference between a house a courtier built for himself and a house that ended up belonging to a king. Both differences are visible from the drive."
         },
         {
           "type": "image",
@@ -3966,7 +3970,7 @@
         },
         {
           "type": "paragraph",
-          "text": "Steninge presents a face. The house is a single ochre block with white dressings, and everything in front of it is arranged to make you look at that block: a gravel drive, a stone balustrade with urns set along it, and a broad staircase climbing straight to the door. There is no courtyard and no wings, nothing to step into. You stand below it and look up, and that is the whole design."
+          "text": "Steninge was begun in 1694 for Carl Gyllenstierna, to a design by Nicodemus Tessin the Younger, who would shortly be handed the rebuilding of the royal palace in Stockholm. What he put here is a single ochre block with white dressings, and everything in front of it is arranged to make you look at that block: a gravel drive, a stone balustrade with urns set along it, and a broad staircase climbing straight to the door. There is no courtyard and no wings, nothing to step into. You stand below it and look up, and that is the whole design."
         },
         {
           "type": "heading",
@@ -3982,12 +3986,16 @@
           "caption": "The avenue on the garden side, clipped trees narrowing the view to the façade."
         },
         {
+          "type": "paragraph",
+          "text": "The von Fersen family bought the estate in 1736, and it came down to Axel von Fersen the Younger — the count beaten to death by a crowd in central Stockholm in June 1810, during a state funeral, on a rumour that he had poisoned the crown prince. The house at the end of this avenue is the one he inherited. Nothing about it says so."
+        },
+        {
           "type": "heading",
           "text": "Three and a half kilometres south"
         },
         {
           "type": "paragraph",
-          "text": "Rosersberg does the opposite. The main block sits back and low, and two long wings run forward from it on either side to enclose a gravel forecourt. Nothing here climbs. The pale walls, the black hipped roofs and the clock in the central pediment are all at the far side of a large open square, and the building's first move is to put that square around you."
+          "text": "Rosersberg is the older house and the larger story. It was built in the 1630s for the Oxenstiernas, at the height of the family's power, and later passed to the crown. In 1762 it was given to Duke Karl, who became Karl XIII, and it has been one of Sweden's royal palaces ever since. It announces none of that. The main block sits back and low, and two long wings run forward from it on either side to enclose a gravel forecourt. Nothing here climbs."
         },
         {
           "type": "panorama",
@@ -3996,7 +4004,7 @@
         },
         {
           "type": "paragraph",
-          "text": "Step in and the enclosure tightens. A cobbled path runs up the middle between two stone urns, the wings hold both sides, and the clock stays straight ahead the whole way. It is a courtyard doing what a courtyard does: taking a large landscape and reducing it, pace by pace, to one door."
+          "text": "Step in and the enclosure tightens. A cobbled path runs up the middle between two stone urns, the wings hold both sides, and the clock in the pediment stays straight ahead the whole way. This is a court arrangement — a room made out of doors, with a single door at the end of it. Karl XIV Johan kept the palace in use in the early 1800s, and the plan suits a household that arrives in carriages and needs somewhere for them to turn."
         },
         {
           "type": "image",
@@ -4009,7 +4017,7 @@
         },
         {
           "type": "paragraph",
-          "text": "Photographed inside the same hour, the difference is hard to miss, and it is not about the houses themselves. It is about what the approach was built to do. Steninge stages a single object and puts you at the bottom of it. Rosersberg makes a room out of doors and walks you into it. Both are still doing it, to anyone who turns up with a camera."
+          "text": "Sixty years and one rank apart, the two buildings do opposite things to whoever walks up. Steninge stages a single object and puts you at the bottom of it, which is what a courtier's house is for. Rosersberg had to hold a court, so it opens, encloses, and channels everyone to the same door. Neither was built with photographs in mind, and both are still working on anyone who turns up with a camera."
         }
       ]
     }
