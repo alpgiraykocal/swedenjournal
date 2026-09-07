@@ -3031,6 +3031,70 @@
           "lng": 18.078753
         }
       }
+    },
+    {
+      "id": "steninge-slott",
+      "title": "Steninge Slott",
+      "location": "Steninge, Sigtuna, Sweden",
+      "date": "Summer 2026",
+      "season": "Summer",
+      "theme": "Palace, Baroque Architecture, Garden Terrace",
+      "tags": [
+        "Steninge Slott",
+        "Steninge Palace",
+        "Sigtuna",
+        "Märsta",
+        "Sweden",
+        "Baroque Architecture",
+        "Palace",
+        "Stone Staircase",
+        "Swedish Flag",
+        "Lake Mälaren",
+        "Nordic Heritage",
+        "Travel Photography"
+      ],
+      "src": "assets/images/photos/steninge-slott.jpeg",
+      "width": 6154,
+      "height": 4102,
+      "alt": "The ochre and white baroque façade of Steninge Slott in Sigtuna, seen head-on from the gravel drive, with a broad stone staircase and balustrade lined with flower urns leading up to the entrance and a Swedish flag flying from the roof.",
+      "caption": "Steninge Slott stands square to its garden terrace, the ochre façade and black roof framed by old trees while a stone staircase climbs from the gravel drive to the door.",
+      "sortOrder": 58,
+      "featured": false,
+      "category": "Castles",
+      "variants": {
+        "thumb": {
+          "jpeg": "assets/images/generated/thumb/steninge-slott.jpeg",
+          "webp": "assets/images/generated/thumb/steninge-slott.webp",
+          "width": 480,
+          "avif": "assets/images/generated/thumb/steninge-slott.avif"
+        },
+        "medium": {
+          "jpeg": "assets/images/generated/medium/steninge-slott.jpeg",
+          "webp": "assets/images/generated/medium/steninge-slott.webp",
+          "width": 1200,
+          "avif": "assets/images/generated/medium/steninge-slott.avif"
+        },
+        "full": {
+          "jpeg": "assets/images/generated/full/steninge-slott.jpeg",
+          "webp": "assets/images/generated/full/steninge-slott.webp",
+          "width": 2200,
+          "avif": "assets/images/generated/full/steninge-slott.avif"
+        }
+      },
+      "exif": {
+        "camera": "FUJIFILM X-T30 II",
+        "lens": "XC15-45mmF3.5-5.6 OIS PZ",
+        "iso": 320,
+        "aperture": 5.6,
+        "shutter": "1/600",
+        "focalLength": 15,
+        "focalLength35": 23,
+        "shotAt": "2026-09-06",
+        "gps": {
+          "lat": 59.601772,
+          "lng": 17.804903
+        }
+      }
     }
   ],
   "stories": [
