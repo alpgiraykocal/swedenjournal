@@ -1,5 +1,5 @@
 Contact: mailto:hej@sweden-journal.com
-Expires: 2027-09-07T11:52:34Z
+Expires: 2027-09-07T00:00:00Z
 Preferred-Languages: en, sv
 Canonical: https://sweden-journal.com/security.txt
 Canonical: https://sweden-journal.com/.well-known/security.txt

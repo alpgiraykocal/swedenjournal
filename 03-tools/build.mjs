@@ -64,12 +64,33 @@ const DV = hashOf(
 //    wrote (non-module tag, stale version).
 // The brand for machine-readable head tags — site.ownerName ("Sweden Journal"), not
 // site.siteTitle, which holds the tagline. Mirrors templates.mjs brandName().
-const BRAND = (() => {
+const [BRAND, TAGLINE] = (() => {
   try {
     const c = JSON.parse(fs.readFileSync(path.join(websiteDir, "assets/data/site-content.json"), "utf8"));
-    return String(c.site?.ownerName || c.site?.siteTitle || "").trim();
-  } catch { return ""; }
+    return [String(c.site?.ownerName || c.site?.siteTitle || "").trim(), String(c.site?.siteTitle || "").trim()];
+  } catch { return ["", ""]; }
 })();
+const esc4 = (s) => s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+// The section pages (gallery, stories, atlas, about, 404, the legacy /story/) keep their
+// titles in their committed shells, so the brand switch reached only the pages the build
+// regenerates. Swap a trailing " — <tagline>" for " — <brand>" here instead, which covers
+// every page from one place. The homepage is skipped: its title already leads with the
+// brand and reads "Sweden Journal — Photography & Travel Notes" on purpose.
+function brandSuffix(html) {
+  if (!BRAND || !TAGLINE || BRAND === TAGLINE) return html;
+  const title = (html.match(/<title>([^<]*)<\/title>/) || [])[1] || "";
+  if (!title || title.startsWith(BRAND) || title.startsWith(esc4(BRAND))) return html;
+  for (const tail of [TAGLINE, esc4(TAGLINE)]) {
+    const from = ` \u2014 ${tail}`;
+    if (!title.endsWith(from)) continue;
+    const branded = title.slice(0, -from.length) + ` \u2014 ${esc4(BRAND)}`;
+    return html
+      .replace(/<title>[^<]*<\/title>/, () => `<title>${branded}</title>`)
+      .replace(/(<meta property="og:title" content=")[^"]*(">)/, (_m, a, b) => a + branded + b)
+      .replace(/(<meta name="twitter:title" content=")[^"]*(">)/, (_m, a, b) => a + branded + b);
+  }
+  return html;
+}
 
 function walkHtml(dir) {
   let out = [];
@@ -103,6 +124,7 @@ for (const f of walkHtml(websiteDir)) {
   // brand line at all. Injected here rather than in each shell because that is the one
   // loop that touches every page, and it is idempotent: the tag is only added when the
   // page has an og:type to anchor to and does not already carry it.
+  html = brandSuffix(html);
   if (BRAND && !html.includes('property="og:site_name"')) {
     html = html.replace(
       /(<meta property="og:type" content="[^"]*">)/,
@@ -130,7 +152,19 @@ for (const f of walkHtml(websiteDir)) {
   const contact = String(content.about?.contactEmail || "").trim();
   const site = String(content.site?.baseUrl || "").replace(/\/+$/, "");
   if (contact && site) {
-    const expires = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().replace(/\.\d{3}Z$/, "Z");
+    // Keep the existing Expires while it has real life left. Recomputing it every build
+    // moved the timestamp by seconds and dirtied the working tree on every single run,
+    // which is noise in every diff. Renew only inside the last sixty days, and pin the
+    // time to midnight so even the renewal lands on a stable value.
+    const existing = (() => {
+      try {
+        const prev = fs.readFileSync(path.join(websiteDir, "security.txt"), "utf8");
+        const m = prev.match(/^Expires:\s*(\S+)/m);
+        const at = m ? Date.parse(m[1]) : NaN;
+        return Number.isFinite(at) && at - Date.now() > 60 * 24 * 60 * 60 * 1000 ? m[1] : "";
+      } catch { return ""; }
+    })();
+    const expires = existing || `${new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)}T00:00:00Z`;
     const txt = [
       `Contact: mailto:${contact}`,
       `Expires: ${expires}`,
