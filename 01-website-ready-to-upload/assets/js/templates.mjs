@@ -414,14 +414,32 @@ export function photoMain(data, p) {
   const storyLink = st ? `<a class="story-map-link" href="${storyHref(st.slug)}">From the story: ${esc(st.title)} <span aria-hidden="true">→</span></a>` : "";
   const col = photoCollection(data, p.id);
   const collectionLink = col ? `<a class="story-map-link" href="${collectionHref(col.slug)}">In series: ${esc(col.title)} <span aria-hidden="true">→</span></a>` : "";
-  const related = list.filter((x) => x.id !== p.id && x.category && x.category === p.category).slice(0, 3);
+  // Rank the rest of the gallery against this photo rather than taking the first three
+  // of the same category — that older rule handed every Castles page the same three
+  // Landskrona frames (lowest sortOrder wins) no matter what the page was about. Place
+  // and series outweigh a shared category, so the other frames of the same building come
+  // first; shared tags only break the remaining ties, which keeps site-wide tags
+  // ("Sweden", "Travel Photography") from ever outvoting a real connection.
+  const relTags = new Set((p.tags || []).map((t) => String(t).toLowerCase()));
+  const colPhotoIds = new Set((col && col.photoIds) || []);
+  const sameText = (a, b) => {
+    const x = String(a || "").trim().toLowerCase();
+    return x !== "" && x === String(b || "").trim().toLowerCase();
+  };
+  const related = list.filter((x) => x.id !== p.id).map((x) => {
+    const score = (x.tags || []).filter((t) => relTags.has(String(t).toLowerCase())).length
+      + (sameText(x.location, p.location) ? 6 : 0)
+      + (colPhotoIds.has(x.id) ? 4 : 0)
+      + (x.category && x.category === p.category ? 2 : 0);
+    return { item: x, score };
+  }).filter((x) => x.score > 0).sort((a, b) => b.score - a.score).slice(0, 3).map((x) => x.item);
   const walkLink = (ph, dir, label) => ph
     ? `<a class="story-walk-link story-walk-${dir}" href="${photoHref(ph.id)}"><span class="story-walk-dir">${label}</span><span class="story-walk-title">${esc(ph.title)}</span></a>`
     : `<span class="story-walk-link is-empty" aria-hidden="true"></span>`;
   const walk = (prev || next)
     ? `<nav class="story-walk container" aria-label="More photographs"><p class="eyebrow story-walk-eyebrow">More from the gallery</p><div class="story-walk-row">${walkLink(prev, "prev", "Previous")}${walkLink(next, "next", "Next")}</div></nav>`
     : "";
-  return `<main><section class="story-hero container photo-page-hero"><div class="story-meta" role="group" aria-label="Photograph details">${chips}</div><h1 class="headline">${esc(p.title)}</h1>${p.caption ? `<p class="intro">${esc(p.caption)}</p>` : ""}${storyLink}${collectionLink}${responsiveImage(p, { priority: true, sizes: "(max-width: 1220px) calc(100vw - 40px), 1180px", fallbackSize: "full", viewTransitionName: p.id ? `photo-${p.id}` : undefined })}${photoExifChips(p) ? `<p class="photo-page-tags photo-exif" aria-label="Camera and exposure settings">${photoExifChips(p)}</p>` : ""}${(p.tags || []).length ? `<p class="photo-page-tags">${(p.tags || []).slice(0, 6).map((t) => `<span>${esc(t)}</span>`).join("")}</p>` : ""}<p class="photo-page-back"><a class="text-link" href="${root()}gallery/index.html">Back to the gallery</a></p></section>${related.length ? `<section class="section related-section"><div class="container related-container"><div class="section-head"><div><p class="eyebrow">Same collection</p><h2>Related photographs</h2></div></div><div class="gallery-grid selected-grid related-photos">${related.map((rp) => `<a class="photo-page-related" href="${photoHref(rp.id)}">${photoFigure(rp, { sizes: RELATED_SIZES })}</a>`).join("")}</div></div></section>` : ""}${photoSharePanel(data, p)}${walk}</main>`;
+  return `<main><section class="story-hero container photo-page-hero"><div class="story-meta" role="group" aria-label="Photograph details">${chips}</div><h1 class="headline">${esc(p.title)}</h1>${p.caption ? `<p class="intro">${esc(p.caption)}</p>` : ""}${storyLink}${collectionLink}${responsiveImage(p, { priority: true, sizes: "(max-width: 1220px) calc(100vw - 40px), 1180px", fallbackSize: "full", viewTransitionName: p.id ? `photo-${p.id}` : undefined })}${photoExifChips(p) ? `<p class="photo-page-tags photo-exif" aria-label="Camera and exposure settings">${photoExifChips(p)}</p>` : ""}${(p.tags || []).length ? `<p class="photo-page-tags">${(p.tags || []).slice(0, 6).map((t) => `<span>${esc(t)}</span>`).join("")}</p>` : ""}<p class="photo-page-back"><a class="text-link" href="${root()}gallery/index.html">Back to the gallery</a></p></section>${related.length ? `<section class="section related-section"><div class="container related-container"><div class="section-head"><div><p class="eyebrow">More like this</p><h2>Related photographs</h2></div></div><div class="gallery-grid selected-grid related-photos">${related.map((rp) => `<a class="photo-page-related" href="${photoHref(rp.id)}">${photoFigure(rp, { sizes: RELATED_SIZES })}</a>`).join("")}</div></div></section>` : ""}${photoSharePanel(data, p)}${walk}</main>`;
 }
 export function legacyStoryMain(data) {
   return `<main class="container section"><p class="eyebrow">Stories</p><h1 class="headline">${esc(data.storiesPage?.headline || "Stories")}</h1><p class="intro">${esc(data.storiesPage?.intro || data.site?.description || "")}</p><p><a class="text-link" href="${root()}stories/index.html">Return to stories</a></p></main>`;
