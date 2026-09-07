@@ -94,6 +94,30 @@ for (const f of walkHtml(websiteDir)) {
   pages += 1;
 }
 
+// 3b. /.well-known/security.txt (RFC 9116). Generated rather than checked in because
+//     Expires is mandatory and a lapsed file is one clients are told to ignore — writing
+//     it here keeps the date a year ahead of the most recent deploy. Contact is the
+//     address the About page already publishes, so this adds no new exposure.
+{
+  const content = JSON.parse(fs.readFileSync(path.join(websiteDir, "assets/data/site-content.json"), "utf8"));
+  const contact = String(content.about?.contactEmail || "").trim();
+  const site = String(content.site?.baseUrl || "").replace(/\/+$/, "");
+  if (contact && site) {
+    const expires = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().replace(/\.\d{3}Z$/, "Z");
+    const txt = [
+      `Contact: mailto:${contact}`,
+      `Expires: ${expires}`,
+      "Preferred-Languages: en, sv",
+      `Canonical: ${site}/.well-known/security.txt`,
+      "",
+    ].join("\n");
+    const out = path.join(websiteDir, ".well-known", "security.txt");
+    fs.mkdirSync(path.dirname(out), { recursive: true });
+    fs.writeFileSync(out, txt);
+    console.log(`security.txt written (expires ${expires.slice(0, 10)}).`);
+  }
+}
+
 // 4. site.js imports templates.mjs in the browser — version that import to match.
 const siteJsPath = path.join(websiteDir, "assets/js/site.js");
 let sjs = fs.readFileSync(siteJsPath, "utf8");

@@ -295,7 +295,7 @@
       }).join("");
       return html.replace(/]]>/g,"]]]]><![CDATA[>");
     };
-    const items=(c.stories||[]).filter(s=>s.title&&s.slug).map(s=>{
+    const items=(c.stories||[]).filter(s=>s.title&&s.slug).sort((a,b)=>String(b.isoDate||b.date||"").localeCompare(String(a.isoDate||a.date||""))).map(s=>{
       const pubDate=rssDate(s);const media=heroUrl(s);const body=contentEncoded(s);
       return `  <item>\n    <title>${escXml(s.title)}</title>\n    <link>${base}/stories/${encodeURIComponent(s.slug)}/</link>\n    <guid isPermaLink="true">${base}/stories/${encodeURIComponent(s.slug)}/</guid>\n    <description>${escXml(s.summary||"")}</description>\n${pubDate?`    <pubDate>${escXml(pubDate)}</pubDate>\n`:""}    <category>${escXml(s.category||s.theme||"Travel Notes")}</category>\n${media?`    <media:content url="${escXml(media)}" medium="image" type="image/jpeg"/>\n`:""}${body?`    <content:encoded><![CDATA[${body}]]></content:encoded>\n`:""}  </item>`;
     }).join("\n");

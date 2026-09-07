@@ -601,6 +601,12 @@ export function feedXml(data, now = new Date().toUTCString()) {
   };
   const items = (data.stories || [])
     .filter((s) => s.title && s.slug)
+    // Newest first, the order the Stories archive and prev/next already walk. RSS does
+    // not mandate an order and most readers sort by pubDate themselves, but the ones
+    // that show source order were putting the newest story last. filter() already
+    // copied the array, so this sorts the copy and leaves data.stories alone.
+    // MIRRORED in editor.js rssXml() — keep the two in lockstep.
+    .sort((a, b) => String(b.isoDate || b.date || "").localeCompare(String(a.isoDate || a.date || "")))
     .map((s) => {
       const pubDate = rssDate(s);
       const media = heroUrl(s);
