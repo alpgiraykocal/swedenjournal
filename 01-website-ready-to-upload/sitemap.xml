@@ -56,6 +56,7 @@
     <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/katarina-kyrka.jpeg</image:loc></image:image>
     <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/steninge-slott.jpeg</image:loc></image:image>
     <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/steninge-slott-from-the-garden.jpeg</image:loc></image:image>
+    <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/rosersbergs-slott.jpeg</image:loc></image:image>
   </url>
   <url>
     <loc>https://sweden-journal.com/stories/</loc>
@@ -374,6 +375,11 @@
     <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/steninge-slott-from-the-garden.jpeg</image:loc></image:image>
   </url>
   <url>
+    <loc>https://sweden-journal.com/photos/rosersbergs-slott/</loc>
+    <lastmod>2026-09-06</lastmod>
+    <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/rosersbergs-slott.jpeg</image:loc></image:image>
+  </url>
+  <url>
     <loc>https://sweden-journal.com/series/runestones-and-carvings/</loc>
     <lastmod>2026-09-07</lastmod>
     <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/anundshog-runestone-vs-13.jpeg</image:loc></image:image>
@@ -404,5 +410,6 @@
     <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/climbing-the-terrace-steps-to-karnan.jpeg</image:loc></image:image>
     <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/steninge-slott.jpeg</image:loc></image:image>
     <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/steninge-slott-from-the-garden.jpeg</image:loc></image:image>
+    <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/rosersbergs-slott.jpeg</image:loc></image:image>
   </url>
 </urlset>

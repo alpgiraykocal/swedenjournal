@@ -3160,6 +3160,69 @@
           "lng": 17.802964
         }
       }
+    },
+    {
+      "id": "rosersbergs-slott",
+      "title": "Rosersbergs Slott",
+      "location": "Rosersberg, Sigtuna, Sweden",
+      "date": "Summer 2026",
+      "season": "Summer",
+      "theme": "Palace, Manor Architecture, Forecourt",
+      "tags": [
+        "Rosersbergs Slott",
+        "Rosersberg Palace",
+        "Rosersberg",
+        "Sigtuna",
+        "Sweden",
+        "Palace",
+        "Royal Palace",
+        "Manor Architecture",
+        "Forecourt",
+        "Nordic Heritage",
+        "Travel Photography"
+      ],
+      "src": "assets/images/photos/rosersbergs-slott.jpeg",
+      "width": 4923,
+      "height": 3282,
+      "alt": "The pale façades and black hipped roofs of Rosersbergs Slott seen across its gravel forecourt and lawns, with the main block carrying a clock in its central pediment and a symmetrical wing pavilion with arched carriage doors standing on either side under a tall summer cloud.",
+      "caption": "Rosersbergs Slott opens onto its forecourt in three parts, the clock-topped main block set back between two wing pavilions while a single summer cloud stands over the roofline.",
+      "sortOrder": 60,
+      "featured": false,
+      "category": "Castles",
+      "variants": {
+        "thumb": {
+          "jpeg": "assets/images/generated/thumb/rosersbergs-slott.jpeg",
+          "webp": "assets/images/generated/thumb/rosersbergs-slott.webp",
+          "width": 480,
+          "avif": "assets/images/generated/thumb/rosersbergs-slott.avif"
+        },
+        "medium": {
+          "jpeg": "assets/images/generated/medium/rosersbergs-slott.jpeg",
+          "webp": "assets/images/generated/medium/rosersbergs-slott.webp",
+          "width": 1200,
+          "avif": "assets/images/generated/medium/rosersbergs-slott.avif"
+        },
+        "full": {
+          "jpeg": "assets/images/generated/full/rosersbergs-slott.jpeg",
+          "webp": "assets/images/generated/full/rosersbergs-slott.webp",
+          "width": 2200,
+          "avif": "assets/images/generated/full/rosersbergs-slott.avif"
+        }
+      },
+      "exif": {
+        "camera": "FUJIFILM X-T30 II",
+        "lens": "XC15-45mmF3.5-5.6 OIS PZ",
+        "iso": 320,
+        "aperture": 5.6,
+        "shutter": "1/1800",
+        "focalLength": 19,
+        "focalLength35": 28,
+        "shotAt": "2026-09-06",
+        "gps": {
+          "lat": 59.575428,
+          "lng": 17.843317
+        }
+      }
     }
   ],
   "stories": [
@@ -3822,7 +3885,8 @@
         "at-the-foot-of-karnan-helsingborg",
         "terrace-steps-to-karnan-helsingborg",
         "steninge-slott",
-        "steninge-slott-from-the-garden"
+        "steninge-slott-from-the-garden",
+        "rosersbergs-slott"
       ]
     }
   ]
