@@ -22,7 +22,7 @@
 
 ## Series
 - [Runestones & Carvings](https://sweden-journal.com/series/runestones-and-carvings/): Sweden’s memory cut into stone — rune inscriptions and the Sigurd carving at Ramsund, gathered from across the journal’s…
-- [Castles & Fortresses](https://sweden-journal.com/series/castles-and-fortresses/): Walls, moats, and towers — Landskrona Slott, Glimmingehus, and Kärnan across Sweden’s fortified past.
+- [Castles & Fortresses](https://sweden-journal.com/series/castles-and-fortresses/): Walls, moats, and forecourts — the medieval keeps at Glimmingehus and Kärnan, the citadel at Landskrona, and the baroque…
 
 ## More
 - [RSS feed](https://sweden-journal.com/feed.xml)
