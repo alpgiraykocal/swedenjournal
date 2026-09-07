@@ -1759,11 +1759,11 @@
         "Skåne",
         "Hammenhög",
         "Sweden",
-        "castle",
-        "medieval fortress",
-        "moat",
-        "stone keep",
-        "reflection"
+        "Castle",
+        "Medieval Fortress",
+        "Moat",
+        "Stone Keep",
+        "Reflection"
       ],
       "src": "assets/images/photos/glimmingehus-across-the-moat.jpeg",
       "width": 6240,
@@ -1820,11 +1820,11 @@
         "Skåne",
         "Hammenhög",
         "Sweden",
-        "castle",
-        "courtyard",
-        "cobblestone",
-        "pillory",
-        "medieval"
+        "Castle",
+        "Courtyard",
+        "Cobblestone",
+        "Pillory",
+        "Medieval"
       ],
       "src": "assets/images/photos/cobbled-courtyard-at-glimmingehus.jpeg",
       "width": 6240,
@@ -1881,11 +1881,10 @@
         "Vs 9",
         "Västmanland",
         "Sweden",
-        "runestone",
-        "rune stone",
+        "Runestone",
         "Viking Age",
-        "inscription",
-        "ancient sites"
+        "Inscription",
+        "Ancient Site"
       ],
       "src": "assets/images/photos/saltangsbron-runestone-vs-9.jpeg",
       "width": 6240,
@@ -1938,16 +1937,15 @@
       "season": "Summer",
       "theme": "Runestone, Viking Age, Zoomorphic Ornament, Nordic Heritage",
       "tags": [
-        "s 10",
+        "Vs 10",
         "Västerås",
         "Västmanland",
         "Sweden",
-        "runestone",
-        "rune stone",
+        "Runestone",
         "Viking Age",
         "Livsten",
-        "serpent ornament",
-        "ancient sites"
+        "Serpent Ornament",
+        "Ancient Site"
       ],
       "src": "assets/images/photos/runestone-vs-10-vasteras.jpeg",
       "width": 6240,
@@ -2008,11 +2006,11 @@
         "Eskilstuna",
         "Södermanland",
         "Sweden",
-        "rock carving",
-        "runestone",
+        "Rock Carving",
+        "Runestone",
         "Viking Age",
         "Sigurd Fafnesbane",
-        "ancient sites"
+        "Ancient Site"
       ],
       "src": "assets/images/photos/the-sigurd-carving-at-ramsund.jpeg",
       "width": 6240,
@@ -2073,11 +2071,11 @@
         "Eskilstuna",
         "Södermanland",
         "Sweden",
-        "runes",
-        "rock carving",
+        "Runes",
+        "Rock Carving",
         "Fafnir",
         "Viking Age",
-        "ancient sites"
+        "Ancient Site"
       ],
       "src": "assets/images/photos/detail-of-the-sigurd-carving-at-ramsund.jpeg",
       "width": 4160,
@@ -2138,11 +2136,11 @@
         "Eskilstuna",
         "Södermanland",
         "Sweden",
-        "runes",
-        "rock carving",
+        "Runes",
+        "Rock Carving",
         "Sigurd Fafnesbane",
         "Viking Age",
-        "ancient sites"
+        "Ancient Site"
       ],
       "src": "assets/images/photos/figures-of-the-sigurd-carving-at-ramsund.jpeg",
       "width": 6240,
@@ -2203,12 +2201,12 @@
         "Eskilstuna",
         "Södermanland",
         "Sweden",
-        "runes",
+        "Runes",
         "Grani",
-        "rock carving",
+        "Rock Carving",
         "Sigurd Fafnesbane",
         "Viking Age",
-        "ancient sites"
+        "Ancient Site"
       ],
       "src": "assets/images/photos/grani-and-the-runic-band-sigurd-carving.jpeg",
       "width": 6240,
@@ -2265,12 +2263,12 @@
         "Helsingborg",
         "Skåne",
         "Sweden",
-        "castle",
-        "medieval tower",
-        "keep",
-        "brick tower",
+        "Castle",
+        "Medieval Tower",
+        "Keep",
+        "Brick Tower",
         "Slottshagen",
-        "Nordic heritage"
+        "Nordic Heritage"
       ],
       "src": "assets/images/photos/karnan-tower-in-helsingborg.jpeg",
       "width": 6240,
@@ -2327,12 +2325,12 @@
         "Helsingborg",
         "Skåne",
         "Sweden",
-        "castle",
-        "medieval tower",
-        "keep",
+        "Castle",
+        "Medieval Tower",
+        "Keep",
         "Terrasstrapporna",
-        "street photography",
-        "Nordic heritage"
+        "Street Photography",
+        "Nordic Heritage"
       ],
       "src": "assets/images/photos/at-the-foot-of-karnan-helsingborg.jpeg",
       "width": 4011,
@@ -2390,10 +2388,10 @@
         "Terrasstrapporna",
         "Skåne",
         "Sweden",
-        "terrace stairs",
-        "cobblestone",
-        "light and shadow",
-        "street photography"
+        "Terrace Stairs",
+        "Cobblestone",
+        "Light and Shadow",
+        "Street Photography"
       ],
       "src": "assets/images/photos/climbing-the-terrace-steps-to-karnan.jpeg",
       "width": 6240,
@@ -2452,10 +2450,10 @@
         "Stortorget",
         "Skåne",
         "Sweden",
-        "terrace staircase",
-        "brick towers",
-        "architecture",
-        "street photography"
+        "Terrace Staircase",
+        "Brick Towers",
+        "Architecture",
+        "Street Photography"
       ],
       "src": "assets/images/photos/the-terrace-staircase-below-karnan.jpeg",
       "width": 5945,
@@ -2513,7 +2511,7 @@
         "Västerås",
         "Västmanland",
         "Sweden",
-        "Rune Stone",
+        "Runestone",
         "Viking Age",
         "Ancient Site",
         "Nordic Heritage",
@@ -2579,7 +2577,7 @@
         "Västerås",
         "Västmanland",
         "Sweden",
-        "Rune Stone",
+        "Runestone",
         "Viking Age",
         "Memorial Inscription",
         "Ancient Site",
@@ -2646,7 +2644,7 @@
         "Västerås",
         "Västmanland",
         "Sweden",
-        "Rune Stone",
+        "Runestone",
         "Viking Age",
         "Medieval Inscription",
         "Ancient Site",
@@ -2713,7 +2711,7 @@
         "Västerås",
         "Västmanland",
         "Sweden",
-        "Rune Stone",
+        "Runestone",
         "Viking Age",
         "Memorial Inscription",
         "England Voyage",
@@ -3294,7 +3292,7 @@
       "title": "Anundshög",
       "location": "Västerås, Västmanland, Sweden",
       "date": "Spring 2026",
-      "theme": "Ancient Landscape / Nordic Heritage / Travel",
+      "theme": "Ancient Landscape, Nordic Heritage, Travel",
       "summary": "Sweden's largest burial mound rises nine metres out of a field outside Västerås, ringed by stone ships and a row of runestones that once marked the road a new king rode. Most of it is anonymous; one stone is not.",
       "heroPhotoId": "stone-ship-at-anundshog",
       "tags": [
@@ -3307,7 +3305,7 @@
         "Nordic Heritage",
         "Burial Mound",
         "Stone Ship",
-        "Rune Stone",
+        "Runestone",
         "Travel Photography",
         "Landscape"
       ],
@@ -3325,8 +3323,13 @@
           "text": "What surrounds the mound matters as much as the mound. Five stone ships lie alongside it, the largest around fifty-three metres from stem to stern — the outlines of vessels laid out in boulders, pointing nowhere. Beside them stands a row of fifteen stones, re-erected in the 1960s, tracing the line of the Eriksgata: the circuit a newly chosen king rode to be recognised by each province in turn. The dead and the road to power shared a field."
         },
         {
+          "type": "heading",
+          "text": "The stone in the row"
+        },
+        {
           "type": "image",
-          "photoId": "anundshog-runestone-vs-13"
+          "photoId": "anundshog-runestone-vs-13",
+          "caption": "Vs 13, the central stone of the row along the Eriksgata."
         },
         {
           "type": "paragraph",
@@ -3379,7 +3382,8 @@
         },
         {
           "type": "image",
-          "photoId": "rooflines-of-landskrona-slott"
+          "photoId": "rooflines-of-landskrona-slott",
+          "caption": "Brick, tiled roofs, and the cap of one of the four corner towers."
         },
         {
           "type": "paragraph",
@@ -3395,7 +3399,7 @@
         },
         {
           "type": "quote",
-          "text": "“Built to keep an army out of Skåne, and still standing because nobody could be bothered to demolish it.”"
+          "text": "Built to keep an army out of Skåne, and still standing because nobody could be bothered to demolish it."
         },
         {
           "type": "paragraph",
@@ -3403,7 +3407,8 @@
         },
         {
           "type": "image",
-          "photoId": "courtyard-of-landskrona-slott"
+          "photoId": "courtyard-of-landskrona-slott",
+          "caption": "The inner courtyard, enclosed on all four sides."
         },
         {
           "type": "heading",
@@ -3498,8 +3503,8 @@
       ],
       "isoDate": "2026-05-03",
       "coordinates": {
-        "lat": 55.38269005030822,
-        "lng": 14.054372627280662
+        "lat": 55.38269,
+        "lng": 14.054373
       }
     },
     {
@@ -3684,7 +3689,7 @@
       "date": "Spring 2026",
       "readingTime": "2 min read",
       "category": "Castles",
-      "theme": "Nordic Heritage / Medieval Fortress",
+      "theme": "Nordic Heritage, Medieval Fortress",
       "summary": "Standing alone among the fields of southeastern Skåne, Glimmingehus is the best-preserved medieval stronghold in Scandinavia — a fortified house raised between 1499 and 1506, when this corner of Sweden still answered to the Danish crown.",
       "heroPhotoId": "glimmingehus-across-the-moat",
       "featured": false,
@@ -3693,11 +3698,11 @@
         "Skåne",
         "Hammenhög",
         "Sweden",
-        "castle",
-        "medieval fortress",
-        "stronghold",
-        "moat",
-        "Nordic heritage"
+        "Castle",
+        "Medieval Fortress",
+        "Stronghold",
+        "Moat",
+        "Nordic Heritage"
       ],
       "body": [
         {
@@ -3745,8 +3750,8 @@
       ],
       "isoDate": "2026-04-03",
       "coordinates": {
-        "lat": 55.50094952034149,
-        "lng": 14.230709914934668
+        "lat": 55.50095,
+        "lng": 14.23071
       }
     },
     {
@@ -3756,7 +3761,7 @@
       "date": "Summer 2025",
       "readingTime": "2 min read",
       "category": "Ancient Sites",
-      "theme": "Nordic Heritage / Norse Saga",
+      "theme": "Nordic Heritage, Norse Saga",
       "summary": "On a low rock at Sundbyholm outside Eskilstuna, an eleventh-century carving spells out the saga of Sigurd the dragon-slayer in red-painted line, while its runes quietly record a bridge raised across the Ramsund channel.",
       "heroPhotoId": "sigurd-carving-ramsund",
       "featured": false,
@@ -3769,12 +3774,12 @@
         "Eskilstuna",
         "Södermanland",
         "Sweden",
-        "rock carving",
-        "runestone",
+        "Rock Carving",
+        "Runestone",
         "Viking Age",
         "Sigurd Fafnesbane",
         "Norse saga",
-        "ancient sites"
+        "Ancient Site"
       ],
       "body": [
         {
@@ -3823,8 +3828,8 @@
       ],
       "isoDate": "2025-06-14",
       "coordinates": {
-        "lat": 59.4412398499279,
-        "lng": 16.634503602895578
+        "lat": 59.44124,
+        "lng": 16.634504
       }
     },
     {
@@ -3834,7 +3839,7 @@
       "date": "Spring 2026",
       "readingTime": "2 min read",
       "category": "Castles",
-      "theme": "Nordic Heritage / Medieval Fortress",
+      "theme": "Nordic Heritage, Medieval Fortress",
       "summary": "Helsingborg's brick keep, Kärnan, has watched over the Sound for some seven centuries — all that remains of a great medieval castle, reached today by a monumental terrace staircase climbing straight up from the old town.",
       "heroPhotoId": "karnan-tower-helsingborg",
       "featured": false,
@@ -3844,11 +3849,11 @@
         "Terrasstrapporna",
         "Skåne",
         "Sweden",
-        "castle",
-        "medieval keep",
-        "brick tower",
-        "Nordic heritage",
-        "fortress"
+        "Castle",
+        "Medieval Keep",
+        "Brick Tower",
+        "Nordic Heritage",
+        "Fortress"
       ],
       "body": [
         {
@@ -3901,8 +3906,8 @@
         }
       ],
       "coordinates": {
-        "lat": 56.04819393391508,
-        "lng": 12.697315390607052
+        "lat": 56.048194,
+        "lng": 12.697315
       },
       "isoDate": "2026-04-04"
     }
