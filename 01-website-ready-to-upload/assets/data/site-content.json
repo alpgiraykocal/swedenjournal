@@ -3095,6 +3095,71 @@
           "lng": 17.804903
         }
       }
+    },
+    {
+      "id": "steninge-slott-from-the-garden",
+      "title": "Steninge Slott from the Garden",
+      "location": "Steninge, Sigtuna, Sweden",
+      "date": "Summer 2026",
+      "season": "Summer",
+      "theme": "Palace, Baroque Garden, Tree Avenue",
+      "tags": [
+        "Steninge Slott",
+        "Steninge Palace",
+        "Sigtuna",
+        "Märsta",
+        "Sweden",
+        "Baroque Architecture",
+        "Palace",
+        "Baroque Garden",
+        "Tree Avenue",
+        "Fountain",
+        "Lake Mälaren",
+        "Nordic Heritage",
+        "Travel Photography"
+      ],
+      "src": "assets/images/photos/steninge-slott-from-the-garden.jpeg",
+      "width": 6114,
+      "height": 4076,
+      "alt": "A wide gravel avenue in the baroque garden of Steninge Slott, lined with rows of clipped conical trees, leading past a fountain toward the ochre and white palace façade, with a few visitors walking up the path.",
+      "caption": "From the garden side, a gravel avenue between clipped trees draws the eye past the fountain to the façade of Steninge Slott, with visitors walking the last stretch toward the house.",
+      "sortOrder": 59,
+      "featured": false,
+      "category": "Castles",
+      "variants": {
+        "thumb": {
+          "jpeg": "assets/images/generated/thumb/steninge-slott-from-the-garden.jpeg",
+          "webp": "assets/images/generated/thumb/steninge-slott-from-the-garden.webp",
+          "width": 480,
+          "avif": "assets/images/generated/thumb/steninge-slott-from-the-garden.avif"
+        },
+        "medium": {
+          "jpeg": "assets/images/generated/medium/steninge-slott-from-the-garden.jpeg",
+          "webp": "assets/images/generated/medium/steninge-slott-from-the-garden.webp",
+          "width": 1200,
+          "avif": "assets/images/generated/medium/steninge-slott-from-the-garden.avif"
+        },
+        "full": {
+          "jpeg": "assets/images/generated/full/steninge-slott-from-the-garden.jpeg",
+          "webp": "assets/images/generated/full/steninge-slott-from-the-garden.webp",
+          "width": 2200,
+          "avif": "assets/images/generated/full/steninge-slott-from-the-garden.avif"
+        }
+      },
+      "exif": {
+        "camera": "FUJIFILM X-T30 II",
+        "lens": "XC15-45mmF3.5-5.6 OIS PZ",
+        "iso": 320,
+        "aperture": 5.6,
+        "shutter": "1/850",
+        "focalLength": 45,
+        "focalLength35": 68,
+        "shotAt": "2026-09-06",
+        "gps": {
+          "lat": 59.60325,
+          "lng": 17.802964
+        }
+      }
     }
   ],
   "stories": [

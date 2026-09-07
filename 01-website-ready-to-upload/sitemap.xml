@@ -55,6 +55,7 @@
     <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/clock-tower-at-engso-castle.jpeg</image:loc></image:image>
     <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/katarina-kyrka.jpeg</image:loc></image:image>
     <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/steninge-slott.jpeg</image:loc></image:image>
+    <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/steninge-slott-from-the-garden.jpeg</image:loc></image:image>
   </url>
   <url>
     <loc>https://sweden-journal.com/stories/</loc>
@@ -366,6 +367,11 @@
     <loc>https://sweden-journal.com/photos/steninge-slott/</loc>
     <lastmod>2026-09-06</lastmod>
     <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/steninge-slott.jpeg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://sweden-journal.com/photos/steninge-slott-from-the-garden/</loc>
+    <lastmod>2026-09-06</lastmod>
+    <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/steninge-slott-from-the-garden.jpeg</image:loc></image:image>
   </url>
   <url>
     <loc>https://sweden-journal.com/series/runestones-and-carvings/</loc>
