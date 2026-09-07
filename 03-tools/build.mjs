@@ -94,10 +94,18 @@ for (const f of walkHtml(websiteDir)) {
   pages += 1;
 }
 
-// 3b. /.well-known/security.txt (RFC 9116). Generated rather than checked in because
-//     Expires is mandatory and a lapsed file is one clients are told to ignore — writing
-//     it here keeps the date a year ahead of the most recent deploy. Contact is the
-//     address the About page already publishes, so this adds no new exposure.
+// 3b. security.txt (RFC 9116). Generated rather than checked in because Expires is
+//     mandatory and a lapsed file is one clients are told to ignore — writing it here
+//     keeps the date a year ahead of the most recent deploy. Contact is the address the
+//     About page already publishes, so this adds no new exposure.
+//
+//     Written to BOTH locations on purpose. GitHub Pages serves no path whose segment
+//     starts with a dot — /.nojekyll 404s too, and it has shipped for months — so the
+//     RFC's /.well-known/security.txt is unreachable on this host until a Cloudflare
+//     redirect rule points it at the root copy. /security.txt is the pre-RFC convention,
+//     it is what Pages will actually serve today, and plenty of scanners still check it.
+//     Both are listed as Canonical (RFC 9116 permits several) so whichever one a client
+//     finds is one the file itself vouches for.
 {
   const content = JSON.parse(fs.readFileSync(path.join(websiteDir, "assets/data/site-content.json"), "utf8"));
   const contact = String(content.about?.contactEmail || "").trim();
@@ -108,13 +116,16 @@ for (const f of walkHtml(websiteDir)) {
       `Contact: mailto:${contact}`,
       `Expires: ${expires}`,
       "Preferred-Languages: en, sv",
+      `Canonical: ${site}/security.txt`,
       `Canonical: ${site}/.well-known/security.txt`,
       "",
     ].join("\n");
-    const out = path.join(websiteDir, ".well-known", "security.txt");
-    fs.mkdirSync(path.dirname(out), { recursive: true });
-    fs.writeFileSync(out, txt);
-    console.log(`security.txt written (expires ${expires.slice(0, 10)}).`);
+    for (const rel of ["security.txt", ".well-known/security.txt"]) {
+      const out = path.join(websiteDir, rel);
+      fs.mkdirSync(path.dirname(out), { recursive: true });
+      fs.writeFileSync(out, txt);
+    }
+    console.log(`security.txt written to / and /.well-known/ (expires ${expires.slice(0, 10)}).`);
   }
 }
 
