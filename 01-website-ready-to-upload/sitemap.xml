@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://sweden-journal.com/</loc>
-    <lastmod>2026-05-10</lastmod>
+    <lastmod>2026-09-07</lastmod>
   </url>
   <url>
     <loc>https://sweden-journal.com/gallery/</loc>
@@ -61,7 +61,7 @@
   </url>
   <url>
     <loc>https://sweden-journal.com/stories/</loc>
-    <lastmod>2026-05-10</lastmod>
+    <lastmod>2026-09-07</lastmod>
   </url>
   <url>
     <loc>https://sweden-journal.com/about/</loc>
@@ -129,6 +129,14 @@
     <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/at-the-foot-of-karnan-helsingborg.jpeg</image:loc></image:image>
     <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/the-terrace-staircase-below-karnan.jpeg</image:loc></image:image>
     <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/climbing-the-terrace-steps-to-karnan.jpeg</image:loc></image:image>
+  </url>
+  <url>
+    <loc>https://sweden-journal.com/stories/steninge-and-rosersberg/</loc>
+    <lastmod>2026-09-07</lastmod>
+    <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/steninge-slott.jpeg</image:loc></image:image>
+    <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/steninge-slott-from-the-garden.jpeg</image:loc></image:image>
+    <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/rosersbergs-slott.jpeg</image:loc></image:image>
+    <image:image><image:loc>https://sweden-journal.com/assets/images/generated/full/courtyard-of-rosersbergs-slott.jpeg</image:loc></image:image>
   </url>
   <url>
     <loc>https://sweden-journal.com/photos/quiet-street-in-gamla-stan/</loc>

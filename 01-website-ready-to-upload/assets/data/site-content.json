@@ -3922,6 +3922,96 @@
         "lng": 12.697315
       },
       "isoDate": "2026-04-04"
+    },
+    {
+      "slug": "steninge-and-rosersberg",
+      "title": "Steninge and Rosersberg",
+      "category": "Castles",
+      "theme": "Palace, Baroque Architecture, Nordic Heritage",
+      "location": "Sigtuna, Uppland, Sweden",
+      "date": "Summer 2026",
+      "isoDate": "2026-09-07",
+      "readingTime": "2 min read",
+      "heroPhotoId": "steninge-slott",
+      "featured": false,
+      "coordinates": {
+        "lat": 59.601772,
+        "lng": 17.804903
+      },
+      "summary": "Two palaces three and a half kilometres apart on the Sigtuna shore of Mälaren, photographed forty-five minutes apart on the same afternoon. One turns a single face to the drive; the other opens a courtyard and closes it around you.",
+      "tags": [
+        "Steninge Slott",
+        "Rosersbergs Slott",
+        "Steninge",
+        "Rosersberg",
+        "Sigtuna",
+        "Sweden",
+        "Palace",
+        "Royal Palace",
+        "Baroque Architecture",
+        "Courtyard",
+        "Forecourt",
+        "Nordic Heritage",
+        "Travel Photography"
+      ],
+      "body": [
+        {
+          "type": "paragraph",
+          "text": "Steninge and Rosersberg stand three and a half kilometres apart on the Sigtuna shore of Mälaren, close enough that the camera puts forty-five minutes between the last frame at one and the first at the other. Seeing them in that order is useful. They are the same kind of building — a great pale house under a black roof with a flag on top — and they solve the problem of arrival in opposite ways."
+        },
+        {
+          "type": "image",
+          "photoId": "steninge-slott",
+          "caption": "Steninge from the drive, the staircase climbing to the door."
+        },
+        {
+          "type": "paragraph",
+          "text": "Steninge presents a face. The house is a single ochre block with white dressings, and everything in front of it is arranged to make you look at that block: a gravel drive, a stone balustrade with urns set along it, and a broad staircase climbing straight to the door. There is no courtyard and no wings, nothing to step into. You stand below it and look up, and that is the whole design."
+        },
+        {
+          "type": "heading",
+          "text": "The garden side"
+        },
+        {
+          "type": "paragraph",
+          "text": "Behind the house the logic reverses. A gravel avenue runs away from the building between two rows of clipped conical trees, past a fountain, and the trees close the view down until the façade is the only thing left at the end of it. The front of Steninge asks you to look up. The garden makes you walk."
+        },
+        {
+          "type": "image",
+          "photoId": "steninge-slott-from-the-garden",
+          "caption": "The avenue on the garden side, clipped trees narrowing the view to the façade."
+        },
+        {
+          "type": "heading",
+          "text": "Three and a half kilometres south"
+        },
+        {
+          "type": "paragraph",
+          "text": "Rosersberg does the opposite. The main block sits back and low, and two long wings run forward from it on either side to enclose a gravel forecourt. Nothing here climbs. The pale walls, the black hipped roofs and the clock in the central pediment are all at the far side of a large open square, and the building's first move is to put that square around you."
+        },
+        {
+          "type": "panorama",
+          "photoId": "rosersbergs-slott",
+          "caption": "The forecourt at Rosersberg, the main block set back between its two wings."
+        },
+        {
+          "type": "paragraph",
+          "text": "Step in and the enclosure tightens. A cobbled path runs up the middle between two stone urns, the wings hold both sides, and the clock stays straight ahead the whole way. It is a courtyard doing what a courtyard does: taking a large landscape and reducing it, pace by pace, to one door."
+        },
+        {
+          "type": "image",
+          "photoId": "courtyard-of-rosersbergs-slott",
+          "caption": "Cobbles, urns, and the clock straight ahead."
+        },
+        {
+          "type": "quote",
+          "text": "One house you look up at; the other closes around you before you reach the door."
+        },
+        {
+          "type": "paragraph",
+          "text": "Photographed inside the same hour, the difference is hard to miss, and it is not about the houses themselves. It is about what the approach was built to do. Steninge stages a single object and puts you at the bottom of it. Rosersberg makes a room out of doors and walks you into it. Both are still doing it, to anyone who turns up with a camera."
+        }
+      ]
     }
   ],
   "collectionsPage": {

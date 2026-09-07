@@ -173,21 +173,38 @@ n += page("story/index.html", { pfx: "../", active: "story", mainHtml: () => leg
 // title/description/og text frozen at whatever the shell was first written with.
 // Refresh those tags from the story before renderInto runs, so a story head tracks its
 // content like every other page. clampDescription then trims the meta description.
+const base = String(data.site?.baseUrl || "").replace(/\/+$/, "");
 function refreshStoryHead(rel, story) {
   const file = path.join(websiteDir, rel);
   if (!fs.existsSync(file)) return;
   const siteTitle = data.site?.siteTitle || data.site?.ownerName || "";
   const title = story.title ? `${story.title} \u2014 ${siteTitle}` : siteTitle;
   const desc = story.summary || data.site?.description || "";
+  // Identity tags, not just the text: a shell that started life as another story — a
+  // folder copied to add a story outside the editor — otherwise keeps that story's
+  // canonical URL and share image, pointing search engines and every share card at the
+  // wrong page. Same for a story whose hero photograph changed after the shell was written.
+  const url = `${base}/stories/${encodeURIComponent(story.slug)}/`;
+  const hero = photo(data, story.heroPhotoId);
+  const image = hero ? `${base}/${String(hero.variants?.full?.jpeg || hero.src || "").replace(/^\/+/, "")}` : "";
+  const imageAlt = hero ? (hero.alt || hero.title || story.title || "") : "";
   let html = fs.readFileSync(file, "utf8");
   const swap = (re, build) => { if (re.test(html)) html = html.replace(re, () => build()); };
   swap(/<title>[^<]*<\/title>/, () => `<title>${encAttr(title)}</title>`);
+  swap(/<link rel="canonical" href="[^"]*">/, () => `<link rel="canonical" href="${encAttr(url)}">`);
   for (const [attr, name, value] of [
     ["name", "description", desc],
     ["property", "og:title", title],
     ["property", "og:description", desc],
+    ["property", "og:url", url],
     ["name", "twitter:title", title],
     ["name", "twitter:description", desc],
+    ...(image ? [
+      ["property", "og:image", image],
+      ["property", "og:image:alt", imageAlt],
+      ["name", "twitter:image", image],
+      ["name", "twitter:image:alt", imageAlt],
+    ] : []),
   ]) {
     swap(new RegExp(`<meta ${attr}="${name}" content="[^"]*">`), () => `<meta ${attr}="${name}" content="${encAttr(value)}">`);
   }
@@ -221,7 +238,6 @@ for (const s of data.stories || []) {
 // Google Images has a real landing page instead of gallery/?photo=… fragments.
 // The shell (head metadata) is rewritten from content on every build, so a photo
 // title/caption/alt edit is always reflected; renderInto then injects the body.
-const base = String(data.site?.baseUrl || "").replace(/\/+$/, "");
 function photoShell(p) {
   const siteTitle = encAttr(data.site?.siteTitle || "Photography & Travel Notes");
   const title = encAttr(`${photoTitleCore(p)} — ${data.site?.siteTitle || data.site?.ownerName || "Photo Blog"}`);
