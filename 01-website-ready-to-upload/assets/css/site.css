@@ -364,6 +364,7 @@ body[data-page="gallery"] .container{overflow:hidden}
 .about-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:40px;align-items:start}
 .about-img{width:100%;height:auto;aspect-ratio:4/5;object-fit:cover;border-radius:var(--radius-lg)}
 .prose{max-width:720px;color:var(--text-soft);font-size:18px;line-height:1.75}
+.headline+.prose{margin-top:22px}
 .about-signature{margin:28px 0 0;font-family:var(--serif);font-style:italic;font-size:1.6rem;line-height:1.2;letter-spacing:-.01em;color:var(--accent)}
 .about-contact{margin:26px 0 0;display:grid;gap:6px;max-width:720px}
 .about-contact .eyebrow{margin:0}

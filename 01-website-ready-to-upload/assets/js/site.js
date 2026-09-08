@@ -5,7 +5,7 @@ import {
   collections, collectionPhotos, collectionMain, collectionHref, photoExifChips,
   photoStory, photoCollection,
   websiteLdObject, imageGalleryLdObject, personLdObject, articleLdObject, photoLdObject, collectionLdObject, fullVariantDims,
-} from "./templates.mjs?v=38b27c3086";
+} from "./templates.mjs?v=aedd114405";
 
 // Cache-bust the runtime content fetches. /assets/data/*.json is served with a long
 // edge cache (the host ignores _headers), so without a content-versioned URL a freshly
