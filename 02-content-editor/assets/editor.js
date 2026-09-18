@@ -250,23 +250,27 @@
     const storyImgs=s=>{const ids=[s.heroPhotoId,...(s.body||[]).flatMap(blockPhotoIds)];return[...new Set(ids)].map(id=>photosById.get(id)).filter(Boolean);};
     const urlEntry=({loc,lastmod,images})=>{const parts=[`  <url>`,`    <loc>${escXml(loc)}</loc>`];if(lastmod)parts.push(`    <lastmod>${lastmod}</lastmod>`);if(images)parts.push(images);parts.push(`  </url>`);return parts.join("\n");};
     const latestStory=(c.stories||[]).map(s=>machineDate(s.isoDate)||machineDate(s.date)).filter(Boolean).sort().at(-1)||buildDay;
+    // Listing lastmods come from the listed content, never the clock — see the note in
+    // templates.mjs sitemapXml(). exif.shotAt before p.date: p.date is display text.
+    const photoDay=p=>machineDate(p?.exif?.shotAt)||machineDate(p?.date);
+    const newestPhotoDay=arr=>(arr||[]).map(photoDay).filter(Boolean).sort().at(-1)||"";
     const entries=[];
     entries.push(urlEntry({loc:`${base}/`,lastmod:latestStory}));
-    entries.push(urlEntry({loc:`${base}/gallery/`,lastmod:buildDay,images:imageTags(list)}));
+    entries.push(urlEntry({loc:`${base}/gallery/`,lastmod:newestPhotoDay(list)||latestStory,images:imageTags(list)}));
     entries.push(urlEntry({loc:`${base}/stories/`,lastmod:latestStory}));
-    entries.push(urlEntry({loc:`${base}/about/`,lastmod:buildDay}));
-    entries.push(urlEntry({loc:`${base}/atlas/`,lastmod:buildDay}));
+    entries.push(urlEntry({loc:`${base}/about/`}));
+    entries.push(urlEntry({loc:`${base}/atlas/`,lastmod:latestStory}));
     for(const s of (c.stories||[]).filter(s=>s.title&&s.slug)){
       entries.push(urlEntry({loc:`${base}/stories/${encodeURIComponent(s.slug)}/`,lastmod:machineDate(s.isoDate)||machineDate(s.date)||buildDay,images:imageTags(storyImgs(s))}));
     }
     for(const p of list.filter(p=>p.id&&p.title)){
-      entries.push(urlEntry({loc:`${base}/photos/${encodeURIComponent(p.id)}/`,lastmod:machineDate(p.date)||machineDate(p.exif?.shotAt)||buildDay,images:imageTags([p])}));
+      entries.push(urlEntry({loc:`${base}/photos/${encodeURIComponent(p.id)}/`,lastmod:photoDay(p)||buildDay,images:imageTags([p])}));
     }
     /* no /series/ index — that listing lives on /gallery/ now */
     for(const col of (c.collections||[]).filter(x=>x.slug&&x.title)){
       const pics=(col.photoIds||[]).map(id=>photosById.get(id)).filter(Boolean);
       if(!pics.length)continue;
-      entries.push(urlEntry({loc:`${base}/series/${encodeURIComponent(col.slug)}/`,lastmod:buildDay,images:imageTags(pics)}));
+      entries.push(urlEntry({loc:`${base}/series/${encodeURIComponent(col.slug)}/`,lastmod:newestPhotoDay(pics)||latestStory,images:imageTags(pics)}));
     }
     return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n${entries.join("\n")}\n</urlset>\n`;
   }
@@ -275,7 +279,11 @@
   function rssDate(story){const raw=machineDate(story?.isoDate)||machineDate(story?.date);return raw?new Date(`${raw}T00:00:00Z`).toUTCString():"";}
   // MIRRORS templates.mjs feedXml() line for line — byte-compared by qa-static-checks.
   function rssXml(c=state.content){
-    const base=publicBaseUrl(c), now=new Date().toUTCString();
+    // lastBuildDate is the newest story date, not the wall clock — see templates.mjs
+    // feedXml(). The clock rewrote feed.xml on every save with no content change.
+    const base=publicBaseUrl(c);
+    const built=(c.stories||[]).map(s=>machineDate(s.isoDate)||machineDate(s.date)).filter(Boolean).sort().at(-1);
+    const now=built?new Date(`${built}T00:00:00Z`).toUTCString():"";
     const photosById=new Map((c.photos||[]).map(p=>[p.id,p]));
     const heroUrl=s=>{const hero=photosById.get(s.heroPhotoId);const rel=hero?.variants?.full?.jpeg||hero?.src;return rel?`${base}/${String(rel).replace(/^\/+/,"")}`:"";};
     // Full story body for <content:encoded>. MIRRORS templates.mjs feedXml() contentEncoded() byte-for-byte.

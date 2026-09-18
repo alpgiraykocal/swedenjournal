@@ -565,7 +565,11 @@ export const xmlMachineDate = (v) => {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(raw)) return "";
   return Number.isNaN(new Date(`${raw}T00:00:00Z`).getTime()) ? "" : raw;
 };
-export function feedXml(data, now = new Date().toUTCString()) {
+// `now` defaults to the newest story's pubDate, NOT the wall clock. lastBuildDate means
+// "the last time the content of the channel changed", and the clock made every rebuild
+// rewrite feed.xml with no content change — churn in every diff, and a freshness claim
+// the feed could not back up. Callers may still pass an explicit value.
+export function feedXml(data, now) {
   const base = String(data.site?.baseUrl || "").replace(/\/+$/, "");
   const photosById = new Map((data.photos || []).map((p) => [p.id, p]));
   const rssDate = (s) => {
@@ -629,6 +633,13 @@ ${pubDate ? `    <pubDate>${escX(pubDate)}</pubDate>\n` : ""}    <category>${esc
 ${media ? `    <media:content url="${escX(media)}" medium="image" type="image/jpeg"/>\n` : ""}${body ? `    <content:encoded><![CDATA[${body}]]></content:encoded>\n` : ""}  </item>`;
     })
     .join("\n");
+  // Newest story date, in the same RFC-822 shape as the item pubDates.
+  const built = now || (data.stories || [])
+    .map((s) => xmlMachineDate(s.isoDate) || xmlMachineDate(s.date))
+    .filter(Boolean)
+    .sort()
+    .at(-1);
+  const lastBuild = built ? (/^\d{4}-\d{2}-\d{2}$/.test(built) ? new Date(`${built}T00:00:00Z`).toUTCString() : built) : "";
   return `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
@@ -636,7 +647,7 @@ ${media ? `    <media:content url="${escX(media)}" medium="image" type="image/jp
     <link>${base}/</link>
     <description>${escX(data.site?.description || "")}</description>
     <language>en</language>
-    <lastBuildDate>${now}</lastBuildDate>
+    <lastBuildDate>${lastBuild}</lastBuildDate>
     <atom:link href="${base}/feed.xml" rel="self" type="application/rss+xml"/>
 ${items}
   </channel>
@@ -670,12 +681,21 @@ export function sitemapXml(data, buildDay = new Date().toISOString().slice(0, 10
     .filter(Boolean)
     .sort()
     .at(-1) || buildDay;
+  // Every listing page's lastmod is derived from the content it lists, never from the
+  // clock. Stamping the build day on /gallery/, /about/, /atlas/ and each series meant a
+  // rebuild with zero content change rewrote sitemap.xml — churn in every diff, and four
+  // entries permanently claiming "modified today". Google drops lastmod entirely once it
+  // catches a sitemap lying about it, which would have cost the entries that ARE honest.
+  const photoDay = (p) => xmlMachineDate(p?.exif?.shotAt) || xmlMachineDate(p?.date);
+  const newestPhotoDay = (arr) => (arr || []).map(photoDay).filter(Boolean).sort().at(-1) || "";
   const entries = [];
   entries.push(urlEntry({ loc: `${base}/`, lastmod: latestStory }));
-  entries.push(urlEntry({ loc: `${base}/gallery/`, lastmod: buildDay, images: imageTags(list) }));
+  entries.push(urlEntry({ loc: `${base}/gallery/`, lastmod: newestPhotoDay(list) || latestStory, images: imageTags(list) }));
   entries.push(urlEntry({ loc: `${base}/stories/`, lastmod: latestStory }));
-  entries.push(urlEntry({ loc: `${base}/about/`, lastmod: buildDay }));
-  entries.push(urlEntry({ loc: `${base}/atlas/`, lastmod: buildDay }));
+  // No date signal exists for the About page, and an invented one is worse than none:
+  // lastmod is optional per the sitemap protocol, so the entry simply omits it.
+  entries.push(urlEntry({ loc: `${base}/about/` }));
+  entries.push(urlEntry({ loc: `${base}/atlas/`, lastmod: latestStory }));
   for (const s of (data.stories || []).filter((s) => s.title && s.slug)) {
     entries.push(urlEntry({
       loc: `${base}/stories/${encodeURIComponent(s.slug)}/`,
@@ -685,10 +705,13 @@ export function sitemapXml(data, buildDay = new Date().toISOString().slice(0, 10
   }
   for (const p of list.filter((p) => p.id && p.title)) {
     // p.date is display text ("Summer 2026"), so the ISO capture date extracted from
-    // the camera EXIF (exif.shotAt) is the real lastmod signal for photo pages.
+    // the camera EXIF (exif.shotAt) is the real lastmod signal for photo pages — and it
+    // is therefore the one that must be tried FIRST. The old order read p.date first,
+    // which only stayed correct as long as no photo's display date happened to parse as
+    // ISO; the first one that did would have quietly outranked its own capture date.
     entries.push(urlEntry({
       loc: `${base}/photos/${encodeURIComponent(p.id)}/`,
-      lastmod: xmlMachineDate(p.date) || xmlMachineDate(p.exif?.shotAt) || buildDay,
+      lastmod: photoDay(p) || buildDay,
       images: imageTags([p]),
     }));
   }
@@ -697,7 +720,7 @@ export function sitemapXml(data, buildDay = new Date().toISOString().slice(0, 10
   for (const col of (data.collections || []).filter((c) => c.slug && c.title)) {
     const pics = (col.photoIds || []).map((id) => photosById.get(id)).filter(Boolean);
     if (!pics.length) continue;
-    entries.push(urlEntry({ loc: `${base}/series/${encodeURIComponent(col.slug)}/`, lastmod: buildDay, images: imageTags(pics) }));
+    entries.push(urlEntry({ loc: `${base}/series/${encodeURIComponent(col.slug)}/`, lastmod: newestPhotoDay(pics) || latestStory, images: imageTags(pics) }));
   }
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">

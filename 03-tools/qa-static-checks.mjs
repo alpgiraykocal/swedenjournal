@@ -327,8 +327,9 @@ function checkCollections(baseDir) {
 // Byte-level parity: the sitemap/feed on disk must be exactly what the canonical
 // builders in templates.mjs produce for the current content. The editor mirrors
 // those builders by hand — this check is what makes that mirror trustworthy.
-// The volatile inputs (sitemap buildDay, feed lastBuildDate) are read back from
-// the file on disk so a same-content regeneration compares byte-for-byte.
+// Both builders are now pure functions of the content (no clock), so nothing volatile
+// has to be read back out of the file first. That makes this check strictly stronger:
+// a sitemap or feed carrying clock-derived dates no longer compares equal to itself.
 function checkGeneratedXmlParity(baseDir) {
   const dataPath = path.join(baseDir, "assets", "data", "site-content.json");
   const content = exists(dataPath) ? readJson(dataPath) : null;
@@ -336,16 +337,12 @@ function checkGeneratedXmlParity(baseDir) {
   const sitemapPath = path.join(baseDir, "sitemap.xml");
   if (exists(sitemapPath)) {
     const disk = read(sitemapPath);
-    const day = disk.match(/<loc>[^<]*\/gallery\/<\/loc>\n\s*<lastmod>(\d{4}-\d{2}-\d{2})<\/lastmod>/)?.[1];
-    const expected = sitemapXml(content, day || undefined);
-    if (disk !== expected) fail(`${path.relative(root, sitemapPath)} does not match the canonical templates.mjs sitemapXml() output — regenerate (npm run build) or fix the writer that produced it`);
+    if (disk !== sitemapXml(content)) fail(`${path.relative(root, sitemapPath)} does not match the canonical templates.mjs sitemapXml() output — regenerate (npm run build) or fix the writer that produced it`);
   }
   const rssPath = path.join(baseDir, "feed.xml");
   if (exists(rssPath)) {
     const disk = read(rssPath);
-    const now = disk.match(/<lastBuildDate>([^<]*)<\/lastBuildDate>/)?.[1];
-    const expected = feedXml(content, now || undefined);
-    if (disk !== expected) fail(`${path.relative(root, rssPath)} does not match the canonical templates.mjs feedXml() output — regenerate (npm run build) or fix the writer that produced it`);
+    if (disk !== feedXml(content)) fail(`${path.relative(root, rssPath)} does not match the canonical templates.mjs feedXml() output — regenerate (npm run build) or fix the writer that produced it`);
   }
 }
 

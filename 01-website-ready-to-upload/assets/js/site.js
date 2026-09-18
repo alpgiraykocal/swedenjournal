@@ -5,7 +5,8 @@ import {
   collections, collectionPhotos, collectionMain, collectionHref, photoExifChips,
   photoStory, photoCollection,
   websiteLdObject, imageGalleryLdObject, personLdObject, articleLdObject, photoLdObject, collectionLdObject, fullVariantDims,
-} from "./templates.mjs?v=aedd114405";
+  brandName,
+} from "./templates.mjs?v=2c68c4ddd1";
 
 // Cache-bust the runtime content fetches. /assets/data/*.json is served with a long
 // edge cache (the host ignores _headers), so without a content-versioned URL a freshly
@@ -62,9 +63,16 @@ function ensureMeta(selector, tagName, attrs){
   }
   return node;
 }
+// `brandName()` (site.ownerName — "Sweden Journal"), NOT site.siteTitle, which holds the
+// tagline. The build brands every pre-rendered <title>/og:title as "<page> — <brand>";
+// this ran on the tagline instead, so on any page the runtime rendered itself the title
+// silently reverted to the pre-brand wording. The homepage keeps "<brand> — <tagline>",
+// which is the one title the build deliberately leads with the brand.
 function updateMeta(data, {title, description, path="", imagePhoto=null, robots=""}={}){
-  const siteTitle = data.site?.siteTitle || data.site?.ownerName || "Photo Blog";
-  const fullTitle = title && title !== siteTitle ? `${title} — ${siteTitle}` : siteTitle;
+  const brand = brandName(data);
+  const tagline = String(data.site?.siteTitle || "").trim();
+  const homeTitle = tagline && tagline !== brand ? `${brand} — ${tagline}` : brand;
+  const fullTitle = !title || title === brand || title === tagline ? homeTitle : `${title} — ${brand}`;
   const desc = description || data.site?.description || "";
   document.title = fullTitle;
   const metaDesc = ensureMeta('meta[name="description"]', "meta", {name:"description"});
@@ -169,12 +177,18 @@ function currentStorySlug(){
   }
   return last && !["story","stories"].includes(last) ? decodeURIComponent(last) : null;
 }
-function isLegacyStoryShell(){
-  if(query().get("slug")) return false;
+// The legacy /story/ shell, regardless of any ?slug= on it.
+function isLegacyStoryPath(){
   const parts = location.pathname.replace(/\/$/, "").split("/").filter(Boolean);
   const last = parts.at(-1);
   const parent = parts.at(-2);
   return last === "story" || (last === "index.html" && parent === "story");
+}
+// The BARE legacy shell — /story/ with no slug to resolve. It stays noindex and keeps
+// the generic stub; the same shell carrying a ?slug= is redirected to the clean URL.
+function isLegacyStoryShell(){
+  if(query().get("slug")) return false;
+  return isLegacyStoryPath();
 }
 function currentPhotoId(){
   const parts = location.pathname.replace(/\/$/, "").split("/").filter(Boolean);
@@ -215,6 +229,15 @@ async function hydrate(page){
     const slug = currentStorySlug() || data.stories?.[0]?.slug;
     const s = (data.stories||[]).find(x => x.slug === slug) || data.stories?.[0];
     if(!s) return;
+    // Old inbound links still carry a slug in the query on the legacy shell. That shell
+    // is pre-rendered with the generic stub, and hydration only binds interactivity — so
+    // the reader landed on "Return to stories" instead of the story they asked for. Send
+    // them to the clean URL (replace, so Back leaves the site rather than bouncing here
+    // again) instead of rendering the story at a second, noindexed address.
+    if(isLegacyStoryPath() && s.slug === slug){
+      location.replace(`${root()}stories/${encodeURIComponent(s.slug)}/`);
+      return;
+    }
     bindShareControls();
     bindLightbox(data, () => withContext(data, storyPhotos(data, s), { currentStory: s.slug }));
   }else if(page === "stories"){
@@ -563,7 +586,7 @@ async function boot(){
       return;
     }
     const data = await loadContent();
-    document.title = data.site.siteTitle || data.site.ownerName || "Photo Blog";
+    document.title = brandName(data);
     const app = $("#app");
     app.insertAdjacentHTML("beforebegin", header(data));
     $("#footer").innerHTML = footer(data);
@@ -749,7 +772,11 @@ function bindStoryFilters(){
       card.hidden = !show;
       if(show) visible += 1;
     });
-    if(count) count.textContent = `${visible} of ${cards.length} stories`;
+    // Same wording rule as the gallery counter: the plain total while nothing is
+    // narrowing the list. The pre-rendered markup says "9 stories", so hydration was
+    // rewriting it to "9 of 9 stories" on every load — a visible flicker, and a count
+    // phrased as if a filter were active when none is.
+    if(count) count.textContent = active === "all" && !activeQuery ? `${visible} stories` : `${visible} of ${cards.length} stories`;
     if(empty) empty.hidden = visible !== 0;
     if(reset) reset.disabled = active === "all" && !activeQuery;
     // The "Featured story" highlight only makes sense in the browse-all view —
@@ -886,12 +913,21 @@ function bindLightbox(data, getVisiblePhotos){
   // not a ?photo= deep link). hide() has to pop that entry instead of replacing it.
   let pushedEntry = false;
   let hiddenBackground = [];
+  // The saved "what was aria-hidden before we touched it" value is an ABSENCE as often
+  // as a string, so presence in dataset — not truthiness — decides whether it is already
+  // recorded. Testing the value instead meant the common case (no aria-hidden at all,
+  // saved as "") looked unsaved, and the second call re-read the "true" this very
+  // function had just written. open() runs on every arrow-key step, so browsing two
+  // photos and closing left the header, the footer and <main> permanently
+  // aria-hidden="true" — the whole page silently gone for a screen reader.
+  // Guard the whole enter path too: re-hiding an already-hidden background is a no-op.
   const setBackgroundInert = hidden => {
     if(hidden){
+      if(hiddenBackground.length) return;
       const siblings = rootEl.parentElement ? [...rootEl.parentElement.children].filter(node => node !== rootEl) : [];
       hiddenBackground = [$(".site-header"), $("#footer"), ...siblings].filter(Boolean);
       hiddenBackground.forEach(node => {
-        if(!node.dataset.lightboxAriaHidden) node.dataset.lightboxAriaHidden = node.getAttribute("aria-hidden") || "";
+        if(!("lightboxAriaHidden" in node.dataset)) node.dataset.lightboxAriaHidden = node.getAttribute("aria-hidden") || "";
         node.setAttribute("aria-hidden", "true");
         if("inert" in node) node.inert = true;
       });
@@ -978,11 +1014,16 @@ function bindLightbox(data, getVisiblePhotos){
     const currentIndex = visible.findIndex(item => item.id === p.id);
     if(position) position.textContent = currentIndex >= 0 ? `${currentIndex + 1} of ${visible.length}` : "";
     setStatus("");
+    const wasClosed = box.hidden;
     setBackgroundInert(true);
     box.hidden = false;
     document.body.classList.add("has-lightbox");
     setUrlParam("photo", p.id, mode);
-    close.focus();
+    // Focus moves into the dialog only when it OPENS. step() re-enters here for every
+    // arrow key and every Prev/Next press: focusing close each time yanked focus off the
+    // Next button mid-sequence, so a keyboard reader had to tab back to it after each
+    // photo. The live-region position line already announces the change.
+    if(wasClosed) close.focus();
   };
   // DOM-only close, shared by the close button and the popstate handler.
   const teardown = () => {
