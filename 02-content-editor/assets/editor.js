@@ -540,7 +540,14 @@
   }
   async function loadImages(){
     for(const u of state.imageUrls.values()) URL.revokeObjectURL(u);state.imageUrls.clear();
-    let dir;try{dir=await getDir(state.websiteHandle,["assets","images","photos"],false);}catch(e){throw new Error("assets/images/photos klasörü bulunamadı.");}
+    // The originals folder is OPTIONAL here. assets/images/photos/ is gitignored, so a
+    // fresh clone — or this machine before the photo backup is restored — simply does not
+    // have it, and throwing meant the editor refused to connect AT ALL: no text edits, no
+    // story work, nothing, on a checkout where every thumbnail below would have rendered
+    // fine from the committed generated variants. `dir` is only ever the fallback for a
+    // photo whose variant has not been generated yet, and that read is already wrapped in
+    // a swallowing try/catch, so a missing folder costs nothing but those previews.
+    let dir=null;try{dir=await getDir(state.websiteHandle,["assets","images","photos"],false);}catch(e){}
     for(const p of state.content.photos){
       const name=filenameOf(p.src);if(!name)continue;
       // Display thumbnails come from the generated 480px variant, never the original.
@@ -553,6 +560,7 @@
         try{const fh=await getFile(state.websiteHandle,thumb.split("/"));const file=await fh.getFile();
           state.imageUrls.set(name,URL.createObjectURL(file));continue;}catch(e){}
       }
+      if(!dir)continue;
       try{const fh=await dir.getFileHandle(name);const file=await fh.getFile();state.imageUrls.set(name,URL.createObjectURL(file));}catch(e){}
     }
   }

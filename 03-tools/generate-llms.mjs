@@ -11,7 +11,12 @@ const data = JSON.parse(fs.readFileSync(path.join(websiteDir, "assets/data/site-
 const base = String(data.site?.baseUrl || "https://sweden-journal.com").replace(/\/+$/, "");
 const owner = data.site?.ownerName || "Sweden Journal";
 const desc = (data.site?.description || "").replace(/\s+/g, " ").trim();
-const stories = (data.stories || []).filter((s) => s.slug && s.title);
+// Newest first, the order the Stories archive, the feed, the sitemap and prev/next all
+// walk. This listing was the last surface still emitting raw authoring order, so an LLM
+// reading llms.txt saw a different "latest" story than every other machine-readable view
+// of the same journal. filter() already copied the array, so data.stories is untouched.
+const stories = (data.stories || []).filter((s) => s.slug && s.title)
+  .sort((a, b) => String(b.isoDate || b.date || "").localeCompare(String(a.isoDate || a.date || "")));
 // Same "live" rule as the build (render-site liveCollectionSlugs): a collection whose
 // photoIds all point at deleted photos gets no page, so it must not be linked here.
 const photoIds = new Set((data.photos || []).map((p) => p.id));
