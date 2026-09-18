@@ -6,7 +6,7 @@ import {
   photoStory, photoCollection,
   websiteLdObject, imageGalleryLdObject, personLdObject, articleLdObject, photoLdObject, collectionLdObject, fullVariantDims,
   brandName,
-} from "./templates.mjs?v=2c68c4ddd1";
+} from "./templates.mjs?v=ce61b99307";
 
 // Cache-bust the runtime content fetches. /assets/data/*.json is served with a long
 // edge cache (the host ignores _headers), so without a content-versioned URL a freshly
@@ -701,7 +701,10 @@ function renderStory(data){
   bindLightbox(data, () => withContext(data, storyPhotos(data, s), { currentStory: s.slug }));
 }
 function bindScrollReveal(){const els=[...document.querySelectorAll(".photo-card,.story-card,.related-photos .photo-card,.story-inline-photo,.story-body > p,.story-body > h2,.story-body > blockquote")];if(typeof IntersectionObserver==="undefined"){els.forEach(el=>el.classList.add("revealed"));return;}const io=new IntersectionObserver((entries)=>{let i=0;entries.forEach(e=>{if(!e.isIntersecting)return;const el=e.target;const delay=Math.min(i,6)*55;i++;if(delay){el.style.transitionDelay=delay+"ms";setTimeout(()=>{el.style.transitionDelay="";},delay+650);}el.classList.add("revealed");io.unobserve(el);});},{threshold:0.08,rootMargin:"0px 0px -40px 0px"});els.forEach(el=>{if(!el.classList.contains("revealed"))io.observe(el);});}
-function bindImageLoadFade(){const sel=".photo-media img,.story-card-media img,.featured-story-media img,.story-inline-img,.hero-img,.about-img,.story-hero img";document.querySelectorAll(sel).forEach(img=>{if(img.complete&&img.naturalWidth){img.classList.add("img-loaded");return;}img.classList.add("img-loading");const done=()=>{img.classList.remove("img-loading");img.classList.add("img-loaded");};img.addEventListener("load",done,{once:true});img.addEventListener("error",done,{once:true});});}
+// Only the images no scroll reveal covers — a card that is already being faded in by
+// bindScrollReveal must not run a second fade of its own. Keep this selector in step
+// with the .img-loading rule in site.css.
+function bindImageLoadFade(){const sel=".featured-story-media img,.hero-img,.about-img,.story-hero img";document.querySelectorAll(sel).forEach(img=>{if(img.complete&&img.naturalWidth){img.classList.add("img-loaded");return;}img.classList.add("img-loading");const done=()=>{img.classList.remove("img-loading");img.classList.add("img-loaded");};img.addEventListener("load",done,{once:true});img.addEventListener("error",done,{once:true});});}
 // Photo masonry via CSS Grid row-span. Each card is given a --masonry-span so
 // it occupies ceil((height + gap) / rowUnit) fine grid rows; with align-items:start
 // the columns then stack independently (true masonry) without CSS multi-column,

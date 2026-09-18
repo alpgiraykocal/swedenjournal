@@ -170,7 +170,12 @@ export function photoFigure(p, options = {}) {
   // The link also lets cmd/middle-click open the photo page in a new tab. site.js intercepts
   // the plain left click and opens the lightbox instead, so the on-page UX is unchanged.
   const trigger = opts.interactive ? `<a class="photo-open" href="${photoHref(p.id)}" data-open-photo="${esc(p.id)}" aria-label="Open ${esc(p.title)}"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M10 2h4v4M14 2l-5 5M6 14H2v-4M2 14l5-5"/></svg></a>` : "";
-  return `<figure class="photo-card ${p.featured ? "featured" : ""}" data-photo-id="${esc(p.id)}" data-category="${esc(p.category || "")}" data-tags="${esc((p.tags || []).join("|"))}" data-theme="${esc(p.theme || "")}"><div class="photo-media"${mediaRatioStyle(p)}>${responsiveImage(p, { priority: opts.priority, eager: opts.eager, sizes: opts.sizes || "(max-width: 560px) calc(100vw - 24px), (max-width: 900px) 50vw, 380px" })}${trigger}</div><figcaption><strong>${esc(p.title)}</strong>${p.location ? ` — ${esc(p.location)}` : ""}${p.caption ? `<br>${esc(p.caption)}` : ""}${opts.story && opts.story.slug ? `<a class="photo-story-link" href="${storyHref(opts.story.slug)}">From the story: ${esc(opts.story.title)} <span aria-hidden="true">→</span></a>` : ""}</figcaption></figure>`;
+  // The description sits in its own element rather than after a <br>: the grid clamps it
+  // to two lines (.photo-caption-text), which it cannot do while the text shares a box
+  // with the title. Nothing is lost — the full caption is in the lightbox and on the
+  // photo page. Card heights stop varying by 4-6 lines of prose, which is what made the
+  // masonry read as ragged rather than composed, and the photographs lead again.
+  return `<figure class="photo-card ${p.featured ? "featured" : ""}" data-photo-id="${esc(p.id)}" data-category="${esc(p.category || "")}" data-tags="${esc((p.tags || []).join("|"))}" data-theme="${esc(p.theme || "")}"><div class="photo-media"${mediaRatioStyle(p)}>${responsiveImage(p, { priority: opts.priority, eager: opts.eager, sizes: opts.sizes || "(max-width: 560px) calc(100vw - 24px), (max-width: 900px) 50vw, 380px" })}${trigger}</div><figcaption><strong>${esc(p.title)}</strong>${p.location ? ` — ${esc(p.location)}` : ""}${p.caption ? `<span class="photo-caption-text">${esc(p.caption)}</span>` : ""}${opts.story && opts.story.slug ? `<a class="photo-story-link" href="${storyHref(opts.story.slug)}">From the story: ${esc(opts.story.title)} <span aria-hidden="true">→</span></a>` : ""}</figcaption></figure>`;
 }
 export function blockHtmlInteractive(data, block) {
   if (!block) return "";
