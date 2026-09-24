@@ -6,7 +6,7 @@ import {
   photoStory, photoCollection,
   websiteLdObject, imageGalleryLdObject, personLdObject, articleLdObject, photoLdObject, collectionLdObject, fullVariantDims,
   brandName,
-} from "./templates.mjs?v=ce61b99307";
+} from "./templates.mjs?v=d5ad7e7c37";
 
 // Cache-bust the runtime content fetches. /assets/data/*.json is served with a long
 // edge cache (the host ignores _headers), so without a content-versioned URL a freshly
@@ -493,8 +493,17 @@ function initMap(elId, dataId){
       m.on("mouseout", () => setActive(null));
       m.on("popupopen", () => {
         setActive(m._slug);
+        // Scroll the place list only. scrollIntoView() also scrolls every ancestor, so a
+        // popup opening (the ?place= deep link opens one on load) dragged the whole page
+        // down and cut off the atlas headline. On the stacked mobile layout the list is
+        // not a scroll box at all, and jumping the page past the map there is worse.
         const card = cards.find(c => c.dataset.placeSlug === m._slug);
-        if(card && card.scrollIntoView) card.scrollIntoView({ block:"nearest", behavior: reduce ? "auto" : "smooth" });
+        const list = card && card.closest("ul");
+        if(card && list && list.scrollHeight > list.clientHeight){
+          const cr = card.getBoundingClientRect(), lr = list.getBoundingClientRect();
+          const delta = cr.top < lr.top ? cr.top - lr.top : cr.bottom > lr.bottom ? cr.bottom - lr.bottom : 0;
+          if(delta) list.scrollBy({ top: delta, behavior: reduce ? "auto" : "smooth" });
+        }
       });
       m.on("popupclose", () => setActive(null));
     });
