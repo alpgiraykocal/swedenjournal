@@ -323,27 +323,74 @@ export function storiesMain(data) {
   const mapSection = mapStories.length ? `<section class="section stories-map-cta"><div class="container"><a class="atlas-cta" href="${root()}atlas/index.html"><span class="atlas-cta-copy"><p class="eyebrow">Explore by place</p><h2>Open the atlas</h2><p class="muted">See every story mapped to where it happened — wander the journal geographically.</p></span><span class="atlas-cta-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a></div></section>` : "";
   return `<main><section class="hero container"><p class="eyebrow">${esc(sp.eyebrow)}</p><h1 class="headline">${esc(sp.headline)}</h1><p class="intro">${esc(sp.intro)}</p></section>${featured ? `<section class="section featured-story-section"><div class="container"><div class="section-head"><div><p class="eyebrow">${esc(sp.featuredLabel || "Featured story")}</p><h2>${esc(featured.title)}</h2></div><a class="text-link" href="${storyHref(featured.slug)}">Read featured</a></div>${featuredStoryBlock(data, featured)}</div></section>` : ""}${mapSection}<section class="section stories-section"><div class="container"><div class="gallery-toolbar story-toolbar"><div><p class="eyebrow">${esc(sp.categoryLabel || "Browse by category")}</p><input type="search" id="storySearch" class="site-search" placeholder="Search stories…" aria-label="Search stories by title, place, or tag" autocomplete="off"><div class="filters" role="group" aria-label="Story categories">${categories.map((category, i) => `<button class="filter story-filter ${i === 0 ? "active" : ""}" data-story-filter="${esc(category)}" aria-pressed="${i === 0 ? "true" : "false"}">${esc(category)}</button>`).join("")}</div><p class="gallery-count" id="storyCount" aria-live="polite">${stories.length} stories</p></div><div class="story-controls"><div class="story-sort" role="group" aria-label="Sort stories"><span class="story-sort-label">Sort</span><button class="filter story-sort-btn active" type="button" data-story-sort="newest" aria-pressed="true">Newest</button><button class="filter story-sort-btn" type="button" data-story-sort="oldest" aria-pressed="false">Oldest</button></div><button class="filter-reset story-reset" type="button">Reset</button></div></div><div class="story-list">${byDate.map((s) => storyCard(data, s, !featured || s.slug !== featured.slug)).join("")}</div><div class="gallery-empty story-empty" id="storyEmpty" hidden><h2>No stories found.</h2><p class="muted">Reset the category filter to return to the archive.</p></div></div></section></main>`;
 }
+// ---- Atlas regions ----
+// The place list is grouped by region. A region is a named centre (atlasPage.regions in
+// the content, editable there) and every story or photograph joins the nearest centre
+// within that region's radius — so new content files itself with no extra field to fill
+// in. Anything outside every radius lands in "Elsewhere". No regions configured → one
+// ungrouped list, the way the atlas worked before.
+const toRad = (d) => d * Math.PI / 180;
+export function distanceKm(aLat, aLng, bLat, bLng) {
+  const h = Math.sin(toRad(bLat - aLat) / 2) ** 2 + Math.cos(toRad(aLat)) * Math.cos(toRad(bLat)) * Math.sin(toRad(bLng - aLng) / 2) ** 2;
+  return 12742 * Math.asin(Math.min(1, Math.sqrt(h)));
+}
+export const atlasRegions = (data) => (Array.isArray(data.atlasPage?.regions) ? data.atlasPage.regions : [])
+  .filter((r) => r && r.key && r.name && Number.isFinite(Number(r.lat)) && Number.isFinite(Number(r.lng)));
+export function regionFor(regions, lat, lng) {
+  let best = null, bestKm = Infinity;
+  for (const r of regions) {
+    const km = distanceKm(lat, lng, Number(r.lat), Number(r.lng));
+    const radius = Number(r.radiusKm) > 0 ? Number(r.radiusKm) : Infinity;
+    if (km <= radius && km < bestKm) { best = r; bestKm = km; }
+  }
+  return best;
+}
+const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
 export function atlasMain(data) {
   const ap = data.atlasPage || {};
+  const regions = atlasRegions(data);
+  const grouped = regions.length > 0;
+  const regionKey = (lat, lng) => (grouped ? regionFor(regions, lat, lng)?.key || "elsewhere" : "all");
+  const inStory = photoStoryMap(data);
   const mapStories = (data.stories || [])
     .filter((s) => s.coordinates && Number.isFinite(Number(s.coordinates.lat)) && Number.isFinite(Number(s.coordinates.lng)))
     .map((s) => {
       const hero = photo(data, s.heroPhotoId);
       const tw = Number(hero?.variants?.thumb?.width) || 480;
       const th = hero?.width && hero?.height ? Math.round(tw * Number(hero.height) / Number(hero.width)) : 0;
-      return { kind: "story", slug: s.slug, title: s.title, location: s.location || "", date: s.date || "", summary: s.summary || "", lat: Number(s.coordinates.lat), lng: Number(s.coordinates.lng), href: storyHref(s.slug), thumbW: tw, thumbH: th, thumb: variant(hero, "thumb", "jpeg") || imgPath(hero), alt: (hero && hero.alt) || s.title };
+      const lat = Number(s.coordinates.lat), lng = Number(s.coordinates.lng);
+      return { kind: "story", slug: s.slug, title: s.title, location: s.location || "", date: s.date || "", summary: s.summary || "", lat, lng, region: regionKey(lat, lng), href: storyHref(s.slug), thumbW: tw, thumbH: th, thumb: variant(hero, "thumb", "jpeg") || imgPath(hero), alt: (hero && hero.alt) || s.title };
     });
   // Photograph pins from camera GPS (exif.gps, extracted locally by backfill-exif).
-  // Rendered smaller than story pins; the place LIST stays stories-only so it reads
-  // as an index of essays, not a 40-item dump.
+  // `loose` marks the frames no story uses: they have no story pin to stand behind, so
+  // the list gives them a card of their own per region instead of leaving them findable
+  // only by zooming into the right corner of the map.
   const mapPhotos = photos(data)
     .filter((p) => p.exif?.gps && Number.isFinite(Number(p.exif.gps.lat)) && Number.isFinite(Number(p.exif.gps.lng)))
-    .map((p) => ({ kind: "photo", title: p.title || p.id, location: p.location || "", lat: Number(p.exif.gps.lat), lng: Number(p.exif.gps.lng), href: photoHref(p.id), thumb: variant(p, "thumb", "jpeg") || imgPath(p), alt: p.alt || p.title || "" }));
-  const places = mapStories.map((s) => `<li><a class="atlas-place" href="${s.href}" data-place-slug="${esc(s.slug)}"><span class="atlas-place-thumb">${s.thumb ? `<img src="${esc(s.thumb)}" alt=""${s.thumbH ? ` width="${s.thumbW}" height="${s.thumbH}"` : ""} loading="lazy">` : ""}</span><span class="atlas-place-copy"><span class="atlas-place-title">${esc(s.title)}</span>${metaText([s.location, s.date]) ? `<span class="meta">${esc(metaText([s.location, s.date]))}</span>` : ""}${s.summary ? `<span class="atlas-place-snippet">${esc(s.summary)}</span>` : ""}</span></a></li>`).join("");
+    .map((p) => {
+      const lat = Number(p.exif.gps.lat), lng = Number(p.exif.gps.lng);
+      return { kind: "photo", id: p.id, title: p.title || p.id, location: p.location || "", lat, lng, region: regionKey(lat, lng), story: inStory.get(p.id)?.slug || null, loose: !inStory.has(p.id), href: photoHref(p.id), thumb: variant(p, "thumb", "jpeg") || imgPath(p), alt: p.alt || p.title || "" };
+    });
+  const placeCard = (s) => `<li><a class="atlas-place" href="${s.href}" data-place-slug="${esc(s.slug)}" data-region="${esc(s.region)}"><span class="atlas-place-thumb">${s.thumb ? `<img src="${esc(s.thumb)}" alt=""${s.thumbH ? ` width="${s.thumbW}" height="${s.thumbH}"` : ""} loading="lazy">` : ""}</span><span class="atlas-place-copy"><span class="atlas-place-title">${esc(s.title)}</span>${metaText([s.location, s.date]) ? `<span class="meta">${esc(metaText([s.location, s.date]))}</span>` : ""}${s.summary ? `<span class="atlas-place-snippet">${esc(s.summary)}</span>` : ""}</span></a></li>`;
+  // Real links to every photo page — all of them, not a first few and a "+N": the card
+  // is the only guaranteed way to reach these frames without the map (no JS, basemap
+  // down) and the crawlable path to them. "Show on the map" is the JS extra on top.
+  const photoGroupCard = (key, name, list) => `<li><div class="atlas-place atlas-place--photos" data-photo-group="${esc(key)}" data-region="${esc(key)}"><span class="atlas-place-copy"><span class="atlas-place-title">${esc(grouped && key !== "elsewhere" ? `Photographs around ${name}` : "More photographs")}</span><span class="meta">${esc(plural(list.length, "photograph", "photographs"))} · not part of a story</span></span><span class="atlas-photo-strip">${list.map((p) => `<a href="${p.href}" title="${esc(p.title)}"><img src="${esc(p.thumb)}" alt="${esc(p.title)}" loading="lazy"></a>`).join("")}</span><button type="button" class="atlas-show" data-show-group="${esc(key)}" hidden>Show on the map</button></div></li>`;
+  const sections = [...regions.map((r) => ({ key: r.key, name: r.name })), { key: grouped ? "elsewhere" : "all", name: "Elsewhere" }]
+    .map(({ key, name }) => {
+      const st = mapStories.filter((s) => s.region === key);
+      const all = mapPhotos.filter((p) => p.region === key);
+      const loose = all.filter((p) => p.loose);
+      if (!st.length && !loose.length) return "";
+      const items = st.map(placeCard).join("") + (loose.length ? photoGroupCard(key, name, loose) : "");
+      if (!grouped) return `<section class="atlas-region" data-region="${esc(key)}"><ul>${items}</ul></section>`;
+      const meta = [st.length ? plural(st.length, "story", "stories") : "", all.length ? plural(all.length, "photograph", "photographs") : ""].filter(Boolean).join(" · ");
+      return `<section class="atlas-region" data-region="${esc(key)}" aria-labelledby="atlas-region-${esc(key)}"><div class="atlas-region-head"><h2 class="atlas-region-title" id="atlas-region-${esc(key)}">${esc(name)}</h2><span class="meta">${esc(meta)}</span><button type="button" class="atlas-show" data-show-region="${esc(key)}" hidden>Show on the map</button></div><ul>${items}</ul></section>`;
+    }).join("");
   const mapData = JSON.stringify([...mapStories, ...mapPhotos]).replace(/</g, "\\u003c");
-  const counts = `${mapStories.length} ${mapStories.length === 1 ? "place" : "places"}${mapPhotos.length ? ` · ${mapPhotos.length} photographs` : ""}`;
+  const counts = `${plural(mapStories.length, "place", "places")}${mapPhotos.length ? ` · ${mapPhotos.length} photographs` : ""}`;
   return `<main><section class="hero container atlas-hero"><p class="eyebrow">${esc(ap.eyebrow || "Explore by place")}</p><h1 class="headline">${esc(ap.headline || "An atlas of quiet places")}</h1><p class="intro">${esc(ap.intro || "Every story mapped to where it happened. Wander the journal geographically — or browse the places below.")}</p></section>
-  <section class="section atlas-section"><div class="container atlas-layout"><div class="atlas-map-wrap"><div id="atlasMap" class="stories-map atlas-map" role="region" aria-label="Map of story and photograph locations"></div><script type="application/json" id="atlas-map-data">${mapData}</script></div><nav class="atlas-places" aria-label="Places in the journal"><p class="eyebrow">${counts}</p><ul>${places}</ul></nav></div></section></main>`;
+  <section class="section atlas-section"><div class="container atlas-layout"><div class="atlas-map-wrap"><div id="atlasMap" class="stories-map atlas-map" role="region" aria-label="Map of story and photograph locations"></div><script type="application/json" id="atlas-map-data">${mapData}</script></div><nav class="atlas-places" aria-label="Places in the journal"><p class="eyebrow">${counts}</p><div class="atlas-regions">${sections}</div></nav></div></section></main>`;
 }
 export function collectionCard(data, col, opts = {}) {
   const cover = collectionPhotos(data, col)[0];

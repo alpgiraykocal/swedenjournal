@@ -881,7 +881,10 @@ body[data-page="gallery"] .container{overflow:hidden}
 
 /* Leaflet map surface (atlas page). Fixed height reserves space so the map never
    causes layout shift. */
-.stories-map{height:440px;border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow);background:var(--surface-strong)}
+/* isolation: Leaflet stacks its panes and controls at z-index 400-1000. Without a
+   stacking context of its own the map painted those over the sticky header (z-index 20)
+   whenever it scrolled underneath it. */
+.stories-map{height:440px;border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow);background:var(--surface-strong);isolation:isolate}
 /* Atlas page */
 .atlas-hero{padding-bottom:46px}
 .atlas-layout{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(280px,.85fr);gap:30px;align-items:start}
@@ -897,6 +900,25 @@ body[data-page="gallery"] .container{overflow:hidden}
 .map-notice{position:absolute;left:50%;top:14px;transform:translateX(-50%);z-index:700;max-width:min(88%,340px);text-align:center;background:var(--paper);color:var(--text-soft);border:1px solid var(--line-strong);border-radius:12px;padding:9px 14px;font-size:12.5px;line-height:1.4;box-shadow:var(--shadow);pointer-events:none}
 .atlas-places .eyebrow{margin:0 0 16px}
 .atlas-places ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+/* Region groups in the place list. The heading row carries the region name, its
+   counts and the JS-only "Show on the map" button. */
+.atlas-regions{display:grid;gap:24px}
+.atlas-region-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;margin:0 0 10px}
+.atlas-region-title{font-family:var(--serif);font-size:1.35rem;line-height:1.15;letter-spacing:-.01em;margin:0}
+.atlas-region-head .meta{font-size:11px}
+.atlas-show{margin-left:auto;padding:0;border:0;background:none;color:var(--accent-cool);font:inherit;font-size:12px;font-weight:650;cursor:pointer;white-space:nowrap}
+.atlas-show:hover{text-decoration:underline}
+.atlas-show:focus-visible{outline:3px solid var(--focus);outline-offset:3px;border-radius:4px}
+/* Photographs that belong to no story, one card per region: a strip of real links to
+   the photo pages, so the card works without the map too. */
+.atlas-place.atlas-place--photos{grid-template-columns:minmax(0,1fr);gap:9px}
+.atlas-place.atlas-place--photos:hover{transform:none}
+.atlas-place--photos .atlas-show{margin-left:0;justify-self:start}
+.atlas-photo-strip{display:flex;flex-wrap:wrap;gap:6px}
+.atlas-photo-strip a{width:42px;height:42px;border-radius:9px;overflow:hidden;border:1px solid var(--hairline);background:var(--surface-strong);flex:0 0 auto}
+.atlas-photo-strip a:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.atlas-photo-strip img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .2s var(--ease)}
+.atlas-photo-strip a:hover img{transform:scale(1.07)}
 .atlas-place{display:grid;grid-template-columns:66px minmax(0,1fr);gap:13px;align-items:start;padding:11px;border:1px solid var(--line);border-radius:15px;background:var(--surface);transition:border-color .18s var(--ease),background .18s var(--ease),transform .28s var(--ease)}
 .atlas-place:hover{border-color:var(--line-strong);background:var(--paper);transform:translateY(-1px)}
 .atlas-place-thumb{width:66px;height:50px;border-radius:11px;overflow:hidden;background:var(--surface-strong);border:1px solid var(--hairline);flex-shrink:0}
@@ -912,8 +934,27 @@ body[data-page="gallery"] .container{overflow:hidden}
 .atlas-cta-arrow{flex-shrink:0;width:50px;height:50px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;border:1px solid var(--line-strong);color:var(--accent-cool);transition:background .18s var(--ease),color .18s var(--ease),border-color .18s var(--ease)}
 .atlas-cta-arrow svg{width:22px;height:22px}
 .atlas-cta:hover .atlas-cta-arrow{background:var(--accent-cool);color:var(--accent-ink);border-color:var(--accent-cool)}
-@media(min-width:851px){.atlas-places{display:flex;flex-direction:column;max-height:min(70vh,600px)}.atlas-places ul{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding-right:7px;scrollbar-width:thin;scrollbar-color:var(--line-strong) transparent}.atlas-places ul::-webkit-scrollbar{width:8px}.atlas-places ul::-webkit-scrollbar-thumb{background:var(--line-strong);border-radius:999px}.atlas-places ul::-webkit-scrollbar-track{background:transparent}}
+@media(min-width:851px){.atlas-places{display:flex;flex-direction:column;max-height:min(70vh,600px)}.atlas-regions{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding-right:7px;scrollbar-width:thin;scrollbar-color:var(--line-strong) transparent}.atlas-regions::-webkit-scrollbar{width:8px}.atlas-regions::-webkit-scrollbar-thumb{background:var(--line-strong);border-radius:999px}.atlas-regions::-webkit-scrollbar-track{background:transparent}}
 @media(max-width:850px){.atlas-layout{grid-template-columns:1fr;gap:24px}.atlas-map{height:54vh}}
+/* Phones and narrow tablets: the place list becomes one horizontal, snapping card strip
+   directly under the map (site.js pans the map to whichever card the swipe settles on).
+   Each region stays a real <section>/<ul> — only laid out in a row — so the list keeps
+   its structure for screen readers; the region heading becomes a narrow label card. */
+@media(max-width:850px){
+  /* minmax(0,…) + min-width:0: a grid item defaults to min-width:auto, which let the
+     strip's full width (every card side by side) size the column and scroll the page. */
+  .atlas-layout{grid-template-columns:minmax(0,1fr);gap:16px}
+  .atlas-places{min-width:0}
+  .atlas-regions{display:flex;gap:12px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;padding:2px 2px 12px;scrollbar-width:none}
+  .atlas-regions::-webkit-scrollbar{display:none}
+  .atlas-region{display:flex;gap:12px;flex:0 0 auto}
+  .atlas-region > ul{display:flex;gap:12px}
+  .atlas-region > ul > li{display:flex;flex:0 0 min(78vw,300px);scroll-snap-align:center}
+  .atlas-region > ul > li > .atlas-place{flex:1 1 auto}
+  .atlas-region-head{flex:0 0 136px;flex-direction:column;align-items:flex-start;justify-content:center;gap:6px;margin:0;padding:14px;border:1px dashed var(--line-strong);border-radius:15px;scroll-snap-align:start}
+  .atlas-region-head .atlas-show{margin-left:0}
+  .atlas-place:hover{transform:none}
+}
 /* .stories-map.atlas-map (not bare .atlas-map): the atlas map element carries both
    classes, and the later stories-page rule `.stories-map{height:320px}` (same 560px
    media block below) ties on specificity — without the double class it wins on source
@@ -929,6 +970,10 @@ body[data-page="gallery"] .container{overflow:hidden}
 .map-pin--active img{transform:scale(1.3);border-color:var(--accent-cool);box-shadow:0 8px 26px rgba(31,29,25,.55)}
 /* Photograph pins: smaller and lighter than story pins so essays stay the map's anchors. */
 .leaflet-marker-icon.map-pin--photo img,.map-pin--photo img{width:34px!important;height:34px!important;border-width:2px}
+/* Low-zoom photograph clusters, and the count a story pin carries for the photographs
+   around it at that zoom (site.js recluster). */
+.leaflet-marker-icon.map-pin--cluster img{width:44px!important;height:44px!important;border-width:2px;box-shadow:4px -4px 0 -1px var(--paper),4px -4px 0 0 var(--line-strong),0 4px 14px rgba(31,29,25,.4)}
+.map-pin-count{position:absolute;top:-5px;right:-7px;min-width:22px;height:22px;padding:0 6px;border-radius:999px;background:var(--accent-cool);color:var(--accent-ink);border:2px solid var(--paper);font:700 11px/18px var(--sans);text-align:center;box-shadow:0 2px 6px rgba(31,29,25,.35);pointer-events:none}
 .atlas-place.is-active{border-color:var(--line-strong);background:var(--paper);transform:translateY(-1px)}
 .map-recenter{width:34px;height:34px;display:flex;align-items:center;justify-content:center;background:var(--paper);border:1px solid var(--line-strong);border-radius:9px;cursor:pointer;font-size:17px;line-height:1;color:var(--text);box-shadow:0 2px 7px rgba(31,29,25,.2)}
 .map-chips{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
@@ -938,8 +983,6 @@ body[data-page="gallery"] .container{overflow:hidden}
 .map-chip-count{color:var(--muted);font-weight:600}
 .map-chip.is-off{opacity:.55}
 .map-chip.is-off .map-chip-count{text-decoration:line-through}
-.map-chip-hint{display:none;color:var(--muted);font-weight:500}
-.map-chip.is-gated .map-chip-hint{display:inline}
 .map-recenter:hover{background:var(--surface)}
 .map-recenter:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
 /* Map controls are mouse-precision sized by default (Leaflet zoom 30px, recenter
@@ -966,6 +1009,9 @@ body[data-page="gallery"] .container{overflow:hidden}
 .map-popup-snippet{font-size:12px;color:var(--muted);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .map-popup-cta{font-size:12px;font-weight:600;color:var(--accent-cool);margin-top:5px}
 .map-popup:hover .map-popup-cta{text-decoration:underline}
+.map-popup-zoom{display:block;width:100%;padding:9px 13px;border:0;border-top:1px solid var(--line);background:var(--surface);color:var(--accent-cool);font:inherit;font-size:12px;font-weight:650;text-align:left;cursor:pointer}
+.map-popup-zoom:hover{background:var(--surface-strong)}
+.map-popup-zoom:focus-visible{outline:3px solid var(--focus);outline-offset:-3px}
 .story-map-link{display:inline-flex;align-items:center;gap:8px;margin-top:20px;color:var(--accent);font-weight:650;font-size:.92rem;text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:9px 15px;background:var(--surface);transition:border-color .18s var(--ease),background .18s var(--ease),transform .2s var(--ease)}
 .story-map-link:hover{border-color:var(--line-strong);background:var(--paper);transform:translateY(-1px)}
 .story-map-link:focus-visible{outline:3px solid var(--focus);outline-offset:2px}

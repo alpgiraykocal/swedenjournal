@@ -502,6 +502,31 @@ function checkPublicRuntime(baseDir) {
   }
 }
 
+// Atlas place list: every story with coordinates gets a card, and every photograph with
+// GPS that no story uses is linked from its region's photo card. Those loose frames
+// have no story pin to stand behind, so the list is the one place they are guaranteed
+// to be reachable from — a region-grouping regression would silently drop them.
+function checkAtlas(baseDir) {
+  const atlasPath = path.join(baseDir, "atlas", "index.html");
+  if (!exists(atlasPath)) return;
+  const html = read(atlasPath);
+  const content = readJson(path.join(baseDir, "assets", "data", "site-content.json"));
+  if (!content) return;
+  const placed = (content.stories || []).filter((s) => s.slug && s.coordinates && Number.isFinite(Number(s.coordinates.lat)) && Number.isFinite(Number(s.coordinates.lng)));
+  for (const s of placed) {
+    if (!html.includes(`data-place-slug="${s.slug}"`)) fail(`atlas/index.html is missing the place card for story: ${s.slug}`);
+  }
+  const used = new Set();
+  for (const s of content.stories || []) {
+    used.add(s.heroPhotoId);
+    for (const b of s.body || []) { if (b.photoId) used.add(b.photoId); for (const id of b.photoIds || []) used.add(id); }
+  }
+  for (const p of content.photos || []) {
+    if (!p.id || used.has(p.id) || !p.exif?.gps) continue;
+    if (!html.includes(`href="../photos/${encodeURIComponent(p.id)}/"`)) fail(`atlas/index.html place list does not link the photograph outside any story: ${p.id}`);
+  }
+}
+
 checkRootCleanliness();
 checkWorkspaceCleanliness();
 checkContent(websiteDir, { requireSourcePhotos: hasSourcePhotos });
@@ -519,6 +544,7 @@ checkAvifEfficiency(websiteDir);
 checkNoDuplicateCopyArtifacts(websiteDir);
 checkEditor();
 checkPublicRuntime(websiteDir);
+checkAtlas(websiteDir);
 
 // 04-upload-package is an optional, gitignored local artifact produced by
 // `npm run build:package`. The deployed site is 01-website-ready-to-upload

@@ -4068,5 +4068,44 @@
         "courtyard-of-rosersbergs-slott"
       ]
     }
-  ]
+  ],
+  "atlasPage": {
+    "regions": [
+      {
+        "key": "norrland",
+        "name": "Norrland",
+        "lat": 64.5,
+        "lng": 20,
+        "radiusKm": 500
+      },
+      {
+        "key": "stockholm-uppland",
+        "name": "Stockholm & Uppland",
+        "lat": 59.55,
+        "lng": 18,
+        "radiusKm": 90
+      },
+      {
+        "key": "malardalen",
+        "name": "Mälardalen",
+        "lat": 59.45,
+        "lng": 16.4,
+        "radiusKm": 90
+      },
+      {
+        "key": "west-coast",
+        "name": "Gothenburg & the West Coast",
+        "lat": 57.7,
+        "lng": 11.95,
+        "radiusKm": 120
+      },
+      {
+        "key": "skane",
+        "name": "Skåne",
+        "lat": 55.8,
+        "lng": 13.5,
+        "radiusKm": 130
+      }
+    ]
+  }
 }

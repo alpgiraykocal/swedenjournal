@@ -6,7 +6,7 @@ import {
   photoStory, photoCollection,
   websiteLdObject, imageGalleryLdObject, personLdObject, articleLdObject, photoLdObject, collectionLdObject, fullVariantDims,
   brandName,
-} from "./templates.mjs?v=d5ad7e7c37";
+} from "./templates.mjs?v=1713a05dae";
 
 // Cache-bust the runtime content fetches. /assets/data/*.json is served with a long
 // edge cache (the host ignores _headers), so without a content-versioned URL a freshly
@@ -291,6 +291,11 @@ function initMap(elId, dataId){
   const coarse = !!(window.matchMedia && window.matchMedia("(pointer: coarse)").matches);
   const themeDark = () => (document.documentElement.getAttribute("data-theme") || (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")) === "dark";
   const cards = Array.from(document.querySelectorAll(".atlas-place[data-place-slug]"));
+  const groupCards = Array.from(document.querySelectorAll(".atlas-place[data-photo-group]"));
+  const listEl = document.querySelector(".atlas-regions");
+  // Below 850px the place list is a horizontal card strip under the map (site.css), and
+  // the strip and the map follow each other: swiping to a card moves the map there.
+  const stripMq = window.matchMedia ? window.matchMedia("(max-width: 850px)") : { matches:false };
   // Deep-link target, read before the map starts loading: it also decides whether the
   // lazy-load gate below may be skipped (see the IntersectionObserver at the end).
   let focused = null;
@@ -361,35 +366,118 @@ function initMap(elId, dataId){
       });
     });
     const storyMarkers = [], photoMarkers = [];
-    const markers = stories.map(s => {
-      // Photograph pins (kind:"photo") render smaller and sit under story pins, so the
-      // essays stay the map's visual anchors even where shots cluster around them.
+    const popupOpts = { className:"map-popup-wrap", minWidth:230, maxWidth:260, autoPanPadding:[28,28] };
+    // Photograph pins (kind:"photo") render smaller and sit under story pins, so the
+    // essays stay the map's visual anchors even where shots cluster around them. Also
+    // used for a lone photograph at low zoom (see recluster), which needs its own marker
+    // object: the real one belongs to photoLayer and cannot be on the map twice.
+    const pinMarker = s => {
       const isPhoto = s.kind === "photo";
       const size = isPhoto ? 34 : 52;
       const icon = L.divIcon({ className:`map-pin${isPhoto ? " map-pin--photo" : ""}`, html:`<img src="${esc(s.thumb)}" alt="${esc(s.alt||s.title)}">`, iconSize:[size,size], iconAnchor:[size/2,size/2] });
       const m = L.marker([s.lat, s.lng], { icon, title:s.title, alt:s.title, riseOnHover:true, keyboard:true, zIndexOffset:isPhoto ? 0 : 200 });
+      m._point = s;
       m._slug = s.slug;
+      m._group = isPhoto && s.loose ? s.region : null;
       m._baseZ = isPhoto ? 0 : 200;
       m.bindTooltip(s.title, { direction:"top", offset:[0,-(size/2 + 2)] });
-      m.bindPopup(placePopupHtml(s), { className:"map-popup-wrap", minWidth:230, maxWidth:260, autoPanPadding:[28,28] });
+      m.bindPopup(placePopupHtml(s), popupOpts);
+      bindPin(m);
+      return m;
+    };
+    const markers = stories.map(s => {
+      const m = pinMarker(s);
       if(s.slug) bySlug.set(s.slug, m);
-      (isPhoto ? photoMarkers : storyMarkers).push(m);
+      (s.kind === "photo" ? photoMarkers : storyMarkers).push(m);
       return m;
     });
-    // Layered pins: story pins are always on; photo pins only join from PHOTO_MIN_ZOOM
-    // in, so the country view stays a readable index of essays (and the photo thumbs
-    // are not all fetched up front). The chips over the map let the reader toggle
-    // either layer; while the zoom gate holds the photo layer back, its chip shows a
-    // "zoom to see" hint instead of silently doing nothing.
+    // Layered pins: story pins are always on; individual photo pins join from
+    // PHOTO_MIN_ZOOM in, so the country view stays a readable index of essays. Below
+    // that zoom the photographs are summarised instead of hidden — hiding them left
+    // Stockholm, which has photographs but no story, looking empty at the default view.
+    // A story's own photographs become a count badge on its pin; every other photograph
+    // groups into numbered bubbles that zoom in when clicked. A bubble is never folded
+    // into a nearby story pin (at country zoom Stockholm sits on top of Sigtuna): it is
+    // nudged clear of the pin instead, so it stays visible and clickable.
     const PHOTO_MIN_ZOOM = 9;
+    const CLUSTER_PX = 46, CLEAR_PX = 48;
     const storyLayer = L.layerGroup(storyMarkers).addTo(map);
     const photoLayer = L.layerGroup(photoMarkers);
-    let storiesOn = true, photosOn = true, photoChip = null;
+    const clusterLayer = L.layerGroup().addTo(map);
+    let storiesOn = true, photosOn = true;
     const setLayerOn = (layer, on) => { if(on && !map.hasLayer(layer)) map.addLayer(layer); if(!on && map.hasLayer(layer)) map.removeLayer(layer); };
+    // Fit a set of markers. `minZoom` lets a photo group land at PHOTO_MIN_ZOOM, where
+    // its pins show individually; a cluster click always goes at least one level deeper.
+    const showMarkers = (list, { minZoom = 0, maxZoom = 15 } = {}) => {
+      if(!list.length) return;
+      const b = L.latLngBounds(list.map(m => m.getLatLng()));
+      const z = Math.max(minZoom, Math.min(maxZoom, map.getBoundsZoom(b.pad(0.25), false)));
+      map.setView(b.getCenter(), z, { animate:!reduce });
+      // On the stacked mobile layout the button sits below the map — bring the map back.
+      if(stripMq.matches) el.scrollIntoView({ block:"nearest", behavior: reduce ? "auto" : "smooth" });
+    };
+    const setStoryCount = (m, n) => {
+      if(m._photoCount === n) return;
+      m._photoCount = n;
+      const s = m._point;
+      m.setPopupContent(placePopupHtml(s) + (n ? `<button type="button" class="map-popup-zoom" data-zoom-in>See its ${n === 1 ? "photograph" : `${n} photographs`} on the map</button>` : ""));
+      paintStoryCount(m);
+    };
+    // The icon element is rebuilt whenever the marker re-enters the map (layer toggles),
+    // so the badge is repainted on `add` as well as on every recount.
+    const paintStoryCount = m => {
+      const node = m.getElement && m.getElement();
+      if(!node) return;
+      let badge = node.querySelector(".map-pin-count");
+      if(!m._photoCount){ badge?.remove(); return; }
+      if(!badge){ badge = document.createElement("span"); badge.className = "map-pin-count"; badge.setAttribute("aria-hidden", "true"); node.appendChild(badge); }
+      badge.textContent = m._photoCount;
+    };
+    storyMarkers.forEach(m => m.on("add", () => paintStoryCount(m)));
+    const clusterMarker = members => {
+      const lat = members.reduce((a, m) => a + m.getLatLng().lat, 0) / members.length;
+      const lng = members.reduce((a, m) => a + m.getLatLng().lng, 0) / members.length;
+      const label = `${members.length} photographs — zoom in`;
+      const icon = L.divIcon({ className:"map-pin map-pin--cluster", html:`<img src="${esc(members[0]._point.thumb)}" alt=""><span class="map-pin-count" aria-hidden="true">${members.length}</span>`, iconSize:[44,44], iconAnchor:[22,22] });
+      const c = L.marker([lat, lng], { icon, title:label, alt:label, riseOnHover:true, keyboard:true, zIndexOffset:100 });
+      c.bindTooltip(label, { direction:"top", offset:[0,-24] });
+      c.on("click", () => showMarkers(members, { minZoom: map.getZoom() + 1 }));
+      return c;
+    };
+    const recluster = () => {
+      clusterLayer.clearLayers();
+      const z = map.getZoom();
+      const counts = new Map();
+      if(photosOn && z < PHOTO_MIN_ZOOM){
+        const storyPts = storiesOn ? storyMarkers.map(m => ({ m, pt: map.project(m.getLatLng(), z) })) : [];
+        const groups = [];
+        photoMarkers.forEach(pm => {
+          const owner = storiesOn && pm._point.story ? bySlug.get(pm._point.story) : null;
+          if(owner){ counts.set(owner, (counts.get(owner) || 0) + 1); return; }
+          const pt = map.project(pm.getLatLng(), z);
+          let g = groups.find(x => x.pt.distanceTo(pt) <= CLUSTER_PX);
+          if(!g){ g = { pt, members: [] }; groups.push(g); }
+          g.members.push(pm);
+        });
+        groups.forEach(g => {
+          const c = g.members.length === 1 ? pinMarker(g.members[0]._point) : clusterMarker(g.members);
+          const at = map.project(c.getLatLng(), z);
+          let near = null, best = CLEAR_PX;
+          storyPts.forEach(sp => { const d = at.distanceTo(sp.pt); if(d < best){ best = d; near = sp; } });
+          if(near){
+            const v = at.subtract(near.pt), len = Math.hypot(v.x, v.y);
+            const dir = len > 0.5 ? v.divideBy(len) : L.point(0.8, 0.6);
+            c.setLatLng(map.unproject(near.pt.add(dir.multiplyBy(CLEAR_PX)), z));
+          }
+          clusterLayer.addLayer(c);
+        });
+      }
+      storyMarkers.forEach(m => setStoryCount(m, counts.get(m) || 0));
+    };
     const syncLayers = () => {
       setLayerOn(storyLayer, storiesOn);
       setLayerOn(photoLayer, photosOn && map.getZoom() >= PHOTO_MIN_ZOOM);
-      if(photoChip) photoChip.classList.toggle("is-gated", photosOn && map.getZoom() < PHOTO_MIN_ZOOM);
+      recluster();
     };
     map.on("zoomend", syncLayers);
     if(photoMarkers.length){
@@ -397,17 +485,17 @@ function initMap(elId, dataId){
         const wrap = L.DomUtil.create("div", "map-chips");
         L.DomEvent.disableClickPropagation(wrap);
         L.DomEvent.disableScrollPropagation(wrap);
-        const chip = (label, count, hint) => {
+        const chip = (label, count) => {
           const b = L.DomUtil.create("button", "map-chip", wrap);
           b.type = "button";
           b.setAttribute("aria-pressed", "true");
-          b.innerHTML = `${label}<span class="map-chip-count">${count}</span>${hint ? `<span class="map-chip-hint">zoom to see</span>` : ""}`;
+          b.innerHTML = `${label}<span class="map-chip-count">${count}</span>`;
           return b;
         };
-        const sb = chip("Stories", storyMarkers.length, false);
+        const sb = chip("Stories", storyMarkers.length);
         L.DomEvent.on(sb, "click", () => { storiesOn = !storiesOn; sb.setAttribute("aria-pressed", String(storiesOn)); sb.classList.toggle("is-off", !storiesOn); syncLayers(); });
-        photoChip = chip("Photographs", photoMarkers.length, true);
-        L.DomEvent.on(photoChip, "click", () => { photosOn = !photosOn; photoChip.setAttribute("aria-pressed", String(photosOn)); photoChip.classList.toggle("is-off", !photosOn); syncLayers(); });
+        const pb = chip("Photographs", photoMarkers.length);
+        L.DomEvent.on(pb, "click", () => { photosOn = !photosOn; pb.setAttribute("aria-pressed", String(photosOn)); pb.classList.toggle("is-off", !photosOn); syncLayers(); });
         return wrap;
       }});
       map.addControl(new Chips());
@@ -472,15 +560,58 @@ function initMap(elId, dataId){
     // taps anywhere else on the page — otherwise the first swipe after using the map
     // would pan it again instead of scrolling on.
     if(coarse) document.addEventListener("pointerdown", e => { if(!el.contains(e.target)) release(); }, { passive:true });
-    // Two-way highlight between the place list and the map pins.
-    const setActive = (slug) => {
+    // Two-way highlight between the place list and the map pins. `group` is a region's
+    // card of photographs that belong to no story; `groupPins` lights up that group's
+    // pins too (from the card), but not when the reader is on one of those pins already.
+    const setActive = (slug, group = null, groupPins = true) => {
       cards.forEach(c => c.classList.toggle("is-active", !!slug && c.dataset.placeSlug === slug));
+      groupCards.forEach(c => c.classList.toggle("is-active", !!group && c.dataset.photoGroup === group));
       markers.forEach(m => {
-        const ic = m.getElement && m.getElement(), on = !!slug && m._slug === slug;
+        const ic = m.getElement && m.getElement(), on = (!!slug && m._slug === slug) || (groupPins && !!group && m._group === group);
         if(ic) ic.classList.toggle("map-pin--active", on);
         if(m.setZIndexOffset) m.setZIndexOffset(on ? 1000 : (m._baseZ || 0)); // lift the active pin; restore the story-over-photo stacking after
       });
     };
+    // Bring a card into view inside the place list only. scrollIntoView() also scrolls
+    // every ancestor, so a popup opening (the ?place= deep link opens one on load)
+    // dragged the whole page down. Vertical on desktop, centred in the mobile strip.
+    let syncPausedUntil = 0;
+    const revealCard = card => {
+      if(!card || !listEl) return;
+      const cr = card.getBoundingClientRect(), lr = listEl.getBoundingClientRect();
+      const behavior = reduce ? "auto" : "smooth";
+      if(stripMq.matches){
+        const delta = (cr.left + cr.width / 2) - (lr.left + lr.width / 2);
+        // The strip follows the map here, so its scroll must not steer the map back.
+        if(Math.abs(delta) > 2){ syncPausedUntil = Date.now() + 900; listEl.scrollBy({ left: delta, behavior }); }
+      }else if(listEl.scrollHeight > listEl.clientHeight){
+        const delta = cr.top < lr.top ? cr.top - lr.top : cr.bottom > lr.bottom ? cr.bottom - lr.bottom : 0;
+        if(delta) listEl.scrollBy({ top: delta, behavior });
+      }
+    };
+    // Hoisted: pinMarker() binds every pin it makes, including the stand-ins recluster()
+    // creates for a lone photograph at low zoom. The handlers only run on user events,
+    // by which point everything they reference exists.
+    function bindPin(m){
+      m.on("mouseover", () => setActive(m._slug, m._group, false));
+      m.on("mouseout", () => setActive(null));
+      m.on("popupopen", () => {
+        setActive(m._slug, m._group, false);
+        revealCard(m._slug ? cards.find(c => c.dataset.placeSlug === m._slug) : groupCards.find(c => c.dataset.photoGroup === m._group));
+        // The popup container outlives its content (setStoryCount swaps the content on
+        // every zoom), so the "Show N photographs here" button is handled from there.
+        const node = m.getPopup() && m.getPopup().getElement();
+        if(node && !node._zoomBound){
+          node._zoomBound = true;
+          node.addEventListener("click", e => {
+            if(!e.target.closest("[data-zoom-in]")) return;
+            m.closePopup();
+            showMarkers([m, ...photoMarkers.filter(p => p._point.story === m._slug)], { minZoom: PHOTO_MIN_ZOOM });
+          });
+        }
+      });
+      m.on("popupclose", () => setActive(null));
+    }
     cards.forEach(card => {
       const slug = card.dataset.placeSlug, m = bySlug.get(slug);
       card.addEventListener("mouseenter", () => setActive(slug));
@@ -488,25 +619,54 @@ function initMap(elId, dataId){
       card.addEventListener("focus", () => { setActive(slug); if(m) map.panTo(m.getLatLng(), { animate:!reduce }); });
       card.addEventListener("blur", () => setActive(null));
     });
-    markers.forEach(m => {
-      m.on("mouseover", () => setActive(m._slug));
-      m.on("mouseout", () => setActive(null));
-      m.on("popupopen", () => {
-        setActive(m._slug);
-        // Scroll the place list only. scrollIntoView() also scrolls every ancestor, so a
-        // popup opening (the ?place= deep link opens one on load) dragged the whole page
-        // down and cut off the atlas headline. On the stacked mobile layout the list is
-        // not a scroll box at all, and jumping the page past the map there is worse.
-        const card = cards.find(c => c.dataset.placeSlug === m._slug);
-        const list = card && card.closest("ul");
-        if(card && list && list.scrollHeight > list.clientHeight){
-          const cr = card.getBoundingClientRect(), lr = list.getBoundingClientRect();
-          const delta = cr.top < lr.top ? cr.top - lr.top : cr.bottom > lr.bottom ? cr.bottom - lr.bottom : 0;
-          if(delta) list.scrollBy({ top: delta, behavior: reduce ? "auto" : "smooth" });
-        }
-      });
-      m.on("popupclose", () => setActive(null));
+    groupCards.forEach(card => {
+      const key = card.dataset.photoGroup;
+      card.addEventListener("mouseenter", () => setActive(null, key));
+      card.addEventListener("mouseleave", () => setActive(null));
     });
+    // "Show on the map" buttons ship hidden: without a working map they would do nothing.
+    // Pins re-render when their layer joins the map, so the group highlight is applied
+    // once the view has moved, not before.
+    document.querySelectorAll("[data-show-group]").forEach(b => {
+      b.hidden = false;
+      b.addEventListener("click", () => {
+        const key = b.dataset.showGroup;
+        map.once("moveend", () => setActive(null, key));
+        showMarkers(photoMarkers.filter(m => m._group === key), { minZoom: PHOTO_MIN_ZOOM });
+      });
+    });
+    document.querySelectorAll("[data-show-region]").forEach(b => {
+      b.hidden = false;
+      b.addEventListener("click", () => showMarkers(markers.filter(m => m._point.region === b.dataset.showRegion), { maxZoom: 11 }));
+    });
+    // Mobile strip → map: when a swipe settles, the card nearest the centre of the strip
+    // drives the map (pan to the story, or to the group's photographs) and lights its pin.
+    if(listEl){
+      let t = 0;
+      listEl.addEventListener("scroll", () => {
+        if(!stripMq.matches) return;
+        clearTimeout(t);
+        t = setTimeout(() => {
+          if(Date.now() < syncPausedUntil) return;
+          const lr = listEl.getBoundingClientRect(), mid = lr.left + lr.width / 2;
+          let best = null, bestD = Infinity;
+          listEl.querySelectorAll(".atlas-place").forEach(c => {
+            const r = c.getBoundingClientRect(), d = Math.abs(r.left + r.width / 2 - mid);
+            if(d < bestD){ bestD = d; best = c; }
+          });
+          if(!best) return;
+          if(best.dataset.placeSlug){
+            const m = bySlug.get(best.dataset.placeSlug);
+            setActive(best.dataset.placeSlug);
+            if(m) map.panTo(m.getLatLng(), { animate:!reduce });
+          }else if(best.dataset.photoGroup){
+            const list = photoMarkers.filter(m => m._group === best.dataset.photoGroup);
+            setActive(null, best.dataset.photoGroup);
+            if(list.length) map.panTo(L.latLngBounds(list.map(m => m.getLatLng())).getCenter(), { animate:!reduce });
+          }
+        }, 160);
+      }, { passive:true });
+    }
   }).catch(() => failMap("The map could not be loaded — the list of places still works."));
   // Lazily started so the tiles and pin thumbnails are not fetched for a reader who
   // never scrolls this far — but a reader arriving on ?place=<slug> is here FOR the map
